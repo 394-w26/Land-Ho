@@ -973,6 +973,11 @@
   max-width: 1400px;
   margin: 0 auto;
   padding: 18px 20px 24px;
+  height: 100vh;
+  display: grid;
+  grid-template-rows: auto auto auto 1fr;
+  gap: 0;
+  overflow: hidden;
 }
 
 .mapTopBar {
@@ -1002,11 +1007,13 @@
   display: grid;
   grid-template-columns: 55% 45%;
   gap: 14px;
-  min-height: calc(100vh - 230px);
+  min-height: 0;
+  height: 100%;
 }
 
 .mapPanel {
-  min-height: 620px;
+  min-height: 0;
+  height: 100%;
   border-radius: 16px;
   overflow: hidden;
   border: 1px solid #e5e7eb;
@@ -1057,7 +1064,8 @@
 }
 
 .mapListPanel {
-  min-height: 620px;
+  min-height: 0;
+  height: 100%;
   border: 1px solid #e5e7eb;
   border-radius: 16px;
   padding: 12px;
@@ -1153,14 +1161,49 @@
 }
 
 .mapCardList {
-  overflow: auto;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
   padding-right: 4px;
-  display: grid;
+  display: flex;
+  flex-direction: column;
   gap: 12px;
 }
 
 .mapCard {
   border: 1px solid #ececec;
+  padding: 8px;
+  border-radius: 12px;
+  flex: 0 0 auto;
+  height: 248px;
+  display: grid;
+  grid-template-rows: 138px 1fr;
+  overflow: hidden;
+}
+
+.mapCard .cardImageWrap {
+  height: 138px;
+  overflow: hidden;
+}
+
+.mapCard .cardImage {
+  aspect-ratio: auto;
+  width: 100%;
+  height: 100%;
+  border-radius: 10px;
+}
+
+.mapCard .cardBody {
+  padding: 8px 2px 2px;
+  overflow: hidden;
+}
+
+.mapCard .cardBody p,
+.mapCard .cardBody h3 {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .mapCard.active {
@@ -1196,15 +1239,18 @@
 
   .mapLayout {
     grid-template-columns: 1fr;
-    min-height: auto;
+    min-height: 0;
+    height: 100%;
   }
 
   .mapPanel {
-    min-height: 440px;
+    min-height: 260px;
+    height: 50vh;
   }
 
   .mapListPanel {
-    min-height: 420px;
+    min-height: 260px;
+    height: auto;
   }
 }
 
@@ -1254,6 +1300,9 @@
 
   .mapPage {
     padding: 12px;
+    height: auto;
+    overflow: visible;
+    display: block;
   }
 }
 

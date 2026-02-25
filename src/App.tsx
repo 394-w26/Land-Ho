@@ -442,7 +442,7 @@ function MarketplacePage() {
   }, [activeRequestBoatId, viewer])
 
   const loginWithGoogle = async () => {
-    if (!auth || !isFirebaseReady) {
+    if (!auth || !isFirebaseReady || !googleProvider) {
       setAuthError('Please configure Firebase environment variables before Google sign-in.')
       return false
     }

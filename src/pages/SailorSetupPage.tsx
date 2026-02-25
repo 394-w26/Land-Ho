@@ -51,7 +51,7 @@ function SailorSetupPage() {
   const [signingIn, setSigningIn] = useState(false)
 
   const handleSignIn = async () => {
-    if (!auth || !isFirebaseReady) {
+    if (!auth || !isFirebaseReady || !googleProvider) {
       setNotice('Firebase is not configured. Please set up environment variables.')
       return
     }
