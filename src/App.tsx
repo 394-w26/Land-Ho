@@ -1667,7 +1667,15 @@ function MarketplacePage() {
             onChange={(e) => setSeatFilter(e.target.value)}
           />
         </div>
-        <button className="searchBtn">Search</button>
+        <button type="button" className="searchBtn searchBtn--icon" aria-label="Search">
+          <span className="searchBtnText">Search</span>
+          <span className="searchBtnIcon" aria-hidden>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="11" cy="11" r="8" />
+              <path d="m21 21-4.35-4.35" />
+            </svg>
+          </span>
+        </button>
       </section>
 
       <section className="categoryTabs">
