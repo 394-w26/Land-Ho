@@ -1,7 +1,7 @@
 import { useEffect, useState, type ChangeEvent } from 'react'
-import { onAuthStateChanged, type User } from 'firebase/auth'
+import { onAuthStateChanged, signInWithPopup, type User } from 'firebase/auth'
 import { useNavigate } from 'react-router-dom'
-import { auth, isFirebaseReady } from '../lib/firebase'
+import { auth, googleProvider, isFirebaseReady } from '../lib/firebase'
 import { uploadImageToStorage } from '../lib/storage'
 import {
   getSailorProfile,
@@ -48,6 +48,23 @@ function SailorSetupPage() {
   const [notice, setNotice] = useState('')
   const [saving, setSaving] = useState(false)
   const [uploading, setUploading] = useState(false)
+  const [signingIn, setSigningIn] = useState(false)
+
+  const handleSignIn = async () => {
+    if (!auth || !isFirebaseReady) {
+      setNotice('Firebase is not configured. Please set up environment variables.')
+      return
+    }
+    setSigningIn(true)
+    setNotice('')
+    try {
+      await signInWithPopup(auth, googleProvider)
+    } catch {
+      setNotice('Sign-in failed. Please try again.')
+    } finally {
+      setSigningIn(false)
+    }
+  }
 
   /* baseline test state */
   const [testQuestions, setTestQuestions] = useState<BaselineQuestion[]>([])
@@ -213,8 +230,23 @@ function SailorSetupPage() {
   if (!viewer) {
     return (
       <div className="setupPage">
-        <p className="authNotice">Please sign in to set up your sailor profile.</p>
-        <button className="ghostBtn" onClick={() => navigate('/')}>Back to home</button>
+        <header className="topBar">
+          <div className="brand">
+            <img className="brandLogo" src="/logo.png" alt="Land Ho logo" />
+            <span>Sailor Setup</span>
+          </div>
+          <button className="ghostBtn" onClick={() => navigate('/')}>Back to home</button>
+        </header>
+        <section className="setupCard">
+          <h2>Sign in to get started</h2>
+          <p className="hintText">You need to sign in with Google before setting up your sailor profile.</p>
+          <div className="setupActions">
+            <button className="publishBtn" onClick={() => void handleSignIn()} disabled={signingIn}>
+              {signingIn ? 'Signing in…' : 'Sign in with Google'}
+            </button>
+          </div>
+          {notice && <p className="setupNotice">{notice}</p>}
+        </section>
       </div>
     )
   }

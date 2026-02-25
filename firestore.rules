@@ -1,0 +1,47 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ── Boats ──────────────────────────────────
+    match /boats/{boatId} {
+      allow read: if true;
+      allow create: if request.auth != null
+                    && request.resource.data.ownerUid == request.auth.uid;
+      allow update, delete: if request.auth != null
+                            && resource.data.ownerUid == request.auth.uid;
+    }
+
+    // ── Booking Requests ───────────────────────
+    match /bookingRequests/{requestId} {
+      allow read: if request.auth != null
+                  && (resource.data.hostUid == request.auth.uid
+                      || resource.data.applicantUid == request.auth.uid);
+      allow create: if request.auth != null
+                    && request.resource.data.applicantUid == request.auth.uid;
+      allow update: if request.auth != null
+                    && resource.data.hostUid == request.auth.uid;
+    }
+
+    // ── User Public Profiles ───────────────────
+    match /users/{uid} {
+      allow read: if true;
+      allow write: if request.auth != null
+                   && request.auth.uid == uid;
+    }
+
+    // ── Captain Onboarding Profiles ────────────
+    match /captainProfiles/{uid} {
+      allow read: if true;
+      allow write: if request.auth != null
+                   && request.auth.uid == uid;
+    }
+
+    // ── Sailor Onboarding Profiles ─────────────
+    match /sailorProfiles/{uid} {
+      allow read: if true;
+      allow write: if request.auth != null
+                   && request.auth.uid == uid;
+    }
+  }
+}
