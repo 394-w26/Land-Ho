@@ -290,6 +290,16 @@ function BoatDetailPage() {
           )}
         </article>
       </section>
+
+      <div className="detailStickyBar">
+        <div className="detailStickyPrice">
+          <span className="detailStickyAmount">$ {boat.price}</span>
+          <span className="detailStickyUnit"> / person</span>
+        </div>
+        <button className="publishBtn detailStickyReserve" onClick={() => void handleReserve()} disabled={reserveSubmitting}>
+          {reserveSubmitting ? 'Submitting...' : 'Reserve'}
+        </button>
+      </div>
     </div>
   )
 }

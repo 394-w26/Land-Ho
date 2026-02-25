@@ -165,6 +165,7 @@ const findCoordinatesForLocation = (locationText: string): BoatCoordinates => {
   return locationCoordinatesLookup[trimmed] ?? defaultCoordinates
 }
 
+/* Boat/sailing imagery only - Unsplash photos of sailboats, yachts, and boats on water */
 const initialBoatData: BoatCard[] = [
   {
     id: 'b1',
@@ -995,30 +996,32 @@ function MarketplacePage() {
         <section className="profileLayout">
           <aside className="profileNavCard">
             <h3>Personal Resume</h3>
-            <button
-              className={profileSection === 'basic' ? 'profileNavBtn active' : 'profileNavBtn'}
-              onClick={() => setProfileSection('basic')}
-            >
-              Basic Info
-            </button>
-            <button
-              className={profileSection === 'skills' ? 'profileNavBtn active' : 'profileNavBtn'}
-              onClick={() => setProfileSection('skills')}
-            >
-              Skills
-            </button>
-            <button
-              className={profileSection === 'experiences' ? 'profileNavBtn active' : 'profileNavBtn'}
-              onClick={() => setProfileSection('experiences')}
-            >
-              Experience
-            </button>
-            <button
-              className={profileSection === 'certificates' ? 'profileNavBtn active' : 'profileNavBtn'}
-              onClick={() => setProfileSection('certificates')}
-            >
-              Certificates
-            </button>
+            <div className="profileNavPills">
+              <button
+                className={profileSection === 'basic' ? 'profileNavBtn active' : 'profileNavBtn'}
+                onClick={() => setProfileSection('basic')}
+              >
+                Basic Info
+              </button>
+              <button
+                className={profileSection === 'skills' ? 'profileNavBtn active' : 'profileNavBtn'}
+                onClick={() => setProfileSection('skills')}
+              >
+                Skills
+              </button>
+              <button
+                className={profileSection === 'experiences' ? 'profileNavBtn active' : 'profileNavBtn'}
+                onClick={() => setProfileSection('experiences')}
+              >
+                Experience
+              </button>
+              <button
+                className={profileSection === 'certificates' ? 'profileNavBtn active' : 'profileNavBtn'}
+                onClick={() => setProfileSection('certificates')}
+              >
+                Certificates
+              </button>
+            </div>
             <div className="profileChecklist">
               <h4>Pending</h4>
               {missingItems.length === 0 ? (
@@ -1223,7 +1226,7 @@ function MarketplacePage() {
           </div>
           <div className="topActions">
             <button className="ghostBtn" onClick={() => setMode('guest')}>
-              Switch to guest mode
+              Browse as Guest
             </button>
             <button
               className={viewer ? 'profileIconBtn loggedIn' : 'profileIconBtn'}
@@ -1248,15 +1251,21 @@ function MarketplacePage() {
                 <div className="topMenu">
                   <button
                     className="menuItem"
+                    onClick={() => { setMenuOpen(false); setMode('guest') }}
+                  >
+                    Browse as Guest
+                  </button>
+                  <button
+                    className="menuItem"
                     onClick={() => { setMenuOpen(false); navigate('/setup/captain') }}
                   >
-                    ⚓ Captain Setup
+                    Captain Setup
                   </button>
                   <button
                     className="menuItem"
                     onClick={() => { setMenuOpen(false); navigate('/setup/sailor') }}
                   >
-                    🚢 Sailor Setup
+                    Sailor Setup
                   </button>
                   {viewer ? (
                     <button className="menuItem dangerText" onClick={() => void handleSignOut()}>
@@ -1569,7 +1578,7 @@ function MarketplacePage() {
         </div>
         <div className="topActions">
           <button className="ghostBtn" onClick={() => void handleHostModeClick()}>
-            {viewer ? 'Switch to host mode' : 'Switch to host mode (sign-in required)'}
+            Become a Host
           </button>
           <button
             className={viewer ? 'profileIconBtn loggedIn' : 'profileIconBtn'}
@@ -1594,15 +1603,27 @@ function MarketplacePage() {
               <div className="topMenu">
                 <button
                   className="menuItem"
+                  onClick={() => { setMenuOpen(false); void handleHostModeClick() }}
+                >
+                  Become a Host
+                </button>
+                <button
+                  className="menuItem"
                   onClick={() => { setMenuOpen(false); navigate('/setup/captain') }}
                 >
-                  ⚓ Captain Setup
+                  Captain Setup
                 </button>
                 <button
                   className="menuItem"
                   onClick={() => { setMenuOpen(false); navigate('/setup/sailor') }}
                 >
-                  🚢 Sailor Setup
+                  Sailor Setup
+                </button>
+                <button
+                  className="menuItem"
+                  onClick={() => { setMenuOpen(false); navigate('/map') }}
+                >
+                  Explore Map
                 </button>
                 {viewer ? (
                   <button className="menuItem dangerText" onClick={() => void handleSignOut()}>
@@ -1629,7 +1650,7 @@ function MarketplacePage() {
         <div className="searchItem">
           <label>Where</label>
           <input
-            placeholder="Search ports or bays"
+            placeholder="Search destinations"
             value={searchText}
             onChange={(e) => setSearchText(e.target.value)}
           />
@@ -1641,7 +1662,7 @@ function MarketplacePage() {
         <div className="searchItem">
           <label>Guests</label>
           <input
-            placeholder="Minimum seats"
+            placeholder="Add guests"
             value={seatFilter}
             onChange={(e) => setSeatFilter(e.target.value)}
           />
