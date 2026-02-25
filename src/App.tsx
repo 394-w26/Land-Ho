@@ -1228,33 +1228,37 @@ function MarketplacePage() {
             <button className="ghostBtn" onClick={() => setMode('guest')}>
               Browse as Guest
             </button>
+          {viewer ? (
             <button
-              className={viewer ? 'profileIconBtn loggedIn' : 'profileIconBtn'}
+              className="profileIconBtn loggedIn"
               onClick={() => void openProfileEditor()}
-              title={viewer ? `Current user: ${viewer.displayName || viewer.email || 'Signed in'}` : 'Guest, click to sign in'}
+              title={`Current user: ${viewer.displayName || viewer.email || 'Signed in'}`}
             >
               {authLoading ? (
                 <span className="profileText">...</span>
               ) : resolvedAvatarUrl ? (
                 <img src={resolvedAvatarUrl} alt="User avatar" className="avatarImg" />
-              ) : viewer ? (
-                <span className="profileText">{userInitial}</span>
               ) : (
-                <span className="profileText">🌐</span>
+                <span className="profileText">{userInitial}</span>
               )}
             </button>
-            <div className="menuWrap">
-              <button className="iconBtn" onClick={() => setMenuOpen((prev) => !prev)}>
-                ☰
-              </button>
-              {menuOpen && (
-                <div className="topMenu">
-                  <button
-                    className="menuItem"
-                    onClick={() => { setMenuOpen(false); setMode('guest') }}
-                  >
-                    Browse as Guest
-                  </button>
+          ) : (
+            <button className="ghostBtn" onClick={() => void openProfileEditor()}>
+              Sign in
+            </button>
+          )}
+          <div className="menuWrap">
+            <button className="iconBtn" onClick={() => setMenuOpen((prev) => !prev)}>
+              ☰
+            </button>
+            {menuOpen && (
+              <div className="topMenu">
+                <button
+                  className="menuItem"
+                  onClick={() => { setMenuOpen(false); setMode('guest') }}
+                >
+                  Browse as Guest
+                </button>
                   <button
                     className="menuItem"
                     onClick={() => { setMenuOpen(false); navigate('/setup/captain') }}
@@ -1580,21 +1584,25 @@ function MarketplacePage() {
           <button className="ghostBtn" onClick={() => void handleHostModeClick()}>
             Become a Host
           </button>
-          <button
-            className={viewer ? 'profileIconBtn loggedIn' : 'profileIconBtn'}
-            onClick={() => void openProfileEditor()}
-            title={viewer ? `Current user: ${viewer.displayName || viewer.email || 'Signed in'}` : 'Guest, click to sign in'}
-          >
-            {authLoading ? (
-              <span className="profileText">...</span>
-            ) : resolvedAvatarUrl ? (
-              <img src={resolvedAvatarUrl} alt="User avatar" className="avatarImg" />
-            ) : viewer ? (
-              <span className="profileText">{userInitial}</span>
-            ) : (
-              <span className="profileText">🌐</span>
-            )}
-          </button>
+          {viewer ? (
+            <button
+              className="profileIconBtn loggedIn"
+              onClick={() => void openProfileEditor()}
+              title={`Current user: ${viewer.displayName || viewer.email || 'Signed in'}`}
+            >
+              {authLoading ? (
+                <span className="profileText">...</span>
+              ) : resolvedAvatarUrl ? (
+                <img src={resolvedAvatarUrl} alt="User avatar" className="avatarImg" />
+              ) : (
+                <span className="profileText">{userInitial}</span>
+              )}
+            </button>
+          ) : (
+            <button className="ghostBtn" onClick={() => void openProfileEditor()}>
+              Sign in
+            </button>
+          )}
           <div className="menuWrap">
             <button className="iconBtn" onClick={() => setMenuOpen((prev) => !prev)}>
               ☰
