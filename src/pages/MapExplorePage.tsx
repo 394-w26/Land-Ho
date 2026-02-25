@@ -217,10 +217,10 @@ function MapExplorePage() {
   return (
     <div className="mapPage">
       <header className="topBar mapTopBar">
-        <div className="brand">
+        <Link className="brand" to="/" state={{ initialMode: 'guest' }}>
           <img className="brandLogo" src="/logo.png" alt="Land Ho logo" />
           <span>Land Ho</span>
-        </div>
+        </Link>
         <div className="mapTopActions">
           <Link className="ghostBtn mapNavBtn" to="/">
             Home listings

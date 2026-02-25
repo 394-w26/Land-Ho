@@ -49,6 +49,11 @@ function MarketplacePage() {
 
   useEffect(() => {
     const routeState = location.state as { initialMode?: 'guest' | 'host' } | null
+    if (routeState?.initialMode === 'guest') {
+      setMode('guest')
+      setAppView('market')
+      return
+    }
     if (routeState?.initialMode === 'host') {
       setMode('host')
       setAppView('market')

@@ -1,6 +1,6 @@
 import { useEffect, useState, type ChangeEvent } from 'react'
 import { onAuthStateChanged, signInWithPopup, type User } from 'firebase/auth'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { auth, googleProvider, isFirebaseReady } from '../lib/firebase'
 import { uploadImageToStorage } from '../lib/storage'
 import {
@@ -231,10 +231,10 @@ function SailorSetupPage() {
     return (
       <div className="setupPage">
         <header className="topBar">
-          <div className="brand">
+          <Link className="brand" to="/" state={{ initialMode: 'guest' }}>
             <img className="brandLogo" src="/logo.png" alt="Land Ho logo" />
             <span>Sailor Setup</span>
-          </div>
+          </Link>
           <button className="ghostBtn" onClick={() => navigate('/')}>Back to home</button>
         </header>
         <section className="setupCard">
@@ -254,10 +254,10 @@ function SailorSetupPage() {
   return (
     <div className="setupPage">
       <header className="topBar">
-        <div className="brand">
+        <Link className="brand" to="/" state={{ initialMode: 'guest' }}>
           <img className="brandLogo" src="/logo.png" alt="Land Ho logo" />
           <span>Sailor Setup</span>
-        </div>
+        </Link>
         <button className="ghostBtn" onClick={() => navigate('/')}>Back to home</button>
       </header>
 

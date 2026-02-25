@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useLocation, useNavigate, useParams } from 'react-router-dom'
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import { getUserPublicProfile, type UserPublicProfile } from '../features/users/usersApi'
 
 function HostResumePage() {
@@ -80,10 +80,10 @@ function HostResumePage() {
   return (
     <div className="detailPage">
       <header className="topBar">
-        <div className="brand">
+        <Link className="brand" to="/" state={{ initialMode: 'guest' }}>
           <img className="brandLogo" src="/logo.png" alt="Land Ho logo" />
           <span>Land Ho</span>
-        </div>
+        </Link>
         <button className="ghostBtn" onClick={handleBack}>
           Back
         </button>

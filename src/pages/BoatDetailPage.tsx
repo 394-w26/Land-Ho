@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { onAuthStateChanged, type User } from 'firebase/auth'
-import { useNavigate, useParams } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import { getBoatListingById, type BoatRecord } from '../features/boats/boatsApi'
 import { getUserPublicProfile, type UserPublicProfile } from '../features/users/usersApi'
 import { createBookingRequest, hasPendingBookingRequest } from '../features/booking/bookingApi'
@@ -193,10 +193,10 @@ function BoatDetailPage() {
   return (
     <div className="detailPage">
       <header className="topBar">
-        <div className="brand">
+        <Link className="brand" to="/" state={{ initialMode: 'guest' }}>
           <img className="brandLogo" src="/logo.png" alt="Land Ho logo" />
           <span>Land Ho</span>
-        </div>
+        </Link>
         <button className="ghostBtn" onClick={() => navigate('/')}>
           Back to listings
         </button>

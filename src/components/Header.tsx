@@ -10,7 +10,7 @@ interface HeaderProps {
 export function Header({ brandText, children }: HeaderProps) {
   return (
     <header className="topBar">
-      <Link className="brand" to="/">
+      <Link className="brand" to="/" state={{ initialMode: 'guest' }}>
         <img className="brandLogo" src="/logo.png" alt="Land Ho logo" />
         <span>{brandText}</span>
       </Link>
