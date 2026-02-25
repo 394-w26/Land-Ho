@@ -8,6 +8,7 @@ import {
   type BoatCoordinates,
   type BoatRecord,
 } from '../features/boats/boatsApi'
+import { searchLocationSuggestions, type LocationSuggestion } from '../features/location/mapboxGeocode'
 import 'mapbox-gl/dist/mapbox-gl.css'
 
 interface LngLatBounds {
@@ -61,6 +62,9 @@ function MapExplorePage() {
   const [category, setCategory] = useState<'all' | BoatCategory>('all')
   const [searchText, setSearchText] = useState('')
   const [seatFilter, setSeatFilter] = useState('')
+  const [suggestions, setSuggestions] = useState<LocationSuggestion[]>([])
+  const [suggestionsLoading, setSuggestionsLoading] = useState(false)
+  const [showSuggestions, setShowSuggestions] = useState(false)
   const [bounds, setBounds] = useState<LngLatBounds | null>(null)
   const [selectedBoatIdManual, setSelectedBoatIdManual] = useState('')
   const highlightBoatId = useMemo(() => {
@@ -91,10 +95,8 @@ function MapExplorePage() {
     return boats.filter((boat) => {
       const byCategory = category === 'all' || boat.category === category
       const keyword = searchText.trim().toLowerCase()
-      const bySearch =
-        keyword.length === 0 ||
-        boat.title.toLowerCase().includes(keyword) ||
-        boat.location.toLowerCase().includes(keyword)
+      // When typing in the "Where" input we should only filter by location
+      const bySearch = keyword.length === 0 || boat.location.toLowerCase().includes(keyword)
       const seats = Number(seatFilter || 0)
       const bySeats = seats === 0 || boat.seats >= seats
       return byCategory && bySearch && bySeats
@@ -137,6 +139,51 @@ function MapExplorePage() {
       })
     }
   }
+
+  // Debounced location suggestions
+  useEffect(() => {
+    if (!mapboxToken || !searchText || searchText.trim().length < 2) {
+      setSuggestions([])
+      setSuggestionsLoading(false)
+      return
+    }
+    let active = true
+    setSuggestionsLoading(true)
+    const id = window.setTimeout(() => {
+      searchLocationSuggestions(searchText, mapboxToken)
+        .then((res) => {
+          if (!active) return
+          setSuggestions(res)
+        })
+        .catch(() => {
+          if (!active) return
+          setSuggestions([])
+        })
+        .finally(() => {
+          if (!active) return
+          setSuggestionsLoading(false)
+        })
+    }, 320)
+    return () => {
+      active = false
+      window.clearTimeout(id)
+    }
+  }, [searchText, mapboxToken])
+
+  // click outside to close suggestions
+  useEffect(() => {
+    const onDoc = (e: MouseEvent) => {
+      const target = e.target as Node | null
+      if (!target) return
+      const el = document.querySelector('.suggestionsList')
+      const input = document.querySelector('.searchItem input')
+      if (el && !el.contains(target) && input && !input.contains(target)) {
+        setShowSuggestions(false)
+      }
+    }
+    document.addEventListener('click', onDoc)
+    return () => document.removeEventListener('click', onDoc)
+  }, [])
 
   const resetFilters = () => {
     setCategory('all')
@@ -187,8 +234,42 @@ function MapExplorePage() {
           <input
             placeholder="Search ports or bays"
             value={searchText}
-            onChange={(e) => setSearchText(e.target.value)}
+            onFocus={() => setShowSuggestions(true)}
+            onChange={(e) => {
+              setSearchText(e.target.value)
+              setShowSuggestions(true)
+            }}
           />
+          {showSuggestions && (suggestions.length > 0 || suggestionsLoading) && (
+            <div className="suggestionsList">
+              {suggestionsLoading && <div className="suggestionItem muted">Searching...</div>}
+              {suggestions.map((s) => (
+                <button
+                  key={s.id}
+                  className="suggestionItem"
+                  onClick={() => {
+                    setSearchText(s.placeName)
+                    setShowSuggestions(false)
+                    // set bounds to center around selection
+                    const delta = 0.08
+                    setBounds({
+                      west: s.coordinates.lng - delta,
+                      south: s.coordinates.lat - delta,
+                      east: s.coordinates.lng + delta,
+                      north: s.coordinates.lat + delta,
+                    })
+                    mapRef.current?.flyTo({
+                      center: [s.coordinates.lng, s.coordinates.lat],
+                      zoom: 10.5,
+                      duration: 600,
+                    })
+                  }}
+                >
+                  <div className="suggestionTitle">{s.placeName}</div>
+                </button>
+              ))}
+            </div>
+          )}
         </div>
         <div className="searchItem">
           <label>Guests</label>

@@ -123,6 +123,7 @@
   display: flex;
   flex-direction: column;
   gap: 3px;
+  position: relative;
 }
 
 .searchItem:hover {
@@ -1108,6 +1109,43 @@
   .categoryTabs {
     gap: 8px;
   }
+}
+
+/* Suggestions dropdown */
+.suggestionsList {
+  position: absolute;
+  left: 6px;
+  right: 6px;
+  top: calc(100% + 8px);
+  z-index: 40;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  background: #ffffff;
+  box-shadow: 0 10px 26px rgba(15, 23, 42, 0.08);
+  overflow: hidden;
+  display: grid;
+}
+
+.suggestionItem {
+  text-align: left;
+  padding: 8px 10px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 0.92rem;
+}
+
+.suggestionItem:not(:last-child) {
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.suggestionItem:hover {
+  background: #f8fafc;
+}
+
+.suggestionTitle {
+  font-weight: 600;
+  color: #111827;
 }
 
 .mapListHeader {
