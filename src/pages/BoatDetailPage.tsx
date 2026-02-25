@@ -234,6 +234,12 @@ function BoatDetailPage() {
           <button className="publishBtn reserveBtn" onClick={() => void handleReserve()} disabled={reserveSubmitting}>
             {reserveSubmitting ? 'Submitting...' : 'Reserve'}
           </button>
+          <button
+            className="ghostBtn instructorCta"
+            onClick={() => navigate(`/request-instructor?boat=${boat.id}&title=${encodeURIComponent(boat.title)}&date=${boat.date}`)}
+          >
+            🎓 Want an onboard instructor?
+          </button>
           {reserveNotice && <p className="hostNotice">{reserveNotice}</p>}
           {boatError && <p className="authNotice">{boatError}</p>}
         </article>

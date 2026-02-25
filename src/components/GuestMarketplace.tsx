@@ -28,6 +28,7 @@ interface GuestMarketplaceProps {
   onLoginWithGoogle: () => void
   onNavigateCaptainSetup: () => void
   onNavigateSailorSetup: () => void
+  onNavigateInstructorRequest: () => void
   onNavigateMap: () => void
 }
 
@@ -54,6 +55,7 @@ export default function GuestMarketplace({
   onLoginWithGoogle,
   onNavigateCaptainSetup,
   onNavigateSailorSetup,
+  onNavigateInstructorRequest,
   onNavigateMap,
 }: GuestMarketplaceProps) {
   const navigate = useNavigate()
@@ -89,6 +91,12 @@ export default function GuestMarketplace({
             onClick={() => { setMenuOpen(false); onNavigateSailorSetup() }}
           >
             Sailor Setup
+          </button>
+          <button
+            className="menuItem"
+            onClick={() => { setMenuOpen(false); onNavigateInstructorRequest() }}
+          >
+            🎓 Request Instructor
           </button>
           <button
             className="menuItem"

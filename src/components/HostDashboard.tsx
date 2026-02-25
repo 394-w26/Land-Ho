@@ -22,6 +22,7 @@ interface HostDashboardProps {
   onLoginWithGoogle: () => void
   onNavigateCaptainSetup: () => void
   onNavigateSailorSetup: () => void
+  onNavigateInstructorRequest: () => void
   form: BoatFormData
   setForm: (updater: BoatFormData | ((prev: BoatFormData) => BoatFormData)) => void
   editingBoatId: string
@@ -78,6 +79,7 @@ export default function HostDashboard({
   onLoginWithGoogle,
   onNavigateCaptainSetup,
   onNavigateSailorSetup,
+  onNavigateInstructorRequest,
   form,
   setForm,
   editingBoatId,
@@ -151,6 +153,12 @@ export default function HostDashboard({
             onClick={() => { setMenuOpen(false); onNavigateSailorSetup() }}
           >
             Sailor Setup
+          </button>
+          <button
+            className="menuItem"
+            onClick={() => { setMenuOpen(false); onNavigateInstructorRequest() }}
+          >
+            🎓 Request Instructor
           </button>
           {viewer ? (
             <button className="menuItem dangerText" onClick={onSignOut}>

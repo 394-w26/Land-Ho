@@ -14,6 +14,7 @@ import BoatDetailPage from './pages/BoatDetailPage'
 import HostResumePage from './pages/HostResumePage'
 import CaptainSetupPage from './pages/CaptainSetupPage'
 import SailorSetupPage from './pages/SailorSetupPage'
+import InstructorRequestPage from './pages/InstructorRequestPage'
 import MapExplorePage from './pages/MapExplorePage'
 
 function MarketplacePage() {
@@ -136,6 +137,7 @@ function MarketplacePage() {
         onLoginWithGoogle={() => void loginWithGoogle()}
         onNavigateCaptainSetup={() => navigate('/setup/captain')}
         onNavigateSailorSetup={() => navigate('/setup/sailor')}
+        onNavigateInstructorRequest={() => navigate('/request-instructor')}
         form={boatForm.form}
         setForm={boatForm.setForm}
         editingBoatId={boatForm.editingBoatId}
@@ -205,6 +207,7 @@ function MarketplacePage() {
       onLoginWithGoogle={() => void loginWithGoogle()}
       onNavigateCaptainSetup={() => navigate('/setup/captain')}
       onNavigateSailorSetup={() => navigate('/setup/sailor')}
+      onNavigateInstructorRequest={() => navigate('/request-instructor')}
       onNavigateMap={() => navigate('/map')}
     />
   )
@@ -219,6 +222,7 @@ function App() {
       <Route path="/hosts/:uid" element={<HostResumePage />} />
       <Route path="/setup/captain" element={<CaptainSetupPage />} />
       <Route path="/setup/sailor" element={<SailorSetupPage />} />
+      <Route path="/request-instructor" element={<InstructorRequestPage />} />
     </Routes>
   )
 }
