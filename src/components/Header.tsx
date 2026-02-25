@@ -1,5 +1,6 @@
 import { useEffect, type ReactNode } from 'react'
 import { type User } from 'firebase/auth'
+import { Link } from 'react-router-dom'
 
 interface HeaderProps {
   brandText: string
@@ -9,10 +10,10 @@ interface HeaderProps {
 export function Header({ brandText, children }: HeaderProps) {
   return (
     <header className="topBar">
-      <div className="brand">
+      <Link className="brand" to="/">
         <img className="brandLogo" src="/logo.png" alt="Land Ho logo" />
         <span>{brandText}</span>
-      </div>
+      </Link>
       <div className="topActions">
         {children}
       </div>
