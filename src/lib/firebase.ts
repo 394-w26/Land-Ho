@@ -28,6 +28,14 @@ const firebaseApp = hasFirebaseConfig
 export const auth = firebaseApp ? getAuth(firebaseApp) : null
 export const db = firebaseApp ? getFirestore(firebaseApp) : null
 export const storage = firebaseApp ? getStorage(firebaseApp) : null
-export const googleProvider = new GoogleAuthProvider()
-googleProvider.setCustomParameters({ prompt: 'select_account' })
+
+// Only create the Google provider if Firebase is properly configured.
+export const googleProvider: GoogleAuthProvider | null = firebaseApp
+  ? (() => {
+      const p = new GoogleAuthProvider()
+      p.setCustomParameters({ prompt: 'select_account' })
+      return p
+    })()
+  : null
+
 export const isFirebaseReady = Boolean(firebaseApp)
