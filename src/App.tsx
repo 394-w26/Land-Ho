@@ -27,6 +27,8 @@ import {
 import { upsertUserPublicProfile } from './features/users/usersApi'
 import BoatDetailPage from './pages/BoatDetailPage'
 import HostResumePage from './pages/HostResumePage'
+import CaptainSetupPage from './pages/CaptainSetupPage'
+import SailorSetupPage from './pages/SailorSetupPage'
 import MapExplorePage from './pages/MapExplorePage'
 
 type BoatCategory = 'all' | CloudBoatCategory
@@ -1244,6 +1246,18 @@ function MarketplacePage() {
               </button>
               {menuOpen && (
                 <div className="topMenu">
+                  <button
+                    className="menuItem"
+                    onClick={() => { setMenuOpen(false); navigate('/setup/captain') }}
+                  >
+                    ⚓ Captain Setup
+                  </button>
+                  <button
+                    className="menuItem"
+                    onClick={() => { setMenuOpen(false); navigate('/setup/sailor') }}
+                  >
+                    🚢 Sailor Setup
+                  </button>
                   {viewer ? (
                     <button className="menuItem dangerText" onClick={() => void handleSignOut()}>
                       Sign out
@@ -1578,6 +1592,18 @@ function MarketplacePage() {
             </button>
             {menuOpen && (
               <div className="topMenu">
+                <button
+                  className="menuItem"
+                  onClick={() => { setMenuOpen(false); navigate('/setup/captain') }}
+                >
+                  ⚓ Captain Setup
+                </button>
+                <button
+                  className="menuItem"
+                  onClick={() => { setMenuOpen(false); navigate('/setup/sailor') }}
+                >
+                  🚢 Sailor Setup
+                </button>
                 {viewer ? (
                   <button className="menuItem dangerText" onClick={() => void handleSignOut()}>
                     Sign out
@@ -1705,6 +1731,8 @@ function App() {
       <Route path="/map" element={<MapExplorePage />} />
       <Route path="/boats/:boatId" element={<BoatDetailPage />} />
       <Route path="/hosts/:uid" element={<HostResumePage />} />
+      <Route path="/setup/captain" element={<CaptainSetupPage />} />
+      <Route path="/setup/sailor" element={<SailorSetupPage />} />
     </Routes>
   )
 }
