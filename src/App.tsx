@@ -1,7 +1,9 @@
-import { useEffect, useMemo, useState, type ChangeEvent } from 'react'
+import { useEffect, useRef, useMemo, useState, type ChangeEvent } from 'react'
 import { onAuthStateChanged, signInWithPopup, signOut, type User } from 'firebase/auth'
 import { Route, Routes, useLocation, useNavigate } from 'react-router-dom'
+import Map, { Marker, NavigationControl, type MapRef } from 'react-map-gl/mapbox'
 import './App.css'
+import 'mapbox-gl/dist/mapbox-gl.css'
 import { auth, db, googleProvider, isFirebaseReady } from './lib/firebase'
 import { uploadImageToStorage } from './lib/storage'
 import {
@@ -9,6 +11,7 @@ import {
   deleteBoatListing,
   subscribePublishedBoats,
   type BoatCategory as CloudBoatCategory,
+  type BoatCoordinates,
   updateBoatListing,
 } from './features/boats/boatsApi'
 import {
@@ -16,9 +19,15 @@ import {
   updateBookingRequestStatus,
   type BookingRequestRecord,
 } from './features/booking/bookingApi'
+import {
+  reverseLookupLocation,
+  searchLocationSuggestions,
+  type LocationSuggestion,
+} from './features/location/mapboxGeocode'
 import { upsertUserPublicProfile } from './features/users/usersApi'
 import BoatDetailPage from './pages/BoatDetailPage'
 import HostResumePage from './pages/HostResumePage'
+import MapExplorePage from './pages/MapExplorePage'
 
 type BoatCategory = 'all' | CloudBoatCategory
 
@@ -26,6 +35,7 @@ interface BoatCard {
   id: string
   title: string
   location: string
+  coordinates: BoatCoordinates | null
   price: number
   rating: number
   seats: number
@@ -69,6 +79,7 @@ interface ProfileDraft {
 
 const profileStorageKey = 'land-ho-profile-draft'
 const maxBoatImages = 6
+const mapboxToken = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN as string | undefined
 
 const defaultProfileDraft: ProfileDraft = {
   displayName: '',
@@ -133,11 +144,31 @@ const formatDateTime = (isoText: string): string => {
   }).format(date)
 }
 
+const locationCoordinatesLookup: Record<string, BoatCoordinates> = {
+  'Sanya Bay': { lat: 18.2528, lng: 109.5119 },
+  'Xiamen Wuyuan Bay': { lat: 24.5096, lng: 118.1881 },
+  'Qingdao Olympic Sailing Center': { lat: 36.0604, lng: 120.3755 },
+  'Zhoushan Islands': { lat: 29.9853, lng: 122.2072 },
+  'Shenzhen Dapeng': { lat: 22.5954, lng: 114.5422 },
+  'Beihai Silver Beach': { lat: 21.4171, lng: 109.1512 },
+}
+
+const defaultCoordinates: BoatCoordinates = { lat: 24.4798, lng: 118.0894 }
+
+const findCoordinatesForLocation = (locationText: string): BoatCoordinates => {
+  const trimmed = locationText.trim()
+  if (trimmed.length === 0) {
+    return defaultCoordinates
+  }
+  return locationCoordinatesLookup[trimmed] ?? defaultCoordinates
+}
+
 const initialBoatData: BoatCard[] = [
   {
     id: 'b1',
     title: 'Sea Breeze Sunset Cruise',
     location: 'Sanya Bay',
+    coordinates: { lat: 18.2528, lng: 109.5119 },
     price: 699,
     rating: 4.92,
     seats: 4,
@@ -153,6 +184,7 @@ const initialBoatData: BoatCard[] = [
     id: 'b2',
     title: 'Voyager Coastal Day Trip',
     location: 'Xiamen Wuyuan Bay',
+    coordinates: { lat: 24.5096, lng: 118.1881 },
     price: 880,
     rating: 4.87,
     seats: 6,
@@ -168,6 +200,7 @@ const initialBoatData: BoatCard[] = [
     id: 'b3',
     title: 'Dolphin Sailing Training Camp',
     location: 'Qingdao Olympic Sailing Center',
+    coordinates: { lat: 36.0604, lng: 120.3755 },
     price: 520,
     rating: 4.95,
     seats: 8,
@@ -183,6 +216,7 @@ const initialBoatData: BoatCard[] = [
     id: 'b4',
     title: 'Azure Islands Hopping Route',
     location: 'Zhoushan Islands',
+    coordinates: { lat: 29.9853, lng: 122.2072 },
     price: 1280,
     rating: 4.9,
     seats: 5,
@@ -198,6 +232,7 @@ const initialBoatData: BoatCard[] = [
     id: 'b5',
     title: 'Lumen City Coastline',
     location: 'Shenzhen Dapeng',
+    coordinates: { lat: 22.5954, lng: 114.5422 },
     price: 760,
     rating: 4.84,
     seats: 4,
@@ -213,6 +248,7 @@ const initialBoatData: BoatCard[] = [
     id: 'b6',
     title: 'Wavecrest Golden Hour Cruise',
     location: 'Beihai Silver Beach',
+    coordinates: { lat: 21.4171, lng: 109.1512 },
     price: 640,
     rating: 4.91,
     seats: 3,
@@ -266,6 +302,14 @@ function MarketplacePage() {
     category: 'dayTrip' as Exclude<BoatCategory, 'all'>,
     images: [] as string[],
   })
+  const hostMapRef = useRef<MapRef | null>(null)
+  const [locationQuery, setLocationQuery] = useState('')
+  const [locationCandidates, setLocationCandidates] = useState<LocationSuggestion[]>([])
+  const [locationSearching, setLocationSearching] = useState(false)
+  const [locationLookupError, setLocationLookupError] = useState('')
+  const [locationMapError, setLocationMapError] = useState('')
+  const [selectedCoordinates, setSelectedCoordinates] = useState<BoatCoordinates | null>(null)
+  const [selectedAddress, setSelectedAddress] = useState('')
 
   const categories: { key: BoatCategory; label: string; icon: string }[] = [
     { key: 'all', label: 'All', icon: '⛵' },
@@ -294,6 +338,16 @@ function MarketplacePage() {
     }
     return boats.filter((item) => item.ownerUid === viewer.uid)
   }, [boats, viewer])
+
+  const hostPickerCenter = useMemo(() => {
+    if (selectedCoordinates) {
+      return selectedCoordinates
+    }
+    if (form.location.trim().length > 0) {
+      return findCoordinatesForLocation(form.location)
+    }
+    return defaultCoordinates
+  }, [selectedCoordinates, form.location])
 
   useEffect(() => {
     if (!auth || !isFirebaseReady) {
@@ -652,6 +706,73 @@ function MarketplacePage() {
     }
   }
 
+  const applySelectedLocation = (next: LocationSuggestion) => {
+    setForm((prev) => ({ ...prev, location: next.placeName }))
+    setLocationQuery(next.placeName)
+    setLocationCandidates([])
+    setSelectedCoordinates(next.coordinates)
+    setSelectedAddress(next.placeName)
+    setLocationLookupError('')
+    hostMapRef.current?.flyTo({
+      center: [next.coordinates.lng, next.coordinates.lat],
+      zoom: 11,
+      duration: 500,
+    })
+  }
+
+  const searchLocations = async () => {
+    const queryText = locationQuery.trim()
+    if (queryText.length < 2) {
+      setLocationCandidates([])
+      setLocationLookupError('Please enter at least 2 characters to search location.')
+      return
+    }
+    if (!mapboxToken) {
+      setLocationLookupError('Mapbox token is missing. Add VITE_MAPBOX_ACCESS_TOKEN to continue.')
+      return
+    }
+    setLocationSearching(true)
+    setLocationLookupError('')
+    try {
+      const suggestions = await searchLocationSuggestions(queryText, mapboxToken)
+      setLocationCandidates(suggestions)
+      if (suggestions.length === 0) {
+        setLocationLookupError('No matching location found. Try another keyword.')
+      }
+    } catch {
+      setLocationLookupError('Location search failed. Please try again.')
+    } finally {
+      setLocationSearching(false)
+    }
+  }
+
+  const syncAddressFromCoordinates = async (coordinates: BoatCoordinates) => {
+    if (!mapboxToken) {
+      return
+    }
+    try {
+      const addressText = await reverseLookupLocation(coordinates, mapboxToken)
+      if (!addressText) {
+        return
+      }
+      setForm((prev) => ({ ...prev, location: addressText }))
+      setLocationQuery(addressText)
+      setSelectedAddress(addressText)
+    } catch {
+      // Keep the selected coordinates if reverse lookup fails.
+    }
+  }
+
+  const handlePickerMarkerDragEnd = (event: { lngLat: { lng: number; lat: number } }) => {
+    const nextCoordinates: BoatCoordinates = {
+      lng: event.lngLat.lng,
+      lat: event.lngLat.lat,
+    }
+    setSelectedCoordinates(nextCoordinates)
+    setLocationLookupError('')
+    void syncAddressFromCoordinates(nextCoordinates)
+  }
+
   const publishBoat = async () => {
     if (!viewer) {
       setHostNotice('Please sign in before publishing a boat.')
@@ -669,12 +790,18 @@ function MarketplacePage() {
       setHostNotice('Please upload at least one real boat image.')
       return
     }
+    const resolvedCoordinates = selectedCoordinates ?? findCoordinatesForLocation(form.location)
+    if (!selectedCoordinates) {
+      setHostNotice('Please search and confirm a map location before publishing.')
+      return
+    }
     setHostNotice(editingBoatId ? 'Updating listing...' : 'Publishing...')
     try {
       if (editingBoatId) {
         await updateBoatListing(editingBoatId, {
           title: form.title,
           location: form.location,
+          coordinates: resolvedCoordinates,
           price: Number(form.price) || 0,
           seats: Number(form.seats) || 1,
           captain: form.captain || viewer.displayName || 'Captain',
@@ -683,10 +810,13 @@ function MarketplacePage() {
           image: form.images[0],
           images: form.images,
         })
+        setEditingBoatId('')
+        setHostNotice('Listing updated successfully.')
       } else {
-        await createBoatListing({
+        const nextBoatId = await createBoatListing({
           title: form.title,
           location: form.location,
+          coordinates: resolvedCoordinates,
           price: Number(form.price) || 0,
           seats: Number(form.seats) || 1,
           captain: form.captain || viewer.displayName || 'Captain',
@@ -697,6 +827,7 @@ function MarketplacePage() {
           ownerUid: viewer.uid,
           ownerName: viewer.displayName || viewer.email || 'Host',
         })
+        navigate(`/map?highlight=${nextBoatId}`)
       }
       setForm({
         title: '',
@@ -708,10 +839,11 @@ function MarketplacePage() {
         category: 'dayTrip',
         images: [],
       })
-      if (editingBoatId) {
-        setEditingBoatId('')
-        setHostNotice('Listing updated successfully.')
-      } else {
+      setLocationQuery('')
+      setLocationCandidates([])
+      setSelectedCoordinates(null)
+      setSelectedAddress('')
+      if (!editingBoatId) {
         setHostNotice('Published successfully.')
         setMode('guest')
       }
@@ -736,6 +868,18 @@ function MarketplacePage() {
       category: boat.category,
       images: boat.images.length > 0 ? boat.images : [boat.image],
     })
+    const fallbackCoordinates = findCoordinatesForLocation(boat.location)
+    const nextCoordinates = boat.coordinates ?? fallbackCoordinates
+    setSelectedCoordinates(nextCoordinates)
+    setSelectedAddress(boat.location)
+    setLocationQuery(boat.location)
+    setLocationCandidates([])
+    setLocationLookupError('')
+    hostMapRef.current?.flyTo({
+      center: [nextCoordinates.lng, nextCoordinates.lat],
+      zoom: 11,
+      duration: 400,
+    })
     setHostNotice('Editing mode enabled. Update fields and save.')
   }
 
@@ -751,6 +895,11 @@ function MarketplacePage() {
       category: 'dayTrip',
       images: [],
     })
+    setLocationQuery('')
+    setLocationCandidates([])
+    setSelectedCoordinates(null)
+    setSelectedAddress('')
+    setLocationLookupError('')
     setHostNotice('Edit cancelled.')
   }
 
@@ -1134,11 +1283,72 @@ function MarketplacePage() {
             </div>
             <div className="formRow">
               <label>Location</label>
-              <input
-                value={form.location}
-                onChange={(e) => setForm({ ...form, location: e.target.value })}
-                placeholder="Sanya Bay"
-              />
+              <div className="locationSearchRow">
+                <input
+                  value={locationQuery}
+                  onChange={(e) => {
+                    const next = e.target.value
+                    setLocationQuery(next)
+                    setForm({ ...form, location: next })
+                    setSelectedCoordinates(null)
+                    setSelectedAddress('')
+                  }}
+                  placeholder="Search marina, bay, or pier"
+                />
+                <button className="ghostBtn inlineActionBtn" type="button" onClick={() => void searchLocations()}>
+                  {locationSearching ? 'Searching...' : 'Search'}
+                </button>
+              </div>
+              {locationCandidates.length > 0 && (
+                <div className="locationCandidates">
+                  {locationCandidates.map((candidate) => (
+                    <button
+                      key={candidate.id}
+                      className="locationCandidateBtn"
+                      type="button"
+                      onClick={() => applySelectedLocation(candidate)}
+                    >
+                      {candidate.placeName}
+                    </button>
+                  ))}
+                </div>
+              )}
+              <div className="locationPickerCard">
+                {mapboxToken ? (
+                  <Map
+                    ref={hostMapRef}
+                    mapboxAccessToken={mapboxToken}
+                    style={{ width: '100%', height: '220px' }}
+                    initialViewState={{
+                      longitude: hostPickerCenter.lng,
+                      latitude: hostPickerCenter.lat,
+                      zoom: 9,
+                    }}
+                    mapStyle="mapbox://styles/mapbox/streets-v12"
+                    onError={() => setLocationMapError('Map failed to load. Please verify Mapbox token scopes and domain restrictions.')}
+                  >
+                    <NavigationControl position="top-right" />
+                    {selectedCoordinates && (
+                      <Marker
+                        longitude={selectedCoordinates.lng}
+                        latitude={selectedCoordinates.lat}
+                        draggable
+                        onDragEnd={handlePickerMarkerDragEnd}
+                      />
+                    )}
+                  </Map>
+                ) : (
+                  <p className="hintText">Map picker requires VITE_MAPBOX_ACCESS_TOKEN in environment.</p>
+                )}
+              </div>
+              {locationMapError && <small className="hintText locationError">{locationMapError}</small>}
+              <small className="hintText">
+                {selectedCoordinates
+                  ? `Pinned at lat ${selectedCoordinates.lat.toFixed(5)}, lng ${selectedCoordinates.lng.toFixed(5)}`
+                  : 'Search and select a location, then drag the marker for precision.'}
+              </small>
+              {selectedAddress && <small className="hintText">Resolved address: {selectedAddress}</small>}
+              {locationLookupError && <small className="hintText locationError">{locationLookupError}</small>}
             </div>
             <div className="formRow split">
               <div>
@@ -1492,6 +1702,7 @@ function App() {
   return (
     <Routes>
       <Route path="/" element={<MarketplacePage />} />
+      <Route path="/map" element={<MapExplorePage />} />
       <Route path="/boats/:boatId" element={<BoatDetailPage />} />
       <Route path="/hosts/:uid" element={<HostResumePage />} />
     </Routes>

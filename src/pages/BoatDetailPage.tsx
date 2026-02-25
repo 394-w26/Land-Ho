@@ -6,6 +6,8 @@ import { getUserPublicProfile, type UserPublicProfile } from '../features/users/
 import { createBookingRequest, hasPendingBookingRequest } from '../features/booking/bookingApi'
 import { auth, isFirebaseReady } from '../lib/firebase'
 
+const mapboxToken = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN as string | undefined
+
 const formatTripDate = (value: string): string => {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) {
     return value
@@ -103,6 +105,14 @@ function BoatDetailPage() {
       return []
     }
     return boat.images.length > 0 ? boat.images : boat.image ? [boat.image] : []
+  }, [boat])
+
+  const detailMapPreviewUrl = useMemo(() => {
+    if (!boat?.coordinates || !mapboxToken) {
+      return ''
+    }
+    const { lng, lat } = boat.coordinates
+    return `https://api.mapbox.com/styles/v1/mapbox/streets-v12/static/pin-s+ff385c(${lng},${lat})/${lng},${lat},12,0/900x320?access_token=${mapboxToken}`
   }, [boat])
 
   const handleReserve = async () => {
@@ -253,6 +263,29 @@ function BoatDetailPage() {
               {hostProfile.skills.slice(0, 6).map((skill) => (
                 <span key={skill}>{skill}</span>
               ))}
+            </div>
+          )}
+        </article>
+      </section>
+
+      <section className="detailMapSection">
+        <article className="detailInfoCard detailMapCard">
+          <div className="detailMapHeader">
+            <h2>Location on map</h2>
+            <button className="ghostBtn compactActionBtn" onClick={() => navigate(`/map?highlight=${boat.id}`)}>
+              Open map view
+            </button>
+          </div>
+          {boat.coordinates && detailMapPreviewUrl ? (
+            <button className="detailMapPreviewBtn" onClick={() => navigate(`/map?highlight=${boat.id}`)}>
+              <img src={detailMapPreviewUrl} alt={`${boat.title} location map`} className="detailMapPreview" />
+            </button>
+          ) : (
+            <div className="detailMapEmpty">
+              <p>Map preview unavailable for this listing.</p>
+              <button className="ghostBtn compactActionBtn" onClick={() => navigate('/map')}>
+                Browse all map listings
+              </button>
             </div>
           )}
         </article>

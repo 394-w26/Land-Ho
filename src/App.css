@@ -349,6 +349,59 @@
   gap: 10px;
 }
 
+.locationSearchRow {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+  align-items: center;
+}
+
+.locationSearchRow .inlineActionBtn {
+  margin-top: 0;
+  width: auto;
+  min-width: 90px;
+}
+
+.locationCandidates {
+  display: grid;
+  gap: 6px;
+  max-height: 140px;
+  overflow: auto;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  background: #ffffff;
+  padding: 6px;
+}
+
+.locationCandidateBtn {
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #ffffff;
+  text-align: left;
+  padding: 8px 10px;
+  font-size: 0.86rem;
+}
+
+.locationCandidateBtn:hover {
+  background: #f9fafb;
+}
+
+.locationPickerCard {
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  overflow: hidden;
+  min-height: 220px;
+}
+
+.locationPickerCard > div {
+  width: 100%;
+  height: 220px;
+}
+
+.locationError {
+  color: #b91c1c;
+}
+
 .publishBtn {
   width: 100%;
   border: none;
@@ -776,6 +829,53 @@
   margin: 0 0 10px;
 }
 
+.detailMapSection {
+  margin-top: 16px;
+}
+
+.detailMapCard {
+  padding: 14px;
+}
+
+.detailMapHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.detailMapHeader h2 {
+  margin: 0;
+}
+
+.detailMapPreviewBtn {
+  border: 0;
+  padding: 0;
+  width: 100%;
+  background: transparent;
+  cursor: pointer;
+}
+
+.detailMapPreview {
+  width: 100%;
+  height: 320px;
+  border-radius: 12px;
+  object-fit: cover;
+  border: 1px solid #e5e7eb;
+}
+
+.detailMapEmpty {
+  border: 1px dashed #d1d5db;
+  border-radius: 12px;
+  padding: 18px;
+}
+
+.detailMapEmpty p {
+  margin: 0 0 8px;
+  color: #6b7280;
+}
+
 .hostProfileHead {
   display: flex;
   align-items: center;
@@ -867,9 +967,161 @@
   color: #4b5563;
 }
 
+.mapPage {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 18px 20px 24px;
+}
+
+.mapTopBar {
+  padding-bottom: 8px;
+}
+
+.mapTopActions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.mapNavBtn {
+  padding: 9px 14px;
+  text-decoration: none;
+  color: #111827;
+  font-size: 0.92rem;
+}
+
+.mapSearchSection {
+  grid-template-columns: 1.8fr 1fr auto;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.mapLayout {
+  display: grid;
+  grid-template-columns: 55% 45%;
+  gap: 14px;
+  min-height: calc(100vh - 230px);
+}
+
+.mapPanel {
+  min-height: 620px;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid #e5e7eb;
+}
+
+.mapPanel > div {
+  width: 100%;
+  height: 100%;
+}
+
+.mapFallback {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-items: center;
+  background: #f8fafc;
+  color: #4b5563;
+}
+
+.priceMarker {
+  border: 1px solid #111827;
+  background: #ffffff;
+  color: #111827;
+  border-radius: 999px;
+  padding: 6px 10px;
+  font-weight: 700;
+  font-size: 0.82rem;
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.22);
+}
+
+.priceMarker.active {
+  background: #111827;
+  color: #ffffff;
+}
+
+.mapPopup {
+  min-width: 180px;
+}
+
+.mapPopup p {
+  margin: 4px 0;
+  color: #4b5563;
+}
+
+.mapPopupBtn {
+  margin-top: 8px;
+  padding: 6px 10px;
+}
+
+.mapListPanel {
+  min-height: 620px;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  padding: 12px;
+  background: #ffffff;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.mapListHeader {
+  margin: 4px 0 10px;
+}
+
+.mapCardList {
+  overflow: auto;
+  padding-right: 4px;
+  display: grid;
+  gap: 12px;
+}
+
+.mapCard {
+  border: 1px solid #ececec;
+}
+
+.mapCard.active {
+  border-color: #111827;
+  box-shadow: 0 10px 22px rgba(15, 23, 42, 0.12);
+}
+
+.mapCardHint {
+  color: #9ca3af;
+  font-size: 0.82rem;
+}
+
+.mapCardFlash {
+  animation: mapCardFlashPulse 1.4s ease-in-out 1;
+}
+
+@keyframes mapCardFlashPulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(255, 56, 92, 0.45);
+  }
+  50% {
+    box-shadow: 0 0 0 6px rgba(255, 56, 92, 0.14);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(255, 56, 92, 0);
+  }
+}
+
 @media (max-width: 1080px) {
   .boatGrid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .mapLayout {
+    grid-template-columns: 1fr;
+    min-height: auto;
+  }
+
+  .mapPanel {
+    min-height: 440px;
+  }
+
+  .mapListPanel {
+    min-height: 420px;
   }
 }
 
@@ -898,6 +1150,14 @@
   .detailInfoGrid {
     grid-template-columns: 1fr;
   }
+
+  .mapSearchSection {
+    grid-template-columns: 1fr;
+  }
+
+  .locationSearchRow {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (max-width: 560px) {
@@ -907,5 +1167,9 @@
 
   .boatGrid {
     grid-template-columns: 1fr;
+  }
+
+  .mapPage {
+    padding: 12px;
   }
 }

@@ -16,10 +16,16 @@ import { db } from '../../lib/firebase'
 
 export type BoatCategory = 'dayTrip' | 'sunset' | 'training' | 'island'
 
+export interface BoatCoordinates {
+  lat: number
+  lng: number
+}
+
 export interface BoatRecord {
   id: string
   title: string
   location: string
+  coordinates: BoatCoordinates | null
   price: number
   rating: number
   seats: number
@@ -35,6 +41,7 @@ export interface BoatRecord {
 export interface CreateBoatInput {
   title: string
   location: string
+  coordinates: BoatCoordinates
   price: number
   seats: number
   captain: string
@@ -48,6 +55,16 @@ export interface CreateBoatInput {
 
 const mapBoatDoc = (doc: QueryDocumentSnapshot): BoatRecord => {
   const data = doc.data() as Record<string, unknown>
+  const rawCoordinates = data.coordinates as Record<string, unknown> | undefined
+  const lat = Number(rawCoordinates?.lat)
+  const lng = Number(rawCoordinates?.lng)
+  const coordinates =
+    Number.isFinite(lat) && Number.isFinite(lng)
+      ? {
+          lat,
+          lng,
+        }
+      : null
   const images = Array.isArray(data.images)
     ? data.images.map((item) => String(item))
     : data.image
@@ -58,6 +75,7 @@ const mapBoatDoc = (doc: QueryDocumentSnapshot): BoatRecord => {
     id: doc.id,
     title: String(data.title ?? ''),
     location: String(data.location ?? ''),
+    coordinates,
     price: Number(data.price ?? 0),
     rating: Number(data.rating ?? 5),
     seats: Number(data.seats ?? 1),
