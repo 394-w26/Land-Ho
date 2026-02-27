@@ -49,12 +49,16 @@ function MarketplacePage() {
   })
 
   useEffect(() => {
-    const routeState = location.state as { initialMode?: 'guest' | 'host' } | null
+    const routeState = location.state as { initialMode?: 'guest' | 'host'; openProfile?: boolean } | null
     if (routeState?.initialMode === 'host') {
       setMode('host')
       setAppView('market')
     }
-  }, [location.state])
+    if (routeState?.openProfile) {
+      setAppView('profile')
+      profile.setProfileSection('basic')
+    }
+  }, [location.state]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleHostModeClick = async () => {
     if (viewer) {
@@ -84,7 +88,7 @@ function MarketplacePage() {
 
   const handleSignOut = async () => {
     await signOutUser()
-    setMode('guest')
+        setMode('guest')
     setAppView('market')
     boatForm.setHostNotice('')
     profile.setProfileNotice('')

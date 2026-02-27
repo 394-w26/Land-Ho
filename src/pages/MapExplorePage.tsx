@@ -272,7 +272,7 @@ function MapExplorePage() {
           )}
         </div>
         <div className="searchItem">
-          <label>Guests</label>
+          <label>Sailors</label>
           <input
             placeholder="Minimum seats"
             value={seatFilter}

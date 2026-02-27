@@ -64,7 +64,7 @@ export default function GuestMarketplace({
     <div className="homePage">
       <Header brandText="Land Ho">
         <button className="ghostBtn" onClick={onBecomeHost}>
-          Become a Host
+          Sign up as a captain
         </button>
         <UserButton
           viewer={viewer}
@@ -78,7 +78,7 @@ export default function GuestMarketplace({
             className="menuItem"
             onClick={() => { setMenuOpen(false); onBecomeHost() }}
           >
-            Become a Host
+            Sign up as a captain
           </button>
           <button
             className="menuItem"
@@ -136,9 +136,9 @@ export default function GuestMarketplace({
           <input placeholder="Any week" />
         </div>
         <div className="searchItem">
-          <label>Guests</label>
+          <label>Sailors</label>
           <input
-            placeholder="Add guests"
+            placeholder="Add sailors"
             value={seatFilter}
             onChange={(e) => setSeatFilter(e.target.value)}
           />

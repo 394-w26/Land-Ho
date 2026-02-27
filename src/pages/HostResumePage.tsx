@@ -21,7 +21,7 @@ function HostResumePage() {
 
   useEffect(() => {
     if (!uid) {
-      setError('Host id is missing.')
+      setError('Captain id is missing.')
       setLoading(false)
       return
     }
@@ -36,14 +36,14 @@ function HostResumePage() {
           return
         }
         if (!next) {
-          setError('Host profile not found.')
+          setError('Captain profile not found.')
           setProfile(null)
           return
         }
         setProfile(next)
       } catch {
         if (active) {
-          setError('Failed to load host profile.')
+          setError('Failed to load captain profile.')
         }
       } finally {
         if (active) {
@@ -61,7 +61,7 @@ function HostResumePage() {
   if (loading) {
     return (
       <div className="detailPage">
-        <p className="muted">Loading host profile...</p>
+        <p className="muted">Loading captain profile...</p>
       </div>
     )
   }
@@ -72,7 +72,7 @@ function HostResumePage() {
         <button className="ghostBtn" onClick={handleBack}>
           Back
         </button>
-        <p className="authNotice">{error || 'Host profile is unavailable.'}</p>
+        <p className="authNotice">{error || 'Captain profile is unavailable.'}</p>
       </div>
     )
   }
@@ -92,7 +92,7 @@ function HostResumePage() {
       <section className="hostResumeHeader">
         <div className="hostResumeAvatar">
           {profile.avatarUrl ? (
-            <img src={profile.avatarUrl} alt={profile.displayName || 'Host'} />
+            <img src={profile.avatarUrl} alt={profile.displayName || 'Captain'} />
           ) : (
             <div className="hostAvatarFallback">
               {(profile.displayName || 'H').charAt(0).toUpperCase()}
@@ -100,7 +100,7 @@ function HostResumePage() {
           )}
         </div>
         <div>
-          <h1>{profile.displayName || 'Host'}</h1>
+          <h1>{profile.displayName || 'Captain'}</h1>
           <p>{profile.city || 'Location not provided'}</p>
         </div>
       </section>
@@ -108,7 +108,7 @@ function HostResumePage() {
       <section className="detailInfoGrid">
         <article className="detailInfoCard">
           <h2>About</h2>
-          <p>{profile.bio || 'This host has not added an introduction yet.'}</p>
+          <p>{profile.bio || 'This captain has not added an introduction yet.'}</p>
         </article>
 
         <article className="detailInfoCard">

@@ -137,7 +137,7 @@ export function useProfile(viewer: User | null) {
       try {
         await upsertUserPublicProfile({
           uid: viewer.uid,
-          displayName: profileDraft.displayName || viewer.displayName || viewer.email || 'Host',
+          displayName: profileDraft.displayName || viewer.displayName || viewer.email || 'Captain',
           avatarUrl: resolvedAvatarUrl,
           city: profileDraft.city,
           bio: profileDraft.bio,

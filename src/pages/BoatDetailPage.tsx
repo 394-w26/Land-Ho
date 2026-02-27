@@ -34,6 +34,7 @@ function BoatDetailPage() {
   const [hostProfile, setHostProfile] = useState<UserPublicProfile | null>(null)
   const [reserveSubmitting, setReserveSubmitting] = useState(false)
   const [reserveNotice, setReserveNotice] = useState('')
+  const [showProfileModal, setShowProfileModal] = useState(false)
 
   useEffect(() => {
     if (!auth || !isFirebaseReady) {
@@ -77,7 +78,7 @@ function BoatDetailPage() {
             }
           } catch {
             if (active) {
-              setHostError('Host profile is temporarily unavailable.')
+              setHostError('Captain profile is temporarily unavailable.')
             }
           }
         } else {
@@ -146,7 +147,7 @@ function BoatDetailPage() {
         applicantProfile.experiences.length >= 1
 
       if (!profileReady) {
-        setReserveNotice('Please complete your profile before booking a trip.')
+        setShowProfileModal(true)
         return
       }
 
@@ -156,7 +157,7 @@ function BoatDetailPage() {
         boatCoverImage: boat.image,
         hostUid: boat.ownerUid,
         applicantUid: viewer.uid,
-        applicantName: applicantProfile.displayName || viewer.displayName || viewer.email || 'Guest',
+        applicantName: applicantProfile.displayName || viewer.displayName || viewer.email || 'Sailor',
         applicantAvatar: applicantProfile.avatarUrl || viewer.photoURL || '',
       })
       setReserveNotice('Request sent.')
@@ -245,24 +246,24 @@ function BoatDetailPage() {
         </article>
 
         <article className="detailInfoCard">
-          <h2>Meet your host</h2>
+          <h2>Meet your captain</h2>
           <div className="hostProfileHead hostProfileClickable" onClick={() => navigate(`/hosts/${boat.ownerUid}`)}>
             {hostProfile?.avatarUrl ? (
               <img src={hostProfile.avatarUrl} alt={hostProfile.displayName || boat.ownerName} />
             ) : (
               <div className="hostAvatarFallback">
-                {(hostProfile?.displayName || boat.ownerName || 'H').charAt(0).toUpperCase()}
+                {(hostProfile?.displayName || boat.ownerName || 'C').charAt(0).toUpperCase()}
               </div>
             )}
             <div>
-              <h3>{hostProfile?.displayName || boat.ownerName || 'Host'}</h3>
+              <h3>{hostProfile?.displayName || boat.ownerName || 'Captain'}</h3>
               <p>{hostProfile?.city || 'Location not provided'}</p>
             </div>
           </div>
           <button className="ghostBtn hostProfileBtn" onClick={() => navigate(`/hosts/${boat.ownerUid}`)}>
             View full profile
           </button>
-          <p>{hostProfile?.bio || 'This host has not added a public introduction yet.'}</p>
+          <p>{hostProfile?.bio || 'This captain has not added a public introduction yet.'}</p>
           {hostError && <p className="authNotice">{hostError}</p>}
           {hostProfile?.skills && hostProfile.skills.length > 0 && (
             <div className="hostSkillList">
@@ -306,6 +307,30 @@ function BoatDetailPage() {
           {reserveSubmitting ? 'Submitting...' : 'Reserve'}
         </button>
       </div>
+
+      {showProfileModal && (
+        <div className="modalOverlay" onClick={() => setShowProfileModal(false)}>
+          <div className="modalCard" onClick={(e) => e.stopPropagation()}>
+            <h3>Complete your profile</h3>
+            <p>
+              Your profile is missing required information. Please fill in your
+              display name, city, bio, skills, and at least one experience before
+              reserving a trip.
+            </p>
+            <div className="modalActions">
+              <button
+                className="publishBtn"
+                onClick={() => navigate('/', { state: { openProfile: true } })}
+              >
+                Go to profile
+              </button>
+              <button className="ghostBtn" onClick={() => setShowProfileModal(false)}>
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

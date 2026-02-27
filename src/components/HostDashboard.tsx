@@ -1,11 +1,11 @@
 import { type ChangeEvent, type RefObject } from 'react'
 import { type User } from 'firebase/auth'
-import Map, { Marker, NavigationControl, type MapRef } from 'react-map-gl/mapbox'
+import { type MapRef } from 'react-map-gl/mapbox'
 import { type BoatCard, type BoatCategory, type BoatFormData } from '../types'
 import { type BoatCoordinates } from '../features/boats/boatsApi'
 import { type BookingRequestRecord } from '../features/booking/bookingApi'
 import { type LocationSuggestion } from '../features/location/mapboxGeocode'
-import { maxBoatImages, mapboxToken } from '../data/constants'
+import { maxBoatImages } from '../data/constants'
 import { formatTripDate, formatDateTime } from '../utils/formatters'
 import { Header, UserButton, MenuDropdown } from './Header'
 
@@ -124,9 +124,9 @@ export default function HostDashboard({
 }: HostDashboardProps) {
   return (
     <div className="ownerPage">
-      <Header brandText="Land Ho Host">
+      <Header brandText="Land Ho Captain">
         <button className="ghostBtn" onClick={onBrowseAsGuest}>
-          Browse as Guest
+          Browse as Sailor
         </button>
         <UserButton
           viewer={viewer}
@@ -140,7 +140,7 @@ export default function HostDashboard({
             className="menuItem"
             onClick={() => { setMenuOpen(false); onBrowseAsGuest() }}
           >
-            Browse as Guest
+            Browse as Sailor
           </button>
           <button
             className="menuItem"
@@ -225,41 +225,9 @@ export default function HostDashboard({
                 ))}
               </div>
             )}
-            <div className="locationPickerCard">
-              {mapboxToken ? (
-                <Map
-                  ref={hostMapRef}
-                  mapboxAccessToken={mapboxToken}
-                  style={{ width: '100%', height: '220px' }}
-                  initialViewState={{
-                    longitude: hostPickerCenter.lng,
-                    latitude: hostPickerCenter.lat,
-                    zoom: 9,
-                  }}
-                  mapStyle="mapbox://styles/mapbox/streets-v12"
-                  onError={() => setLocationMapError('Map failed to load. Please verify Mapbox token scopes and domain restrictions.')}
-                >
-                  <NavigationControl position="top-right" />
-                  {selectedCoordinates && (
-                    <Marker
-                      longitude={selectedCoordinates.lng}
-                      latitude={selectedCoordinates.lat}
-                      draggable
-                      onDragEnd={handlePickerMarkerDragEnd}
-                    />
-                  )}
-                </Map>
-              ) : (
-                <p className="hintText">Map picker requires VITE_MAPBOX_ACCESS_TOKEN in environment.</p>
-              )}
-            </div>
-            {locationMapError && <small className="hintText locationError">{locationMapError}</small>}
-            <small className="hintText">
-              {selectedCoordinates
-                ? `Pinned at lat ${selectedCoordinates.lat.toFixed(5)}, lng ${selectedCoordinates.lng.toFixed(5)}`
-                : 'Search and select a location, then drag the marker for precision.'}
-            </small>
-            {selectedAddress && <small className="hintText">Resolved address: {selectedAddress}</small>}
+            {selectedAddress && (
+              <small className="hintText">Selected location: {selectedAddress}</small>
+            )}
             {locationLookupError && <small className="hintText locationError">{locationLookupError}</small>}
           </div>
           <div className="formRow split">
@@ -419,7 +387,7 @@ export default function HostDashboard({
                                 </div>
                               )}
                               <div className="requestMain">
-                                <strong>{request.applicantName || 'Guest'}</strong>
+                                <strong>{request.applicantName || 'Sailor'}</strong>
                                 <p>{formatDateTime(request.createdAt)}</p>
                                 <span className={`requestStatus status-${request.status}`}>
                                   {request.status}

@@ -2421,3 +2421,53 @@
   outline: none;
   border-color: var(--color-dark);
 }
+
+/* ── Modal ────────────────────────────────────── */
+
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.45);
+  padding: 16px;
+}
+
+.modalCard {
+  background: #fff;
+  border-radius: var(--radius-card);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.2);
+  max-width: 420px;
+  width: 100%;
+  padding: 28px 24px 24px;
+  text-align: center;
+}
+
+.modalCard h3 {
+  margin: 0 0 12px;
+  font-size: 1.2rem;
+  color: var(--color-dark);
+}
+
+.modalCard p {
+  margin: 0 0 24px;
+  font-size: 0.95rem;
+  color: #484848;
+  line-height: 1.5;
+}
+
+.modalActions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.modalActions .publishBtn {
+  min-width: 140px;
+}
+
+.modalActions .ghostBtn {
+  min-width: 100px;
+}

@@ -261,7 +261,7 @@ export function useBoatForm({ viewer, resumeCompleted, navigate, onNewListingPub
           image: form.images[0],
           images: form.images,
           ownerUid: viewer.uid,
-          ownerName: viewer.displayName || viewer.email || 'Host',
+          ownerName: viewer.displayName || viewer.email || 'Captain',
         })
         navigate(`/map?highlight=${nextBoatId}`)
       }
