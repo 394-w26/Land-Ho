@@ -49,6 +49,7 @@ export function useBoatForm({ viewer, resumeCompleted, navigate, onNewListingPub
   const [editingBoatId, setEditingBoatId] = useState('')
   const [deletingBoatId, setDeletingBoatId] = useState('')
   const [hostNotice, setHostNotice] = useState('')
+  const [hostSuccessModal, setHostSuccessModal] = useState('')
   const [boatImageUploading, setBoatImageUploading] = useState(false)
   const [draggingImageIndex, setDraggingImageIndex] = useState<number | null>(null)
 
@@ -247,7 +248,7 @@ export function useBoatForm({ viewer, resumeCompleted, navigate, onNewListingPub
           images: form.images,
         })
         setEditingBoatId('')
-        setHostNotice('Listing updated successfully.')
+        setHostSuccessModal('Listing updated successfully.')
       } else {
         const nextBoatId = await createBoatListing({
           title: form.title,
@@ -280,7 +281,7 @@ export function useBoatForm({ viewer, resumeCompleted, navigate, onNewListingPub
       setSelectedCoordinates(null)
       setSelectedAddress('')
       if (!editingBoatId) {
-        setHostNotice('Published successfully.')
+        setHostSuccessModal('Published successfully!')
         onNewListingRef.current?.()
       }
     } catch {
@@ -368,7 +369,7 @@ export function useBoatForm({ viewer, resumeCompleted, navigate, onNewListingPub
     setHostNotice('Deleting listing...')
     try {
       await deleteBoatListing(boatId)
-      setHostNotice('Listing deleted.')
+      setHostSuccessModal('Listing deleted.')
     } catch {
       setHostNotice('Delete failed. Check Firestore permissions and retry.')
     } finally {
@@ -389,7 +390,7 @@ export function useBoatForm({ viewer, resumeCompleted, navigate, onNewListingPub
     setHostNotice(status === 'approved' ? 'Approving request...' : 'Rejecting request...')
     try {
       await updateBookingRequestStatus(requestId, status)
-      setHostNotice(status === 'approved' ? 'Request approved.' : 'Request rejected.')
+      setHostSuccessModal(status === 'approved' ? 'Request approved.' : 'Request rejected.')
     } catch (error) {
       if (error instanceof Error && error.message) {
         setHostNotice(error.message)
@@ -417,6 +418,8 @@ export function useBoatForm({ viewer, resumeCompleted, navigate, onNewListingPub
     deletingBoatId,
     hostNotice,
     setHostNotice,
+    hostSuccessModal,
+    setHostSuccessModal,
     boatImageUploading,
     draggingImageIndex,
     setDraggingImageIndex,

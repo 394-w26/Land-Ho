@@ -8,6 +8,7 @@ import { type LocationSuggestion } from '../features/location/mapboxGeocode'
 import { maxBoatImages } from '../data/constants'
 import { formatTripDate, formatDateTime } from '../utils/formatters'
 import { Header, UserButton, MenuDropdown } from './Header'
+import FeedbackModal from './FeedbackModal'
 
 interface HostDashboardProps {
   viewer: User | null
@@ -28,6 +29,8 @@ interface HostDashboardProps {
   editingBoatId: string
   deletingBoatId: string
   hostNotice: string
+  hostSuccessModal: string
+  setHostSuccessModal: (msg: string) => void
   boatImageUploading: boolean
   draggingImageIndex: number | null
   setDraggingImageIndex: (index: number | null) => void
@@ -85,6 +88,8 @@ export default function HostDashboard({
   editingBoatId,
   deletingBoatId,
   hostNotice,
+  hostSuccessModal,
+  setHostSuccessModal,
   boatImageUploading,
   draggingImageIndex,
   setDraggingImageIndex,
@@ -416,6 +421,14 @@ export default function HostDashboard({
           </div>
         </div>
       </section>
+
+      {hostSuccessModal && (
+        <FeedbackModal
+          title="Success"
+          message={hostSuccessModal}
+          onClose={() => setHostSuccessModal('')}
+        />
+      )}
     </div>
   )
 }

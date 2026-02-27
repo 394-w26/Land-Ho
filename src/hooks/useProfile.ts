@@ -18,6 +18,7 @@ export function useProfile(viewer: User | null) {
   const [profileDraft, setProfileDraft] = useState<ProfileDraft>(() => loadStoredProfileDraft())
   const [profileSection, setProfileSection] = useState<ProfileSection>('basic')
   const [profileNotice, setProfileNotice] = useState('')
+  const [profileSuccessModal, setProfileSuccessModal] = useState('')
   const [skillInput, setSkillInput] = useState('')
   const [avatarUploading, setAvatarUploading] = useState(false)
 
@@ -150,7 +151,7 @@ export function useProfile(viewer: User | null) {
         return
       }
     }
-    setProfileNotice('Profile draft saved.')
+    setProfileSuccessModal('Profile draft saved.')
   }
 
   const saveAndFinishProfile = async () => {
@@ -159,7 +160,7 @@ export function useProfile(viewer: User | null) {
       setProfileNotice(`${missingItems.length} item(s) remaining: ${missingItems.join(', ')}`)
       return
     }
-    setProfileNotice('Profile completed. You can now book and publish boats.')
+    setProfileSuccessModal('Profile completed! You can now book and publish boats.')
   }
 
   const handleAvatarUpload = async (event: ChangeEvent<HTMLInputElement>) => {
@@ -177,7 +178,7 @@ export function useProfile(viewer: User | null) {
     try {
       const uploadedUrl = await uploadImageToStorage(`avatars/${viewer.uid}`, file)
       updateProfileDraft((prev) => ({ ...prev, avatarUrl: uploadedUrl }))
-      setProfileNotice('Avatar uploaded successfully.')
+      setProfileSuccessModal('Avatar uploaded successfully.')
     } catch (error) {
       setProfileNotice(getUploadErrorText(error))
     } finally {
@@ -191,6 +192,8 @@ export function useProfile(viewer: User | null) {
     setProfileSection,
     profileNotice,
     setProfileNotice,
+    profileSuccessModal,
+    setProfileSuccessModal,
     skillInput,
     setSkillInput,
     avatarUploading,

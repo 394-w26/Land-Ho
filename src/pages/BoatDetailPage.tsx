@@ -5,6 +5,7 @@ import { getBoatListingById, type BoatRecord } from '../features/boats/boatsApi'
 import { getUserPublicProfile, type UserPublicProfile } from '../features/users/usersApi'
 import { createBookingRequest, hasPendingBookingRequest } from '../features/booking/bookingApi'
 import { auth, isFirebaseReady } from '../lib/firebase'
+import FeedbackModal from '../components/FeedbackModal'
 
 const mapboxToken = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN as string | undefined
 
@@ -34,6 +35,7 @@ function BoatDetailPage() {
   const [hostProfile, setHostProfile] = useState<UserPublicProfile | null>(null)
   const [reserveSubmitting, setReserveSubmitting] = useState(false)
   const [reserveNotice, setReserveNotice] = useState('')
+  const [reserveSuccessModal, setReserveSuccessModal] = useState('')
   const [showProfileModal, setShowProfileModal] = useState(false)
 
   useEffect(() => {
@@ -160,7 +162,7 @@ function BoatDetailPage() {
         applicantName: applicantProfile.displayName || viewer.displayName || viewer.email || 'Sailor',
         applicantAvatar: applicantProfile.avatarUrl || viewer.photoURL || '',
       })
-      setReserveNotice('Request sent.')
+      setReserveSuccessModal('Your booking request has been sent! The captain will review it shortly.')
     } catch (error) {
       if (error instanceof Error && error.message) {
         setReserveNotice(error.message)
@@ -330,6 +332,14 @@ function BoatDetailPage() {
             </div>
           </div>
         </div>
+      )}
+
+      {reserveSuccessModal && (
+        <FeedbackModal
+          title="Request Sent"
+          message={reserveSuccessModal}
+          onClose={() => setReserveSuccessModal('')}
+        />
       )}
     </div>
   )

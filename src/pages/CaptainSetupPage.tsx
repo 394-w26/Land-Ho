@@ -12,6 +12,7 @@ import type {
   CaptainLicenseType,
   CaptainOnboardingProfile,
 } from '../features/onboarding/onboardingTypes'
+import FeedbackModal from '../components/FeedbackModal'
 
 type Step = 'identity' | 'credential' | 'boat' | 'compliance' | 'review'
 const STEPS: { key: Step; label: string }[] = [
@@ -64,6 +65,7 @@ function CaptainSetupPage() {
   const [step, setStep] = useState<Step>('identity')
   const [draft, setDraft] = useState(emptyDraft)
   const [notice, setNotice] = useState('')
+  const [successModal, setSuccessModal] = useState('')
   const [saving, setSaving] = useState(false)
   const [uploading, setUploading] = useState(false)
   const [signingIn, setSigningIn] = useState(false)
@@ -138,7 +140,7 @@ function CaptainSetupPage() {
     try {
       const url = await uploadImageToStorage(`captain-credentials/${viewer.uid}`, file)
       patch({ licenseImageUrl: url })
-      setNotice('Credential image uploaded.')
+      setSuccessModal('Credential image uploaded.')
     } catch {
       setNotice('Upload failed. Please try again.')
     } finally {
@@ -184,7 +186,7 @@ function CaptainSetupPage() {
         backgroundCheckStatus: 'pending',
         completedAt: new Date().toISOString(),
       })
-      setNotice('Captain profile submitted! Your background check is now pending review.')
+      setSuccessModal('Captain profile submitted! Your background check is now pending review.')
     } catch {
       setNotice('Submission failed. Please try again.')
     } finally {
@@ -487,6 +489,14 @@ function CaptainSetupPage() {
 
         {notice && <p className="setupNotice">{notice}</p>}
       </section>
+
+      {successModal && (
+        <FeedbackModal
+          title="Captain Setup"
+          message={successModal}
+          onClose={() => setSuccessModal('')}
+        />
+      )}
     </div>
   )
 }

@@ -1,12 +1,15 @@
 import { type ChangeEvent } from 'react'
 import { type ProfileDraft, type ProfileSection, type ExperienceItem, type CertificateItem } from '../types'
 import { Header } from './Header'
+import FeedbackModal from './FeedbackModal'
 
 interface ProfileEditorProps {
   profileDraft: ProfileDraft
   profileSection: ProfileSection
   setProfileSection: (section: ProfileSection) => void
   profileNotice: string
+  profileSuccessModal: string
+  setProfileSuccessModal: (msg: string) => void
   skillInput: string
   setSkillInput: (value: string) => void
   avatarUploading: boolean
@@ -34,6 +37,8 @@ export default function ProfileEditor({
   profileSection,
   setProfileSection,
   profileNotice,
+  profileSuccessModal,
+  setProfileSuccessModal,
   skillInput,
   setSkillInput,
   avatarUploading,
@@ -283,6 +288,14 @@ export default function ProfileEditor({
           {profileNotice && <p className="profileNotice">{profileNotice}</p>}
         </div>
       </section>
+
+      {profileSuccessModal && (
+        <FeedbackModal
+          title="Profile Updated"
+          message={profileSuccessModal}
+          onClose={() => setProfileSuccessModal('')}
+        />
+      )}
     </div>
   )
 }

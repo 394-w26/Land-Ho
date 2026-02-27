@@ -12,6 +12,7 @@ import type {
   InstructorRequest,
   InstructorFocusArea,
 } from '../features/onboarding/onboardingTypes'
+import FeedbackModal from '../components/FeedbackModal'
 
 const FOCUS_OPTIONS: { value: InstructorFocusArea; label: string }[] = [
   { value: 'sailing_basics', label: 'Sailing Basics' },
@@ -45,6 +46,7 @@ function InstructorRequestPage() {
   const [loading, setLoading] = useState(true)
   const [signingIn, setSigningIn] = useState(false)
   const [notice, setNotice] = useState('')
+  const [successModal, setSuccessModal] = useState('')
   const [tab, setTab] = useState<'new' | 'history'>('new')
 
   /* ── form state ─── */
@@ -133,7 +135,7 @@ function InstructorRequestPage() {
         experienceLevel,
         notes: notes.trim(),
       })
-      setNotice('✅ Instructor request submitted! You will be notified when matched.')
+      setSuccessModal('Instructor request submitted! You will be notified when matched.')
       /* reset form */
       setBoatId('')
       setBoatTitle('')
@@ -410,6 +412,14 @@ function InstructorRequestPage() {
 
         {notice && <p className="setupNotice">{notice}</p>}
       </section>
+
+      {successModal && (
+        <FeedbackModal
+          title="Instructor Request"
+          message={successModal}
+          onClose={() => setSuccessModal('')}
+        />
+      )}
     </div>
   )
 }

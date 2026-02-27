@@ -8,6 +8,7 @@ import {
   upsertSailorProfile,
 } from '../features/onboarding/onboardingApi'
 import type { SailorOnboardingProfile } from '../features/onboarding/onboardingTypes'
+import FeedbackModal from '../components/FeedbackModal'
 import {
   getShuffledQuestions,
   PASS_THRESHOLD,
@@ -46,6 +47,7 @@ function SailorSetupPage() {
   const [step, setStep] = useState<Step>('identity')
   const [draft, setDraft] = useState(emptyDraft)
   const [notice, setNotice] = useState('')
+  const [successModal, setSuccessModal] = useState('')
   const [saving, setSaving] = useState(false)
   const [uploading, setUploading] = useState(false)
   const [signingIn, setSigningIn] = useState(false)
@@ -190,7 +192,7 @@ function SailorSetupPage() {
     try {
       const url = await uploadImageToStorage(`sailor-certificates/${viewer.uid}`, file)
       patch({ boatEdCertificateUrl: url })
-      setNotice('Certificate uploaded.')
+      setSuccessModal('Certificate uploaded.')
     } catch {
       setNotice('Upload failed. Please try again.')
     } finally {
@@ -213,7 +215,7 @@ function SailorSetupPage() {
         backgroundCheckStatus: 'pending',
         completedAt: new Date().toISOString(),
       })
-      setNotice('Sailor profile submitted! Background check is now pending review.')
+      setSuccessModal('Sailor profile submitted! Background check is now pending review.')
     } catch {
       setNotice('Submission failed. Please try again.')
     } finally {
@@ -562,6 +564,14 @@ function SailorSetupPage() {
 
         {notice && <p className="setupNotice">{notice}</p>}
       </section>
+
+      {successModal && (
+        <FeedbackModal
+          title="Sailor Setup"
+          message={successModal}
+          onClose={() => setSuccessModal('')}
+        />
+      )}
     </div>
   )
 }

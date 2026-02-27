@@ -102,6 +102,8 @@ function MarketplacePage() {
         profileSection={profile.profileSection}
         setProfileSection={profile.setProfileSection}
         profileNotice={profile.profileNotice}
+        profileSuccessModal={profile.profileSuccessModal}
+        setProfileSuccessModal={profile.setProfileSuccessModal}
         skillInput={profile.skillInput}
         setSkillInput={profile.setSkillInput}
         avatarUploading={profile.avatarUploading}
@@ -147,6 +149,8 @@ function MarketplacePage() {
         editingBoatId={boatForm.editingBoatId}
         deletingBoatId={boatForm.deletingBoatId}
         hostNotice={boatForm.hostNotice}
+        hostSuccessModal={boatForm.hostSuccessModal}
+        setHostSuccessModal={boatForm.setHostSuccessModal}
         boatImageUploading={boatForm.boatImageUploading}
         draggingImageIndex={boatForm.draggingImageIndex}
         setDraggingImageIndex={boatForm.setDraggingImageIndex}
