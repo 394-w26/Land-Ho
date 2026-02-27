@@ -726,6 +726,12 @@
   gap: 12px;
 }
 
+.formRow.split > div {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
 @media (min-width: 480px) {
   .formRow.split {
     grid-template-columns: 1fr 1fr;

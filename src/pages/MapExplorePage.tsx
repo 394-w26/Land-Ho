@@ -25,7 +25,7 @@ const categories: { key: 'all' | BoatCategory; label: string }[] = [
   { key: 'dayTrip', label: 'Day Trips' },
   { key: 'sunset', label: 'Sunset Cruises' },
   { key: 'training', label: 'Training' },
-  { key: 'island', label: 'Island Hops' },
+  { key: 'cruise', label: 'Cruises' },
 ]
 
 const hasCoordinates = (coordinates: BoatCoordinates | null): coordinates is BoatCoordinates => {

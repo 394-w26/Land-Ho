@@ -14,7 +14,7 @@ import {
 } from 'firebase/firestore'
 import { db } from '../../lib/firebase'
 
-export type BoatCategory = 'dayTrip' | 'sunset' | 'training' | 'island'
+export type BoatCategory = 'dayTrip' | 'sunset' | 'training' | 'cruise'
 
 export interface BoatCoordinates {
   lat: number

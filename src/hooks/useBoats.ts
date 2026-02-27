@@ -25,7 +25,7 @@ export function useBoats({ viewer, category, searchText, seatFilter }: UseBoatsO
     }
     const unsubscribe = subscribePublishedBoats(
       (nextBoats) => {
-        setBoats(nextBoats)
+        setBoats(nextBoats.length === 0 ? initialBoatData : nextBoats)
         setBoatsLoading(false)
         setBoatsError('')
       },
@@ -40,10 +40,11 @@ export function useBoats({ viewer, category, searchText, seatFilter }: UseBoatsO
   const filteredBoats = useMemo(() => {
     return boats.filter((boat) => {
       const byCategory = category === 'all' || boat.category === category
+      const keyword = searchText.trim().toLowerCase()
       const bySearch =
-        searchText.trim().length === 0 ||
-        boat.title.includes(searchText) ||
-        boat.location.includes(searchText)
+        keyword.length === 0 ||
+        boat.title.toLowerCase().includes(keyword) ||
+        boat.location.toLowerCase().includes(keyword)
       const seats = Number(seatFilter || 0)
       const bySeats = seats === 0 || boat.seats >= seats
       return byCategory && bySearch && bySeats

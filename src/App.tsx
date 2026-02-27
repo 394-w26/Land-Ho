@@ -16,6 +16,7 @@ import CaptainSetupPage from './pages/CaptainSetupPage'
 import SailorSetupPage from './pages/SailorSetupPage'
 import InstructorRequestPage from './pages/InstructorRequestPage'
 import MapExplorePage from './pages/MapExplorePage'
+import SeedPage from './pages/SeedPage'
 
 function MarketplacePage() {
   const navigate = useNavigate()
@@ -231,6 +232,7 @@ function App() {
       <Route path="/setup/captain" element={<CaptainSetupPage />} />
       <Route path="/setup/sailor" element={<SailorSetupPage />} />
       <Route path="/request-instructor" element={<InstructorRequestPage />} />
+      <Route path="/seed" element={<SeedPage />} />
     </Routes>
   )
 }

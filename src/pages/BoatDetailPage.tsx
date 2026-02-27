@@ -5,6 +5,7 @@ import { getBoatListingById, type BoatRecord } from '../features/boats/boatsApi'
 import { getUserPublicProfile, type UserPublicProfile } from '../features/users/usersApi'
 import { createBookingRequest, hasPendingBookingRequest } from '../features/booking/bookingApi'
 import { auth, isFirebaseReady } from '../lib/firebase'
+import { initialBoatData } from '../data/seedBoats'
 import FeedbackModal from '../components/FeedbackModal'
 
 const mapboxToken = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN as string | undefined
@@ -66,8 +67,31 @@ function BoatDetailPage() {
           return
         }
         if (!boatDoc) {
-          setBoat(null)
-          setBoatError('This boat listing does not exist.')
+          // Fallback to local seed data (for demo boats that aren't in Firestore yet)
+          const seedBoat = initialBoatData.find((b) => b.id === boatId)
+          if (!seedBoat) {
+            setBoat(null)
+            setBoatError('This boat listing does not exist.')
+            setLoading(false)
+            return
+          }
+          const mappedSeedBoat: BoatRecord = {
+            id: seedBoat.id,
+            title: seedBoat.title,
+            location: seedBoat.location,
+            coordinates: seedBoat.coordinates,
+            price: seedBoat.price,
+            rating: seedBoat.rating,
+            seats: seedBoat.seats,
+            captain: seedBoat.captain,
+            date: seedBoat.date,
+            category: seedBoat.category,
+            image: seedBoat.image,
+            images: seedBoat.images,
+            ownerUid: seedBoat.ownerUid,
+            ownerName: seedBoat.ownerName,
+          }
+          setBoat(mappedSeedBoat)
           setLoading(false)
           return
         }

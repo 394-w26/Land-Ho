@@ -1,7 +1,8 @@
+import { useMemo, useState } from 'react'
 import { type User } from 'firebase/auth'
 import { useNavigate } from 'react-router-dom'
 import { type BoatCard, type BoatCategory } from '../types'
-import { categories } from '../data/constants'
+import { categories, chicagoLocations } from '../data/constants'
 import { formatTripDate } from '../utils/formatters'
 import { Header, UserButton, MenuDropdown } from './Header'
 
@@ -59,6 +60,13 @@ export default function GuestMarketplace({
   onNavigateMap,
 }: GuestMarketplaceProps) {
   const navigate = useNavigate()
+  const [whereFocused, setWhereFocused] = useState(false)
+
+  const locationSuggestions = useMemo(() => {
+    if (!whereFocused || searchText.trim().length === 0) return []
+    const keyword = searchText.trim().toLowerCase()
+    return chicagoLocations.filter(loc => loc.toLowerCase().includes(keyword))
+  }, [searchText, whereFocused])
 
   return (
     <div className="homePage">
@@ -126,10 +134,32 @@ export default function GuestMarketplace({
         <div className="searchItem">
           <label>Where</label>
           <input
-            placeholder="Search destinations"
+            placeholder="Search harbors & marinas"
             value={searchText}
-            onChange={(e) => setSearchText(e.target.value)}
+            onFocus={() => setWhereFocused(true)}
+            onBlur={() => setTimeout(() => setWhereFocused(false), 150)}
+            onChange={(e) => {
+              setSearchText(e.target.value)
+              setWhereFocused(true)
+            }}
           />
+          {locationSuggestions.length > 0 && (
+            <div className="suggestionsList">
+              {locationSuggestions.map((loc) => (
+                <button
+                  key={loc}
+                  className="suggestionItem"
+                  onMouseDown={(e) => e.preventDefault()}
+                  onClick={() => {
+                    setSearchText(loc)
+                    setWhereFocused(false)
+                  }}
+                >
+                  <div className="suggestionTitle">{loc}</div>
+                </button>
+              ))}
+            </div>
+          )}
         </div>
         <div className="searchItem">
           <label>When</label>

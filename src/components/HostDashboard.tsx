@@ -190,7 +190,7 @@ export default function HostDashboard({
             <input
               value={form.title}
               onChange={(e) => setForm({ ...form, title: e.target.value })}
-              placeholder="Sunset sailing in Sanya Bay"
+              placeholder="Sunset cruise from Monroe Harbor"
             />
           </div>
           <div className="formRow">
@@ -204,7 +204,7 @@ export default function HostDashboard({
                   setForm({ ...form, location: next })
                   setSelectedCoordinates(null)
                 }}
-                placeholder="Search marina, bay, or pier"
+                placeholder="Search Chicago harbor or marina"
               />
               <button className="ghostBtn inlineActionBtn" type="button" onClick={() => void searchLocations()}>
                 {locationSearching ? 'Searching...' : 'Search'}
@@ -234,6 +234,7 @@ export default function HostDashboard({
               <label>Price (USD/person)</label>
               <input
                 value={form.price}
+                placeholder="e.g. 85"
                 onChange={(e) => setForm({ ...form, price: e.target.value })}
               />
             </div>
@@ -241,6 +242,7 @@ export default function HostDashboard({
               <label>Seats</label>
               <input
                 value={form.seats}
+                placeholder="e.g. 6"
                 onChange={(e) => setForm({ ...form, seats: e.target.value })}
               />
             </div>
@@ -251,7 +253,7 @@ export default function HostDashboard({
               <input
                 value={form.captain}
                 onChange={(e) => setForm({ ...form, captain: e.target.value })}
-                placeholder="Captain name"
+                placeholder="Captain name (you)"
               />
             </div>
             <div>
@@ -274,11 +276,11 @@ export default function HostDashboard({
               <option value="dayTrip">Day Trips</option>
               <option value="sunset">Sunset Cruises</option>
               <option value="training">Training</option>
-              <option value="island">Island Hops</option>
+              <option value="cruise">Cruises</option>
             </select>
           </div>
           <div className="formRow">
-            <label>Boat image (required)</label>
+            <label>Boat photos (required)</label>
             <input type="file" accept="image/*" multiple onChange={handleBoatImageUpload} />
             <small className="hintText">
               {form.images.length} / {maxBoatImages} images uploaded

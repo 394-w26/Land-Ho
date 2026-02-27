@@ -37,15 +37,25 @@ export const loadStoredProfileDraft = (): ProfileDraft => {
 }
 
 export const locationCoordinatesLookup: Record<string, BoatCoordinates> = {
-  'Sanya Bay': { lat: 18.2528, lng: 109.5119 },
-  'Xiamen Wuyuan Bay': { lat: 24.5096, lng: 118.1881 },
-  'Qingdao Olympic Sailing Center': { lat: 36.0604, lng: 120.3755 },
-  'Zhoushan Islands': { lat: 29.9853, lng: 122.2072 },
-  'Shenzhen Dapeng': { lat: 22.5954, lng: 114.5422 },
-  'Beihai Silver Beach': { lat: 21.4171, lng: 109.1512 },
+  'Montrose Harbor': { lat: 41.9639, lng: -87.6383 },
+  'Belmont Harbor': { lat: 41.9418, lng: -87.6365 },
+  'Diversey Harbor': { lat: 41.9328, lng: -87.6416 },
+  'The Playpen Chicago': { lat: 41.929, lng: -87.62 },
+  'Navy Pier Marina': { lat: 41.8917, lng: -87.6 },
+  'Chicago Harbor': { lat: 41.887, lng: -87.609 },
+  'DuSable Harbor': { lat: 41.884, lng: -87.612 },
+  'Monroe Harbor': { lat: 41.878, lng: -87.613 },
+  'Burnham Harbor': { lat: 41.858, lng: -87.61 },
+  '31st Street Harbor': { lat: 41.8383, lng: -87.6075 },
+  '59th Street Harbor': { lat: 41.787, lng: -87.579 },
+  'Jackson Park Inner Harbor': { lat: 41.773, lng: -87.576 },
+  'Jackson Park Outer Harbor': { lat: 41.77, lng: -87.571 },
+  'Canal Street Marina': { lat: 41.855, lng: -87.634 },
 }
 
-export const defaultCoordinates: BoatCoordinates = { lat: 24.4798, lng: 118.0894 }
+export const chicagoLocations: string[] = Object.keys(locationCoordinatesLookup)
+
+export const defaultCoordinates: BoatCoordinates = { lat: 41.8781, lng: -87.6298 }
 
 export const findCoordinatesForLocation = (locationText: string): BoatCoordinates => {
   const trimmed = locationText.trim()
@@ -60,5 +70,5 @@ export const categories: { key: BoatCategory; label: string; icon: string }[] = 
   { key: 'dayTrip', label: 'Day Trips', icon: '🌊' },
   { key: 'sunset', label: 'Sunset Cruises', icon: '🌇' },
   { key: 'training', label: 'Training', icon: '🧭' },
-  { key: 'island', label: 'Island Hops', icon: '🏝️' },
+  { key: 'cruise', label: 'Cruises', icon: '🚢' },
 ]
