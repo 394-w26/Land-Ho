@@ -88,18 +88,13 @@ export default function HostDashboard({
   boatImageUploading,
   draggingImageIndex,
   setDraggingImageIndex,
-  hostMapRef,
   locationQuery,
   setLocationQuery,
   locationCandidates,
   locationSearching,
   locationLookupError,
-  locationMapError,
-  setLocationMapError,
-  selectedCoordinates,
   setSelectedCoordinates,
   selectedAddress,
-  hostPickerCenter,
   activeRequestBoatId,
   activeBoatRequests,
   requestsLoading,
@@ -120,7 +115,6 @@ export default function HostDashboard({
   handleBoatImageUpload,
   applySelectedLocation,
   searchLocations,
-  handlePickerMarkerDragEnd,
 }: HostDashboardProps) {
   return (
     <div className="ownerPage">
