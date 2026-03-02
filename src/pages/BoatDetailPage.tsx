@@ -305,18 +305,47 @@ function BoatDetailPage() {
         <article className="detailInfoCard detailMapCard">
           <div className="detailMapHeader">
             <h2>Location on map</h2>
-            <button className="ghostBtn compactActionBtn" onClick={() => navigate(`/map?highlight=${boat.id}`)}>
+            <button
+              className="ghostBtn compactActionBtn"
+              onClick={() =>
+                navigate('/', {
+                  state: {
+                    openMap: true,
+                    highlightBoatId: boat.id,
+                  },
+                })
+              }
+            >
               Open map view
             </button>
           </div>
           {boat.coordinates && detailMapPreviewUrl ? (
-            <button className="detailMapPreviewBtn" onClick={() => navigate(`/map?highlight=${boat.id}`)}>
+            <button
+              className="detailMapPreviewBtn"
+              onClick={() =>
+                navigate('/', {
+                  state: {
+                    openMap: true,
+                    highlightBoatId: boat.id,
+                  },
+                })
+              }
+            >
               <img src={detailMapPreviewUrl} alt={`${boat.title} location map`} className="detailMapPreview" />
             </button>
           ) : (
             <div className="detailMapEmpty">
               <p>Map preview unavailable for this listing.</p>
-              <button className="ghostBtn compactActionBtn" onClick={() => navigate('/map')}>
+              <button
+                className="ghostBtn compactActionBtn"
+                onClick={() =>
+                  navigate('/', {
+                    state: {
+                      openMap: true,
+                    },
+                  })
+                }
+              >
                 Browse all map listings
               </button>
             </div>

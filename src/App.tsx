@@ -10,12 +10,12 @@ import { useBoatForm } from './hooks/useBoatForm'
 import ProfileEditor from './components/ProfileEditor'
 import HostDashboard from './components/HostDashboard'
 import GuestMarketplace from './components/GuestMarketplace'
+import MarketplaceMapView from './components/MarketplaceMapView'
 import BoatDetailPage from './pages/BoatDetailPage'
 import HostResumePage from './pages/HostResumePage'
 import CaptainSetupPage from './pages/CaptainSetupPage'
 import SailorSetupPage from './pages/SailorSetupPage'
 import InstructorRequestPage from './pages/InstructorRequestPage'
-import MapExplorePage from './pages/MapExplorePage'
 
 function MarketplacePage() {
   const navigate = useNavigate()
@@ -26,6 +26,7 @@ function MarketplacePage() {
   const [category, setCategory] = useState<BoatCategory>('all')
   const [searchText, setSearchText] = useState('')
   const [seatFilter, setSeatFilter] = useState('')
+  const [highlightBoatId, setHighlightBoatId] = useState('')
 
   const { viewer, authLoading, authError, loginWithGoogle, signOutUser, userInitial } = useAuth()
   const profile = useProfile(viewer)
@@ -49,7 +50,12 @@ function MarketplacePage() {
   })
 
   useEffect(() => {
-    const routeState = location.state as { initialMode?: 'guest' | 'host'; openProfile?: boolean } | null
+    const routeState = location.state as {
+      initialMode?: 'guest' | 'host'
+      openProfile?: boolean
+      openMap?: boolean
+      highlightBoatId?: string
+    } | null
     if (routeState?.initialMode === 'host') {
       setMode('host')
       setAppView('market')
@@ -57,6 +63,12 @@ function MarketplacePage() {
     if (routeState?.openProfile) {
       setAppView('profile')
       profile.setProfileSection('basic')
+    }
+    if (routeState?.openMap) {
+      setMode('guest')
+      setAppView('map')
+      setHighlightBoatId(routeState.highlightBoatId ?? '')
+      navigate('/', { replace: true, state: null })
     }
   }, [location.state]) // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -88,7 +100,7 @@ function MarketplacePage() {
 
   const handleSignOut = async () => {
     await signOutUser()
-        setMode('guest')
+    setMode('guest')
     setAppView('market')
     boatForm.setHostNotice('')
     profile.setProfileNotice('')
@@ -191,6 +203,25 @@ function MarketplacePage() {
     )
   }
 
+  if (appView === 'map') {
+    return (
+      <MarketplaceMapView
+        boats={filteredBoats}
+        boatsLoading={boatsLoading}
+        boatsError={boatsError}
+        category={category}
+        setCategory={setCategory}
+        searchText={searchText}
+        setSearchText={setSearchText}
+        seatFilter={seatFilter}
+        setSeatFilter={setSeatFilter}
+        onBackToList={() => setAppView('market')}
+        highlightBoatId={highlightBoatId}
+        onHighlightHandled={() => setHighlightBoatId('')}
+      />
+    )
+  }
+
   return (
     <GuestMarketplace
       viewer={viewer}
@@ -216,7 +247,7 @@ function MarketplacePage() {
       onNavigateCaptainSetup={() => navigate('/setup/captain')}
       onNavigateSailorSetup={() => navigate('/setup/sailor')}
       onNavigateInstructorRequest={() => navigate('/request-instructor')}
-      onNavigateMap={() => navigate('/map')}
+      onNavigateMap={() => setAppView('map')}
     />
   )
 }
@@ -225,7 +256,6 @@ function App() {
   return (
     <Routes>
       <Route path="/" element={<MarketplacePage />} />
-      <Route path="/map" element={<MapExplorePage />} />
       <Route path="/boats/:boatId" element={<BoatDetailPage />} />
       <Route path="/hosts/:uid" element={<HostResumePage />} />
       <Route path="/setup/captain" element={<CaptainSetupPage />} />

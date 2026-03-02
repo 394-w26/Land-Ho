@@ -69,18 +69,6 @@
   }
 }
 
-.mapPage > .topBar {
-  margin: 0 -12px;
-  padding: 14px 12px;
-}
-
-@media (min-width: 768px) {
-  .mapPage > .topBar {
-    margin: 0 -20px;
-    padding: 14px 20px;
-  }
-}
-
 .brand {
   display: flex;
   align-items: center;
@@ -1640,68 +1628,15 @@
    Map Explore Page
    ════════════════════════════════════════════════ */
 
-.mapPage {
-  padding: 0 12px 0;
-  display: flex;
-  flex-direction: column;
-  height: 100dvh;
-  overflow: hidden;
-}
-
-@media (min-width: 768px) {
-  .mapPage {
-    padding: 0 20px 0;
-  }
-}
-
-@media (min-width: 1080px) {
-  .mapPage {
-    max-width: 1400px;
-    margin: 0 auto;
-  }
-}
-
-.mapTopBar {
-  padding-bottom: 8px;
-  flex-shrink: 0;
-}
-
-.mapTopActions {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.mapNavBtn {
-  padding: 8px 14px;
-  text-decoration: none;
-  color: #F5F0E8;
-  font-size: 0.875rem;
-  font-weight: 600;
-  border: 1px solid rgba(255,255,255,0.25);
-  border-radius: var(--radius-pill);
-}
-
-.mapNavBtn:hover {
-  border-color: rgba(255,255,255,0.4);
-  color: #ffffff;
-}
-
 .mapSearchSection {
   flex-shrink: 0;
-  margin: 12px 0 10px;
+  margin: 20px 0;
 }
 
 @media (min-width: 768px) {
   .mapSearchSection {
     max-width: 960px;
-    margin: 24px auto 16px;
-  }
-  .mapSearchSection.searchSection {
-    flex-direction: row;
-    border-radius: var(--radius-pill);
-    padding: 4px 4px 4px 12px;
-    gap: 0;
+    margin: 28px auto 24px;
   }
 }
 

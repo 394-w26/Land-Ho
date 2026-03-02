@@ -96,7 +96,6 @@ export default function HostDashboard({
   locationQuery,
   setLocationQuery,
   locationCandidates,
-  locationSearching,
   locationLookupError,
   setSelectedCoordinates,
   selectedAddress,
@@ -119,7 +118,6 @@ export default function HostDashboard({
   openApplicantProfile,
   handleBoatImageUpload,
   applySelectedLocation,
-  searchLocations,
 }: HostDashboardProps) {
   const [locationFocused, setLocationFocused] = useState(false)
 

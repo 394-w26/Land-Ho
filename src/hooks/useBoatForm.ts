@@ -264,7 +264,12 @@ export function useBoatForm({ viewer, resumeCompleted, navigate, onNewListingPub
           ownerUid: viewer.uid,
           ownerName: viewer.displayName || viewer.email || 'Captain',
         })
-        navigate(`/map?highlight=${nextBoatId}`)
+        navigate('/', {
+          state: {
+            openMap: true,
+            highlightBoatId: nextBoatId,
+          },
+        })
       }
       setForm({
         title: '',

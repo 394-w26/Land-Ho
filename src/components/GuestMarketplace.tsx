@@ -1,10 +1,11 @@
-import { useMemo, useState } from 'react'
+import { useMemo } from 'react'
 import { type User } from 'firebase/auth'
 import { useNavigate } from 'react-router-dom'
 import { type BoatCard, type BoatCategory } from '../types'
-import { categories, chicagoLocations } from '../data/constants'
+import { chicagoLocations } from '../data/constants'
 import { formatTripDate } from '../utils/formatters'
 import { Header, UserButton, MenuDropdown } from './Header'
+import MarketplaceControls from './MarketplaceControls'
 
 interface GuestMarketplaceProps {
   viewer: User | null
@@ -60,19 +61,21 @@ export default function GuestMarketplace({
   onNavigateMap,
 }: GuestMarketplaceProps) {
   const navigate = useNavigate()
-  const [whereFocused, setWhereFocused] = useState(false)
 
   const locationSuggestions = useMemo(() => {
-    if (!whereFocused || searchText.trim().length === 0) return []
     const keyword = searchText.trim().toLowerCase()
-    return chicagoLocations.filter(loc => loc.toLowerCase().includes(keyword))
-  }, [searchText, whereFocused])
+    if (keyword.length === 0) return []
+    return chicagoLocations.filter((loc) => loc.toLowerCase().includes(keyword))
+  }, [searchText])
 
   return (
     <div className="homePage">
       <Header brandText="Land Ho">
         <button className="ghostBtn" onClick={onBecomeHost}>
           Sign up as a captain
+        </button>
+        <button className="ghostBtn" onClick={onNavigateMap}>
+          Map view
         </button>
         <UserButton
           viewer={viewer}
@@ -110,7 +113,7 @@ export default function GuestMarketplace({
             className="menuItem"
             onClick={() => { setMenuOpen(false); onNavigateMap() }}
           >
-            Explore Map
+            Map view
           </button>
           {viewer ? (
             <button className="menuItem dangerText" onClick={onSignOut}>
@@ -130,72 +133,15 @@ export default function GuestMarketplace({
         </MenuDropdown>
       </Header>
 
-      <section className="searchSection">
-        <div className="searchItem">
-          <label>Where</label>
-          <input
-            placeholder="Search harbors & marinas"
-            value={searchText}
-            onFocus={() => setWhereFocused(true)}
-            onBlur={() => setTimeout(() => setWhereFocused(false), 150)}
-            onChange={(e) => {
-              setSearchText(e.target.value)
-              setWhereFocused(true)
-            }}
-          />
-          {locationSuggestions.length > 0 && (
-            <div className="suggestionsList">
-              {locationSuggestions.map((loc) => (
-                <button
-                  key={loc}
-                  className="suggestionItem"
-                  onMouseDown={(e) => e.preventDefault()}
-                  onClick={() => {
-                    setSearchText(loc)
-                    setWhereFocused(false)
-                  }}
-                >
-                  <div className="suggestionTitle">{loc}</div>
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
-        <div className="searchItem">
-          <label>When</label>
-          <input placeholder="Any week" />
-        </div>
-        <div className="searchItem">
-          <label>Sailors</label>
-          <input
-            placeholder="Add sailors"
-            value={seatFilter}
-            onChange={(e) => setSeatFilter(e.target.value)}
-          />
-        </div>
-        <button type="button" className="searchBtn searchBtn--icon" aria-label="Search">
-          <span className="searchBtnText">Search</span>
-          <span className="searchBtnIcon" aria-hidden>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <circle cx="11" cy="11" r="8" />
-              <path d="m21 21-4.35-4.35" />
-            </svg>
-          </span>
-        </button>
-      </section>
-
-      <section className="categoryTabs">
-        {categories.map((item) => (
-          <button
-            key={item.key}
-            className={category === item.key ? 'tab active' : 'tab'}
-            onClick={() => setCategory(item.key)}
-          >
-            <span>{item.icon}</span>
-            {item.label}
-          </button>
-        ))}
-      </section>
+      <MarketplaceControls
+        category={category}
+        setCategory={setCategory}
+        searchText={searchText}
+        setSearchText={setSearchText}
+        seatFilter={seatFilter}
+        setSeatFilter={setSeatFilter}
+        suggestions={locationSuggestions.map((loc) => ({ id: loc, label: loc }))}
+      />
 
       <section className="listHeader">
         <h2>Explore Popular Boats</h2>

@@ -24,7 +24,7 @@ export interface BoatCard {
   ownerName: string
 }
 
-export type AppView = 'market' | 'profile'
+export type AppView = 'market' | 'map' | 'profile'
 
 export type ProfileSection = 'basic' | 'skills' | 'experiences' | 'certificates'
 
