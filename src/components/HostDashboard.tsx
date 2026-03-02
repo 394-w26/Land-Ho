@@ -1,11 +1,11 @@
-import { type ChangeEvent, type RefObject } from 'react'
+import { type ChangeEvent, type RefObject, useMemo, useState } from 'react'
 import { type User } from 'firebase/auth'
 import { type MapRef } from 'react-map-gl/mapbox'
 import { type BoatCard, type BoatCategory, type BoatFormData } from '../types'
 import { type BoatCoordinates } from '../features/boats/boatsApi'
 import { type BookingRequestRecord } from '../features/booking/bookingApi'
 import { type LocationSuggestion } from '../features/location/mapboxGeocode'
-import { maxBoatImages } from '../data/constants'
+import { maxBoatImages, chicagoLocations, locationCoordinatesLookup } from '../data/constants'
 import { formatTripDate, formatDateTime } from '../utils/formatters'
 import { Header, UserButton, MenuDropdown } from './Header'
 import FeedbackModal from './FeedbackModal'
@@ -121,6 +121,24 @@ export default function HostDashboard({
   applySelectedLocation,
   searchLocations,
 }: HostDashboardProps) {
+  const [locationFocused, setLocationFocused] = useState(false)
+
+  const localHarborSuggestions = useMemo(() => {
+    const keyword = locationQuery.trim().toLowerCase()
+    if (!locationFocused || keyword.length === 0) return []
+    return chicagoLocations.filter((loc) => loc.toLowerCase().includes(keyword))
+  }, [locationQuery, locationFocused])
+
+  const applyLocalHarbor = (harbor: string) => {
+    setLocationQuery(harbor)
+    setForm({ ...form, location: harbor })
+    const coords = locationCoordinatesLookup[harbor]
+    if (coords) {
+      setSelectedCoordinates(coords)
+    }
+    setLocationFocused(false)
+  }
+
   return (
     <div className="ownerPage">
       <Header brandText="Land Ho Captain">
@@ -195,22 +213,35 @@ export default function HostDashboard({
           </div>
           <div className="formRow">
             <label>Location</label>
-            <div className="locationSearchRow">
-              <input
-                value={locationQuery}
-                onChange={(e) => {
-                  const next = e.target.value
-                  setLocationQuery(next)
-                  setForm({ ...form, location: next })
-                  setSelectedCoordinates(null)
-                }}
-                placeholder="Search Chicago harbor or marina"
-              />
-              <button className="ghostBtn inlineActionBtn" type="button" onClick={() => void searchLocations()}>
-                {locationSearching ? 'Searching...' : 'Search'}
-              </button>
-            </div>
-            {locationCandidates.length > 0 && (
+            <input
+              value={locationQuery}
+              onChange={(e) => {
+                const next = e.target.value
+                setLocationQuery(next)
+                setForm({ ...form, location: next })
+                setSelectedCoordinates(null)
+                setLocationFocused(true)
+              }}
+              onFocus={() => setLocationFocused(true)}
+              onBlur={() => setTimeout(() => setLocationFocused(false), 150)}
+              placeholder="Type a Chicago harbor or marina"
+            />
+            {localHarborSuggestions.length > 0 && (
+              <div className="locationCandidates">
+                {localHarborSuggestions.map((loc) => (
+                  <button
+                    key={loc}
+                    className="locationCandidateBtn"
+                    type="button"
+                    onMouseDown={(e) => e.preventDefault()}
+                    onClick={() => applyLocalHarbor(loc)}
+                  >
+                    {loc}
+                  </button>
+                ))}
+              </div>
+            )}
+            {locationCandidates.length > 0 && localHarborSuggestions.length === 0 && (
               <div className="locationCandidates">
                 {locationCandidates.map((candidate) => (
                   <button
@@ -225,7 +256,7 @@ export default function HostDashboard({
               </div>
             )}
             {selectedAddress && (
-              <small className="hintText">Selected location: {selectedAddress}</small>
+              <small className="hintText">Selected: {selectedAddress}</small>
             )}
             {locationLookupError && <small className="hintText locationError">{locationLookupError}</small>}
           </div>

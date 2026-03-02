@@ -32,6 +32,7 @@ export interface CaptainOnboardingProfile {
   licenseImageUrl: string          // uploaded photo / scan of credential
 
   /* boat */
+  homeHarbor: string
   boatRegistrationNumber: string
   boatType: BoatType
   boatName: string

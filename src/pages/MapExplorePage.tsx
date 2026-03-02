@@ -9,6 +9,7 @@ import {
   type BoatRecord,
 } from '../features/boats/boatsApi'
 import { searchLocationSuggestions, type LocationSuggestion } from '../features/location/mapboxGeocode'
+import { categories, defaultCoordinates } from '../data/constants'
 import 'mapbox-gl/dist/mapbox-gl.css'
 
 interface LngLatBounds {
@@ -19,14 +20,6 @@ interface LngLatBounds {
 }
 
 const mapboxToken = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN as string | undefined
-
-const categories: { key: 'all' | BoatCategory; label: string }[] = [
-  { key: 'all', label: 'All' },
-  { key: 'dayTrip', label: 'Day Trips' },
-  { key: 'sunset', label: 'Sunset Cruises' },
-  { key: 'training', label: 'Training' },
-  { key: 'cruise', label: 'Cruises' },
-]
 
 const hasCoordinates = (coordinates: BoatCoordinates | null): coordinates is BoatCoordinates => {
   if (!coordinates) {
@@ -122,11 +115,11 @@ function MapExplorePage() {
 
   const initialViewState = useMemo(() => {
     if (centeredBoats.length === 0) {
-      return { longitude: 118.0894, latitude: 24.4798, zoom: 5.2 }
+      return { longitude: defaultCoordinates.lng, latitude: defaultCoordinates.lat, zoom: 10.2 }
     }
     const lat = centeredBoats.reduce((sum, item) => sum + item.coordinates.lat, 0) / centeredBoats.length
     const lng = centeredBoats.reduce((sum, item) => sum + item.coordinates.lng, 0) / centeredBoats.length
-    return { longitude: lng, latitude: lat, zoom: 5.4 }
+    return { longitude: lng, latitude: lat, zoom: 10.2 }
   }, [centeredBoats])
 
   const handleCardSelect = (boat: BoatRecord) => {
@@ -232,7 +225,7 @@ function MapExplorePage() {
         <div className="searchItem">
           <label>Where</label>
           <input
-            placeholder="Search ports or bays"
+            placeholder="Search harbors & marinas"
             value={searchText}
             onFocus={() => setShowSuggestions(true)}
             onChange={(e) => {
@@ -272,15 +265,34 @@ function MapExplorePage() {
           )}
         </div>
         <div className="searchItem">
+          <label>When</label>
+          <input placeholder="Any week" />
+        </div>
+        <div className="searchItem">
           <label>Sailors</label>
           <input
-            placeholder="Minimum seats"
+            placeholder="Add sailors"
             value={seatFilter}
             onChange={(e) => setSeatFilter(e.target.value)}
           />
         </div>
-        <button className="searchBtn" onClick={resetFilters}>
-          Reset
+        <button type="button" className="searchBtn searchBtn--icon" aria-label="Search">
+          <span className="searchBtnText">Search</span>
+          <span className="searchBtnIcon" aria-hidden>
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <circle cx="11" cy="11" r="8" />
+              <path d="m21 21-4.35-4.35" />
+            </svg>
+          </span>
         </button>
       </section>
 
@@ -291,6 +303,7 @@ function MapExplorePage() {
             className={category === item.key ? 'tab active' : 'tab'}
             onClick={() => setCategory(item.key)}
           >
+            <span>{item.icon}</span>
             {item.label}
           </button>
         ))}

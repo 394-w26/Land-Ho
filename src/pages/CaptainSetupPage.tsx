@@ -1,4 +1,4 @@
-import { useEffect, useState, type ChangeEvent } from 'react'
+import { useEffect, useMemo, useState, type ChangeEvent } from 'react'
 import { onAuthStateChanged, signInWithPopup, type User } from 'firebase/auth'
 import { useNavigate } from 'react-router-dom'
 import { auth, googleProvider, isFirebaseReady } from '../lib/firebase'
@@ -13,6 +13,7 @@ import type {
   CaptainOnboardingProfile,
 } from '../features/onboarding/onboardingTypes'
 import FeedbackModal from '../components/FeedbackModal'
+import { chicagoLocations } from '../data/constants'
 
 type Step = 'identity' | 'credential' | 'boat' | 'compliance' | 'review'
 const STEPS: { key: Step; label: string }[] = [
@@ -48,6 +49,7 @@ const emptyDraft: Omit<CaptainOnboardingProfile, 'updatedAt'> = {
   licenseType: 'oupv_six_pack',
   licenseNumber: '',
   licenseImageUrl: '',
+  homeHarbor: '',
   boatRegistrationNumber: '',
   boatType: 'sailboat',
   boatName: '',
@@ -69,6 +71,7 @@ function CaptainSetupPage() {
   const [saving, setSaving] = useState(false)
   const [uploading, setUploading] = useState(false)
   const [signingIn, setSigningIn] = useState(false)
+  const [harborFocused, setHarborFocused] = useState(false)
 
   const handleSignIn = async () => {
     if (!auth || !isFirebaseReady || !googleProvider) {
@@ -154,10 +157,19 @@ function CaptainSetupPage() {
     draft.licenseNumber.trim().length >= 2 &&
     draft.licenseImageUrl.length > 0
   const boatValid =
+    draft.homeHarbor.trim().length > 0 &&
     draft.boatRegistrationNumber.trim().length >= 2 &&
     draft.boatType.length > 0
   const complianceValid = draft.backgroundCheckConsent && draft.liabilityWaiverAccepted
   const allValid = identityValid && credentialValid && boatValid && complianceValid
+
+  const harborSuggestions = useMemo(() => {
+    const keyword = draft.homeHarbor.trim().toLowerCase()
+    if (!harborFocused || keyword.length === 0) {
+      return []
+    }
+    return chicagoLocations.filter((loc) => loc.toLowerCase().includes(keyword))
+  }, [draft.homeHarbor, harborFocused])
 
   const saveAndContinue = async (nextStep: Step) => {
     if (!viewer) { setNotice('Please sign in first.'); return }
@@ -323,6 +335,37 @@ function CaptainSetupPage() {
           <>
             <h2>Boat Information</h2>
             <div className="formRow">
+              <label>Home Harbor *</label>
+              <input
+                value={draft.homeHarbor}
+                onChange={(e) => patch({ homeHarbor: e.target.value })}
+                onFocus={() => setHarborFocused(true)}
+                onBlur={() => {
+                  // small delay so click can register
+                  setTimeout(() => setHarborFocused(false), 120)
+                }}
+                placeholder="e.g. Monroe Harbor"
+              />
+              {harborSuggestions.length > 0 && (
+                <div className="locationCandidates">
+                  {harborSuggestions.map((loc) => (
+                    <button
+                      key={loc}
+                      type="button"
+                      className="locationCandidateBtn"
+                      onMouseDown={(event) => event.preventDefault()}
+                      onClick={() => {
+                        patch({ homeHarbor: loc })
+                        setHarborFocused(false)
+                      }}
+                    >
+                      {loc}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+            <div className="formRow">
               <label>Boat Registration Number *</label>
               <input
                 value={draft.boatRegistrationNumber}
@@ -452,6 +495,7 @@ function CaptainSetupPage() {
               <div className="reviewItem">
                 <span className="reviewLabel">Boat</span>
                 <span>
+                  Home harbor: {draft.homeHarbor || '—'} ·{' '}
                   {BOAT_TYPE_OPTIONS.find((o) => o.value === draft.boatType)?.label ?? draft.boatType}{' '}
                   — Reg# {draft.boatRegistrationNumber || '—'}
                   {draft.boatName ? ` — "${draft.boatName}"` : ''}

@@ -263,7 +263,7 @@
 /* ── Search Section ────────────────────────────── */
 
 .searchSection {
-  margin: 16px 0;
+  margin: 20px 0;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
   padding: 16px;
@@ -340,9 +340,9 @@
     flex-direction: row;
     align-items: center;
     border-radius: var(--radius-pill);
-    padding: 8px 8px 8px 16px;
-    margin: 20px auto;
-    max-width: 720px;
+    padding: 10px 10px 10px 20px;
+    margin: 28px auto 24px;
+    max-width: 960px;
     gap: 0;
   }
 
@@ -416,6 +416,20 @@
 
 .categoryTabs::-webkit-scrollbar {
   display: none;
+}
+
+@media (min-width: 768px) {
+  .categoryTabs {
+    max-width: 960px;
+    margin-left: auto;
+    margin-right: auto;
+    justify-content: space-between;
+  }
+
+  .categoryTabs .tab {
+    flex: 1;
+    text-align: center;
+  }
 }
 
 .tab {
@@ -1675,12 +1689,13 @@
 
 .mapSearchSection {
   flex-shrink: 0;
-  margin: 0 0 8px;
+  margin: 12px 0 10px;
 }
 
 @media (min-width: 768px) {
   .mapSearchSection {
-    max-width: 580px;
+    max-width: 960px;
+    margin: 24px auto 16px;
   }
   .mapSearchSection.searchSection {
     flex-direction: row;
