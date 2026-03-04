@@ -22,7 +22,7 @@ import type {
 
 const COLLECTION = 'instructorRequests'
 
-const toTimestamp = (val: unknown): string => {
+export const toTimestamp = (val: unknown): string => {
   if (typeof val === 'object' && val && 'seconds' in val) {
     return new Date(Number((val as { seconds: number }).seconds) * 1000).toISOString()
   }
