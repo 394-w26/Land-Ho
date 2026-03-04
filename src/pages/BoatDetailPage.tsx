@@ -321,16 +321,18 @@ function BoatDetailPage() {
               <p>{hostProfile?.city || 'Location not provided'}</p>
             </div>
           </div>
-          <button className="ghostBtn hostProfileBtn" onClick={() => navigate(`/hosts/${boat.ownerUid}`)}>
-            View full profile
-          </button>
-          <button
-            className="publishBtn messageHostBtn"
-            onClick={() => void handleMessageHost()}
-            disabled={messagingHost}
-          >
-            {messagingHost ? 'Opening chat…' : '💬 Message host'}
-          </button>
+          <div className="captainBtnRow">
+            <button className="ghostBtn hostProfileBtn" onClick={() => navigate(`/hosts/${boat.ownerUid}`)}>
+              View full profile
+            </button>
+            <button
+              className="ghostBtn hostProfileBtn"
+              onClick={() => void handleMessageHost()}
+              disabled={messagingHost}
+            >
+              {messagingHost ? 'Opening chat…' : '💬 Message host'}
+            </button>
+          </div>
           <p>{hostProfile?.bio || 'This captain has not added a public introduction yet.'}</p>
           {hostError && <p className="authNotice">{hostError}</p>}
           {hostProfile?.skills && hostProfile.skills.length > 0 && (

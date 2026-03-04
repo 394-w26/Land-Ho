@@ -1524,6 +1524,12 @@
 }
 
 .hostProfileBtn {
+  margin: 0;
+}
+
+.captainBtnRow {
+  display: flex;
+  gap: 8px;
   margin: 12px 0;
 }
 
@@ -2493,13 +2499,6 @@
 /* ═══════════════════════════════════════════════
    Chat / Messaging
    ═══════════════════════════════════════════════ */
-
-/* Message host button on boat detail */
-.messageHostBtn {
-  margin-top: 10px;
-  width: 100%;
-  font-size: 0.9375rem;
-}
 
 /* Full chat page layout */
 .chatPage {
