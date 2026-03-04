@@ -16,6 +16,7 @@ import HostResumePage from './pages/HostResumePage'
 import CaptainSetupPage from './pages/CaptainSetupPage'
 import SailorSetupPage from './pages/SailorSetupPage'
 import InstructorRequestPage from './pages/InstructorRequestPage'
+import ChatPage from './pages/ChatPage'
 
 function MarketplacePage() {
   const navigate = useNavigate()
@@ -156,6 +157,7 @@ function MarketplacePage() {
         onNavigateCaptainSetup={() => navigate('/setup/captain')}
         onNavigateSailorSetup={() => navigate('/setup/sailor')}
         onNavigateInstructorRequest={() => navigate('/request-instructor')}
+        onNavigateChat={() => navigate('/chat')}
         form={boatForm.form}
         setForm={boatForm.setForm}
         editingBoatId={boatForm.editingBoatId}
@@ -247,6 +249,7 @@ function MarketplacePage() {
       onNavigateCaptainSetup={() => navigate('/setup/captain')}
       onNavigateSailorSetup={() => navigate('/setup/sailor')}
       onNavigateInstructorRequest={() => navigate('/request-instructor')}
+      onNavigateChat={() => navigate('/chat')}
       onNavigateMap={() => setAppView('map')}
     />
   )
@@ -261,6 +264,8 @@ function App() {
       <Route path="/setup/captain" element={<CaptainSetupPage />} />
       <Route path="/setup/sailor" element={<SailorSetupPage />} />
       <Route path="/request-instructor" element={<InstructorRequestPage />} />
+      <Route path="/chat" element={<ChatPage />} />
+      <Route path="/chat/:conversationId" element={<ChatPage />} />
     </Routes>
   )
 }

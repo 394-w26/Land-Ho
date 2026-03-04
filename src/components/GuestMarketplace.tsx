@@ -32,6 +32,7 @@ interface GuestMarketplaceProps {
   onNavigateSailorSetup: () => void
   onNavigateInstructorRequest: () => void
   onNavigateMap: () => void
+  onNavigateChat: () => void
 }
 
 export default function GuestMarketplace({
@@ -59,6 +60,7 @@ export default function GuestMarketplace({
   onNavigateSailorSetup,
   onNavigateInstructorRequest,
   onNavigateMap,
+  onNavigateChat,
 }: GuestMarketplaceProps) {
   const navigate = useNavigate()
 
@@ -109,6 +111,14 @@ export default function GuestMarketplace({
           >
             🎓 Request Instructor
           </button>
+          {viewer && (
+            <button
+              className="menuItem"
+              onClick={() => { setMenuOpen(false); onNavigateChat() }}
+            >
+              💬 Messages
+            </button>
+          )}
           <button
             className="menuItem"
             onClick={() => { setMenuOpen(false); onNavigateMap() }}

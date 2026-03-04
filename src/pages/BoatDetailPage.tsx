@@ -4,6 +4,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { getBoatListingById, type BoatRecord } from '../features/boats/boatsApi'
 import { getUserPublicProfile, type UserPublicProfile } from '../features/users/usersApi'
 import { createBookingRequest, hasPendingBookingRequest } from '../features/booking/bookingApi'
+import { getOrCreateConversation } from '../features/chat/chatApi'
 import { auth, isFirebaseReady } from '../lib/firebase'
 import { initialBoatData } from '../data/seedBoats'
 import FeedbackModal from '../components/FeedbackModal'
@@ -38,6 +39,7 @@ function BoatDetailPage() {
   const [reserveNotice, setReserveNotice] = useState('')
   const [reserveSuccessModal, setReserveSuccessModal] = useState('')
   const [showProfileModal, setShowProfileModal] = useState(false)
+  const [messagingHost, setMessagingHost] = useState(false)
 
   useEffect(() => {
     if (!auth || !isFirebaseReady) {
@@ -198,6 +200,39 @@ function BoatDetailPage() {
     }
   }
 
+  const handleMessageHost = async () => {
+    if (!boat) return
+    if (!viewer) {
+      setReserveNotice('Please sign in to message the captain.')
+      return
+    }
+    if (viewer.uid === boat.ownerUid) {
+      setReserveNotice('You cannot message yourself.')
+      return
+    }
+    setMessagingHost(true)
+    setReserveNotice('')
+    try {
+      const sailorProfile = await getUserPublicProfile(viewer.uid)
+      const convoId = await getOrCreateConversation({
+        sailorUid: viewer.uid,
+        sailorName: sailorProfile?.displayName || viewer.displayName || viewer.email || 'Sailor',
+        sailorAvatar: sailorProfile?.avatarUrl || viewer.photoURL || '',
+        captainUid: boat.ownerUid,
+        captainName: hostProfile?.displayName || boat.ownerName || 'Captain',
+        captainAvatar: hostProfile?.avatarUrl || '',
+        boatId: boat.id,
+        boatTitle: boat.title,
+      })
+      navigate(`/chat/${convoId}`)
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Unknown error'
+      setReserveNotice(`Failed to open chat: ${msg}`)
+    } finally {
+      setMessagingHost(false)
+    }
+  }
+
   if (loading) {
     return (
       <div className="detailPage">
@@ -288,6 +323,13 @@ function BoatDetailPage() {
           </div>
           <button className="ghostBtn hostProfileBtn" onClick={() => navigate(`/hosts/${boat.ownerUid}`)}>
             View full profile
+          </button>
+          <button
+            className="publishBtn messageHostBtn"
+            onClick={() => void handleMessageHost()}
+            disabled={messagingHost}
+          >
+            {messagingHost ? 'Opening chat…' : '💬 Message host'}
           </button>
           <p>{hostProfile?.bio || 'This captain has not added a public introduction yet.'}</p>
           {hostError && <p className="authNotice">{hostError}</p>}

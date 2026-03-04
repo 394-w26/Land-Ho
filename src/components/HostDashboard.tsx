@@ -24,6 +24,7 @@ interface HostDashboardProps {
   onNavigateCaptainSetup: () => void
   onNavigateSailorSetup: () => void
   onNavigateInstructorRequest: () => void
+  onNavigateChat: () => void
   form: BoatFormData
   setForm: (updater: BoatFormData | ((prev: BoatFormData) => BoatFormData)) => void
   editingBoatId: string
@@ -83,6 +84,7 @@ export default function HostDashboard({
   onNavigateCaptainSetup,
   onNavigateSailorSetup,
   onNavigateInstructorRequest,
+  onNavigateChat,
   form,
   setForm,
   editingBoatId,
@@ -175,6 +177,14 @@ export default function HostDashboard({
           >
             🎓 Request Instructor
           </button>
+          {viewer && (
+            <button
+              className="menuItem"
+              onClick={() => { setMenuOpen(false); onNavigateChat() }}
+            >
+              💬 Messages
+            </button>
+          )}
           {viewer ? (
             <button className="menuItem dangerText" onClick={onSignOut}>
               Sign out
