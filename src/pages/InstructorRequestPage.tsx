@@ -96,6 +96,7 @@ function InstructorRequestPage() {
     let active = true
     const run = async () => {
       setHistoryLoading(true)
+      setNotice('')
       try {
         const data = await getInstructorRequestsBySailor(viewer.uid)
         if (active) setRequests(data)
@@ -143,6 +144,18 @@ function InstructorRequestPage() {
       setFocusAreas([])
       setExperienceLevel('beginner')
       setNotes('')
+      /* switch to history and reload */
+      setTab('history')
+      setHistoryLoading(true)
+      setNotice('')
+      try {
+        const data = await getInstructorRequestsBySailor(viewer.uid)
+        setRequests(data)
+      } catch {
+        setNotice('Failed to load request history.')
+      } finally {
+        setHistoryLoading(false)
+      }
     } catch {
       setNotice('Failed to submit request. Please try again.')
     } finally {

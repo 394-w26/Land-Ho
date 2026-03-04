@@ -8,7 +8,6 @@ import {
   serverTimestamp,
   updateDoc,
   where,
-  orderBy,
   type QueryDocumentSnapshot,
   type Unsubscribe,
 } from 'firebase/firestore'
@@ -92,9 +91,17 @@ export const getInstructorRequestsBySailor = async (
 ): Promise<InstructorRequest[]> => {
   if (!db) throw new Error('db-not-configured')
   const ref = collection(db, COLLECTION)
-  const q = query(ref, where('sailorUid', '==', sailorUid), orderBy('createdAt', 'desc'))
-  const snap = await getDocs(q)
-  return snap.docs.map(mapDoc)
+  const q = query(ref, where('sailorUid', '==', sailorUid))
+  try {
+    const snap = await getDocs(q)
+    return snap.docs
+      .map(mapDoc)
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+  } catch (err: unknown) {
+    const code = (err as { code?: string })?.code ?? 'unknown'
+    const msg = err instanceof Error ? err.message : String(err)
+    throw new Error(`Firestore error (${code}): ${msg}`)
+  }
 }
 
 /* ── Read: by boat (for captains) ───────────── */
@@ -106,10 +113,16 @@ export const subscribeInstructorRequestsByBoat = (
 ): Unsubscribe => {
   if (!db) { onData([]); return () => undefined }
   const ref = collection(db, COLLECTION)
-  const q = query(ref, where('boatId', '==', boatId), orderBy('createdAt', 'desc'))
+  // orderBy omitted — no composite index needed; sort client-side
+  const q = query(ref, where('boatId', '==', boatId))
   return onSnapshot(
     q,
-    (snap) => onData(snap.docs.map(mapDoc)),
+    (snap) => {
+      const sorted = snap.docs
+        .map(mapDoc)
+        .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+      onData(sorted)
+    },
     () => onError('Failed to load instructor requests.'),
   )
 }
