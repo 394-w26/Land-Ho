@@ -196,10 +196,10 @@ function CaptainSetupPage() {
       await upsertCaptainProfile({
         ...draft,
         uid: viewer.uid,
-        backgroundCheckStatus: 'pending',
+        backgroundCheckStatus: 'approved',
         completedAt: new Date().toISOString(),
       })
-      setSuccessModal('Captain profile submitted! Your background check is now pending review.')
+      setSuccessModal('Captain profile submitted! You’re all set to publish trips.')
     } catch {
       setNotice('Submission failed. Please try again.')
     } finally {
@@ -519,7 +519,7 @@ function CaptainSetupPage() {
 
             {draft.completedAt && (
               <p className="setupCompletedBadge">
-                ✅ Profile submitted on {new Date(draft.completedAt).toLocaleDateString()}
+                ✅ Profile approved — submitted on {new Date(draft.completedAt).toLocaleDateString()}
               </p>
             )}
 

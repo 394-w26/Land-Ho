@@ -11,11 +11,12 @@ interface FeedbackModalProps {
 export default function FeedbackModal({
   title = 'Done',
   message,
-  actionLabel = 'Go to homepage',
+  actionLabel,
   actionTo = '/',
   onClose,
 }: FeedbackModalProps) {
   const navigate = useNavigate()
+  const hasAction = actionLabel != null && actionLabel !== ''
 
   return (
     <div className="modalOverlay" onClick={onClose}>
@@ -23,12 +24,14 @@ export default function FeedbackModal({
         <h3>{title}</h3>
         <p>{message}</p>
         <div className="modalActions">
-          <button
-            className="publishBtn"
-            onClick={() => { onClose(); navigate(actionTo) }}
-          >
-            {actionLabel}
-          </button>
+          {hasAction && (
+            <button
+              className="publishBtn"
+              onClick={() => { onClose(); navigate(actionTo) }}
+            >
+              {actionLabel}
+            </button>
+          )}
           <button className="ghostBtn" onClick={onClose}>
             Dismiss
           </button>

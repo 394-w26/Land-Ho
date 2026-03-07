@@ -4,12 +4,7 @@ import {
   profileStorageKey,
   loadStoredProfileDraft,
 } from '../data/constants'
-import {
-  type ProfileDraft,
-  type ProfileSection,
-  type ExperienceItem,
-  type CertificateItem,
-} from '../types'
+import { type ProfileDraft, type ProfileSection } from '../types'
 import { uploadImageToStorage } from '../lib/storage'
 import { upsertUserPublicProfile } from '../features/users/usersApi'
 import { getUploadErrorText } from '../utils/formatters'
@@ -32,7 +27,6 @@ export function useProfile(viewer: User | null) {
       { key: 'city', ok: profileDraft.city.trim().length > 0, label: 'Add your city' },
       { key: 'bio', ok: profileDraft.bio.trim().length >= 30, label: 'Bio must be at least 30 characters' },
       { key: 'skills', ok: profileDraft.skills.length >= 2, label: 'Add at least 2 skills' },
-      { key: 'experiences', ok: profileDraft.experiences.length >= 1, label: 'Add at least 1 experience' },
     ]
   }, [profileDraft])
 
@@ -76,60 +70,6 @@ export function useProfile(viewer: User | null) {
 
   const removeSkill = (skill: string) => {
     updateProfileDraft((prev) => ({ ...prev, skills: prev.skills.filter((item) => item !== skill) }))
-  }
-
-  const addExperience = () => {
-    updateProfileDraft((prev) => ({
-      ...prev,
-      experiences: [
-        ...prev.experiences,
-        {
-          id: `exp-${Date.now()}`,
-          title: '',
-          organization: '',
-          start: '',
-          end: '',
-          description: '',
-        },
-      ],
-    }))
-  }
-
-  const updateExperience = (id: string, field: keyof Omit<ExperienceItem, 'id'>, value: string) => {
-    updateProfileDraft((prev) => ({
-      ...prev,
-      experiences: prev.experiences.map((item) => (item.id === id ? { ...item, [field]: value } : item)),
-    }))
-  }
-
-  const removeExperience = (id: string) => {
-    updateProfileDraft((prev) => ({
-      ...prev,
-      experiences: prev.experiences.filter((item) => item.id !== id),
-    }))
-  }
-
-  const addCertificate = () => {
-    updateProfileDraft((prev) => ({
-      ...prev,
-      certificates: [...prev.certificates, { id: `cert-${Date.now()}`, name: '', issuer: '', year: '' }],
-    }))
-  }
-
-  const updateCertificate = (id: string, field: keyof Omit<CertificateItem, 'id'>, value: string) => {
-    updateProfileDraft((prev) => ({
-      ...prev,
-      certificates: prev.certificates.map((item) =>
-        item.id === id ? { ...item, [field]: value } : item,
-      ),
-    }))
-  }
-
-  const removeCertificate = (id: string) => {
-    updateProfileDraft((prev) => ({
-      ...prev,
-      certificates: prev.certificates.filter((item) => item.id !== id),
-    }))
   }
 
   const saveProfile = async () => {
@@ -205,12 +145,6 @@ export function useProfile(viewer: User | null) {
     syncFromAuth,
     addSkill,
     removeSkill,
-    addExperience,
-    updateExperience,
-    removeExperience,
-    addCertificate,
-    updateCertificate,
-    removeCertificate,
     saveProfile,
     saveAndFinishProfile,
     handleAvatarUpload,

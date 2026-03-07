@@ -7,6 +7,7 @@ import { useAuth } from './hooks/useAuth'
 import { useProfile } from './hooks/useProfile'
 import { useBoats } from './hooks/useBoats'
 import { useBoatForm } from './hooks/useBoatForm'
+import { getCaptainProfile } from './features/onboarding/onboardingApi'
 import ProfileEditor from './components/ProfileEditor'
 import HostDashboard from './components/HostDashboard'
 import GuestMarketplace from './components/GuestMarketplace'
@@ -31,10 +32,23 @@ function MarketplacePage() {
 
   const { viewer, authLoading, authError, loginWithGoogle, signOutUser, userInitial } = useAuth()
   const profile = useProfile(viewer)
+  const [captainProfileCompleted, setCaptainProfileCompleted] = useState(false)
 
   useEffect(() => {
     profile.syncFromAuth(viewer)
   }, [viewer]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    if (!viewer?.uid) {
+      setCaptainProfileCompleted(false)
+      return
+    }
+    let active = true
+    getCaptainProfile(viewer.uid).then((captain) => {
+      if (active) setCaptainProfileCompleted(!!captain?.completedAt)
+    })
+    return () => { active = false }
+  }, [viewer?.uid, location.pathname])
 
   const { filteredBoats, hostBoats, boatsLoading, boatsError } = useBoats({
     viewer,
@@ -45,7 +59,7 @@ function MarketplacePage() {
 
   const boatForm = useBoatForm({
     viewer,
-    resumeCompleted: profile.resumeCompleted,
+    resumeCompleted: captainProfileCompleted,
     navigate,
     onNewListingPublished: () => setMode('guest'),
   })
@@ -127,12 +141,6 @@ function MarketplacePage() {
         updateProfileDraft={profile.updateProfileDraft}
         addSkill={profile.addSkill}
         removeSkill={profile.removeSkill}
-        addExperience={profile.addExperience}
-        updateExperience={profile.updateExperience}
-        removeExperience={profile.removeExperience}
-        addCertificate={profile.addCertificate}
-        updateCertificate={profile.updateCertificate}
-        removeCertificate={profile.removeCertificate}
         saveProfile={profile.saveProfile}
         saveAndFinishProfile={profile.saveAndFinishProfile}
         handleAvatarUpload={profile.handleAvatarUpload}

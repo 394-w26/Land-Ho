@@ -26,7 +26,7 @@ export interface BoatCard {
 
 export type AppView = 'market' | 'map' | 'profile'
 
-export type ProfileSection = 'basic' | 'skills' | 'experiences' | 'certificates'
+export type ProfileSection = 'basic' | 'skills'
 
 export interface ExperienceItem {
   id: string

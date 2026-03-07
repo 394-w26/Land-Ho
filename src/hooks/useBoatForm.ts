@@ -116,7 +116,7 @@ export function useBoatForm({ viewer, resumeCompleted, navigate, onNewListingPub
       return
     }
     if (!resumeCompleted) {
-      setHostNotice('Please complete your profile before publishing a boat.')
+      setHostNotice('Please complete the Captain Setup before publishing a boat.')
       return
     }
     const remainingSlots = maxBoatImages - form.images.length
@@ -216,7 +216,7 @@ export function useBoatForm({ viewer, resumeCompleted, navigate, onNewListingPub
       return
     }
     if (!resumeCompleted) {
-      setHostNotice('Please complete your profile before publishing a boat.')
+      setHostNotice('Please complete the Captain Setup before publishing a boat.')
       return
     }
     if (!form.title || !form.location || !form.captain) {

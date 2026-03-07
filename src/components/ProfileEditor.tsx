@@ -1,5 +1,5 @@
 import { type ChangeEvent } from 'react'
-import { type ProfileDraft, type ProfileSection, type ExperienceItem, type CertificateItem } from '../types'
+import { type ProfileDraft, type ProfileSection } from '../types'
 import { Header } from './Header'
 import FeedbackModal from './FeedbackModal'
 
@@ -20,12 +20,6 @@ interface ProfileEditorProps {
   updateProfileDraft: (updater: (prev: ProfileDraft) => ProfileDraft) => void
   addSkill: () => void
   removeSkill: (skill: string) => void
-  addExperience: () => void
-  updateExperience: (id: string, field: keyof Omit<ExperienceItem, 'id'>, value: string) => void
-  removeExperience: (id: string) => void
-  addCertificate: () => void
-  updateCertificate: (id: string, field: keyof Omit<CertificateItem, 'id'>, value: string) => void
-  removeCertificate: (id: string) => void
   saveProfile: () => Promise<void>
   saveAndFinishProfile: () => Promise<void>
   handleAvatarUpload: (event: ChangeEvent<HTMLInputElement>) => Promise<void>
@@ -49,12 +43,6 @@ export default function ProfileEditor({
   updateProfileDraft,
   addSkill,
   removeSkill,
-  addExperience,
-  updateExperience,
-  removeExperience,
-  addCertificate,
-  updateCertificate,
-  removeCertificate,
   saveProfile,
   saveAndFinishProfile,
   handleAvatarUpload,
@@ -84,18 +72,6 @@ export default function ProfileEditor({
               onClick={() => setProfileSection('skills')}
             >
               Skills
-            </button>
-            <button
-              className={profileSection === 'experiences' ? 'profileNavBtn active' : 'profileNavBtn'}
-              onClick={() => setProfileSection('experiences')}
-            >
-              Experience
-            </button>
-            <button
-              className={profileSection === 'certificates' ? 'profileNavBtn active' : 'profileNavBtn'}
-              onClick={() => setProfileSection('certificates')}
-            >
-              Certificates
             </button>
           </div>
           <div className="profileChecklist">
@@ -170,108 +146,6 @@ export default function ProfileEditor({
                   <button key={skill} className="tagItem" onClick={() => removeSkill(skill)}>
                     {skill} ×
                   </button>
-                ))}
-              </div>
-            </>
-          )}
-
-          {profileSection === 'experiences' && (
-            <>
-              <h3>Experience</h3>
-              <button className="ghostBtn" onClick={addExperience}>
-                Add Experience
-              </button>
-              <div className="stackList">
-                {profileDraft.experiences.map((item) => (
-                  <div className="stackCard" key={item.id}>
-                    <div className="formRow split">
-                      <div>
-                        <label>Title</label>
-                        <input
-                          value={item.title}
-                          onChange={(e) => updateExperience(item.id, 'title', e.target.value)}
-                        />
-                      </div>
-                      <div>
-                        <label>Organization</label>
-                        <input
-                          value={item.organization}
-                          onChange={(e) => updateExperience(item.id, 'organization', e.target.value)}
-                        />
-                      </div>
-                    </div>
-                    <div className="formRow split">
-                      <div>
-                        <label>Start</label>
-                        <input
-                          value={item.start}
-                          onChange={(e) => updateExperience(item.id, 'start', e.target.value)}
-                          placeholder="2025-05"
-                        />
-                      </div>
-                      <div>
-                        <label>End</label>
-                        <input
-                          value={item.end}
-                          onChange={(e) => updateExperience(item.id, 'end', e.target.value)}
-                          placeholder="Present"
-                        />
-                      </div>
-                    </div>
-                    <div className="formRow">
-                      <label>Description</label>
-                      <textarea
-                        value={item.description}
-                        onChange={(e) => updateExperience(item.id, 'description', e.target.value)}
-                        rows={3}
-                      />
-                    </div>
-                    <button className="dangerBtn" onClick={() => removeExperience(item.id)}>
-                      Remove Experience
-                    </button>
-                  </div>
-                ))}
-              </div>
-            </>
-          )}
-
-          {profileSection === 'certificates' && (
-            <>
-              <h3>Certificates</h3>
-              <button className="ghostBtn" onClick={addCertificate}>
-                Add Certificate
-              </button>
-              <div className="stackList">
-                {profileDraft.certificates.map((item) => (
-                  <div className="stackCard" key={item.id}>
-                    <div className="formRow split">
-                      <div>
-                        <label>Certificate Name</label>
-                        <input
-                          value={item.name}
-                          onChange={(e) => updateCertificate(item.id, 'name', e.target.value)}
-                        />
-                      </div>
-                      <div>
-                        <label>Issuer</label>
-                        <input
-                          value={item.issuer}
-                          onChange={(e) => updateCertificate(item.id, 'issuer', e.target.value)}
-                        />
-                      </div>
-                    </div>
-                    <div className="formRow">
-                      <label>Year</label>
-                      <input
-                        value={item.year}
-                        onChange={(e) => updateCertificate(item.id, 'year', e.target.value)}
-                        placeholder="2026"
-                      />
-                    </div>
-                    <button className="dangerBtn" onClick={() => removeCertificate(item.id)}>
-                      Remove Certificate
-                    </button>
-                  </div>
                 ))}
               </div>
             </>
