@@ -3,12 +3,9 @@ import { useWeather } from '../hooks/useWeather'
 /** Compact inline: sits next to list header. Full: big today + week row. */
 export default function WeatherForecast({
   compact = false,
-  variant,
 }: {
   compact?: boolean
-  variant?: 'inline'
 }) {
-  const isInline = compact || variant === 'inline'
   const { periods, loading, error } = useWeather()
 
   if (loading) {

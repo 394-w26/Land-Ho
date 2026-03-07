@@ -6,7 +6,6 @@ import { chicagoLocations } from '../data/constants'
 import { formatTripDate } from '../utils/formatters'
 import { Header, UserButton, MenuDropdown } from './Header'
 import MarketplaceControls from './MarketplaceControls'
-import WeatherForecast from './WeatherForecast'
 
 interface GuestMarketplaceProps {
   viewer: User | null
@@ -170,7 +169,6 @@ export default function GuestMarketplace({
         boatSizeSort={boatSizeSort}
         setBoatSizeSort={setBoatSizeSort}
         suggestions={locationSuggestions.map((loc) => ({ id: loc, label: loc }))}
-        weather={<WeatherForecast variant="inline" />}
       />
 
       <section className="listHeader">

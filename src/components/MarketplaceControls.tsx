@@ -53,7 +53,6 @@ export default function MarketplaceControls({
   showWhen = true,
   searchSectionClassName = '',
   onSelectSuggestion,
-  weather,
 }: MarketplaceControlsProps) {
   const [whereFocused, setWhereFocused] = useState(false)
 
