@@ -102,11 +102,6 @@ function CaptainSetupPage() {
     return () => unsub()
   }, [])
 
-  /* lock background scrolling while on the captain setup page */
-  useEffect(() => {
-    document.body.classList.add('no-scroll')
-    return () => { document.body.classList.remove('no-scroll') }
-  }, [])
 
   /* load existing captain profile */
   useEffect(() => {
@@ -222,11 +217,13 @@ function CaptainSetupPage() {
     return (
       <div className="setupPage">
         <header className="topBar">
-          <div className="brand">
-            <img className="brandLogo" src="/logo.png" alt="Land Ho logo" />
-            <span>Captain Setup</span>
+          <div className="topBarInner setupTopBarInner">
+            <div className="brand">
+              <img className="brandLogo" src="/logo.png" alt="Land Ho logo" />
+              <span>Captain Setup</span>
+            </div>
+            <button className="ghostBtn" onClick={() => navigate('/')}>Back to home</button>
           </div>
-          <button className="ghostBtn" onClick={() => navigate('/')}>Back to home</button>
         </header>
         <section className="setupCard">
           <h2>Sign in to get started</h2>
@@ -245,11 +242,13 @@ function CaptainSetupPage() {
   return (
     <div className="setupPage">
       <header className="topBar">
-        <div className="brand">
-          <img className="brandLogo" src="/logo.png" alt="Land Ho logo" />
-          <span>Captain Setup</span>
+        <div className="topBarInner setupTopBarInner">
+          <div className="brand">
+            <img className="brandLogo" src="/logo.png" alt="Land Ho logo" />
+            <span>Captain Setup</span>
+          </div>
+          <button className="ghostBtn" onClick={() => navigate('/')}>Back to home</button>
         </div>
-        <button className="ghostBtn" onClick={() => navigate('/')}>Back to home</button>
       </header>
 
       {/* step indicator */}

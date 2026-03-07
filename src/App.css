@@ -112,20 +112,21 @@
   }
 }
 
-.ownerPage > .topBar,
-.setupPage > .topBar,
 .detailPage > .topBar {
   margin: 0 -16px;
   padding: 14px 16px;
 }
 
 @media (min-width: 768px) {
-  .ownerPage > .topBar,
-  .setupPage > .topBar,
   .detailPage > .topBar {
     margin: 0 -24px;
     padding: 14px 24px;
   }
+}
+
+/* Setup page: header content aligned with steps + card (same max-width 760px) */
+.setupTopBarInner {
+  max-width: 760px;
 }
 
 .brand {
@@ -691,30 +692,34 @@
 }
 
 /* ════════════════════════════════════════════════
-   Owner / Host Page
+   Owner / Host Page — same container as home/sailor
    ════════════════════════════════════════════════ */
 
 .ownerPage {
-  /* Owner page should have no outer padding or margin — layout handled by inner containers */
-  padding: 0;
-  margin: 0;
+  padding: 0 16px 32px;
 }
 
 @media (min-width: 768px) {
   .ownerPage {
-    /* keep same max-width as sailor/home pages, but no margins/padding */
     max-width: 1280px;
-    margin: 0;
-    padding: 0;
+    margin: 0 auto;
+    padding: 0 24px 40px;
+  }
+}
+
+@media (min-width: 1080px) {
+  .ownerPage {
+    padding: 0 40px 48px;
   }
 }
 
 .ownerHero {
-  padding: 8px 0 16px;
+  margin: 28px 0 28px;
+  padding: 0;
 }
 
 .ownerHero h2 {
-  margin: 0 0 4px;
+  margin: 0 0 6px;
   font-size: 1.5rem;
   font-weight: 700;
 }
@@ -728,13 +733,14 @@
 .ownerFormGrid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 20px;
+  gap: 24px;
+  align-items: start;
 }
 
 @media (min-width: 768px) {
   .ownerFormGrid {
-    grid-template-columns: 1.2fr 1fr;
-    gap: 24px;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
   }
 }
 
@@ -742,23 +748,55 @@
   border: 1px solid var(--color-border-light);
   border-radius: var(--radius-lg);
   background: #ffffff;
-  padding: 20px;
+  padding: 28px;
   box-shadow: var(--shadow-card);
 }
 
+.ownerFormGrid > .ownerCard:nth-child(2) {
+  min-height: 280px;
+}
+
+.ownerEmptyState {
+  padding: 12px 0;
+  margin: 0;
+}
+
 .ownerCard h3 {
-  margin: 0 0 16px;
+  margin: 0 0 20px;
   font-size: 1.125rem;
   font-weight: 700;
+}
+
+/* Form sections: group related fields with spacing and a light divider (no color change) */
+.ownerCard .formSection {
+  margin-bottom: 28px;
+}
+
+.ownerCard .formSection:last-child {
+  margin-bottom: 0;
+}
+
+.ownerCard .formSection:not(:first-child) {
+  padding-top: 24px;
+  border-top: 1px solid var(--color-border-light);
+}
+
+.ownerCard .formSection .formRow:last-child {
+  margin-bottom: 0;
+}
+
+.ownerCard .uploadGallery {
+  margin-top: 12px;
+  gap: 14px;
 }
 
 /* ── Form Rows ─────────────────────────────────── */
 
 .formRow {
-  margin-bottom: 16px;
+  margin-bottom: 20px;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
 }
 
 .formRow label {
@@ -793,7 +831,7 @@
 .formRow.split > div {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
 }
 
 @media (min-width: 480px) {
@@ -870,6 +908,10 @@
   border-radius: var(--radius-sm);
   margin-top: 8px;
   letter-spacing: 0.01em;
+}
+
+.ownerCard .formSection .publishBtn {
+  margin-top: 20px;
 }
 
 .publishBtn:hover {
@@ -1986,6 +2028,7 @@
 
 .setupPage {
   padding: 0 16px 48px;
+  min-height: 100vh;
 }
 
 @media (min-width: 768px) {

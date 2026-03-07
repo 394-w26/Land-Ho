@@ -211,165 +211,174 @@ export default function HostDashboard({
       <section className="ownerFormGrid">
         <div className="ownerCard">
           <h3>Boat and Trip Information</h3>
-          <div className="formRow">
-            <label>Trip title</label>
-            <input
-              value={form.title}
-              onChange={(e) => setForm({ ...form, title: e.target.value })}
-              placeholder="Sunset cruise from Monroe Harbor"
-            />
+
+          <div className="formSection">
+            <div className="formRow">
+              <label>Trip title</label>
+              <input
+                value={form.title}
+                onChange={(e) => setForm({ ...form, title: e.target.value })}
+                placeholder="Sunset cruise from Monroe Harbor"
+              />
+            </div>
+            <div className="formRow">
+              <label>Location</label>
+              <input
+                value={locationQuery}
+                onChange={(e) => {
+                  const next = e.target.value
+                  setLocationQuery(next)
+                  setForm({ ...form, location: next })
+                  setSelectedCoordinates(null)
+                  setLocationFocused(true)
+                }}
+                onFocus={() => setLocationFocused(true)}
+                onBlur={() => setTimeout(() => setLocationFocused(false), 150)}
+                placeholder="Type a Chicago harbor or marina"
+              />
+              {localHarborSuggestions.length > 0 && (
+                <div className="locationCandidates">
+                  {localHarborSuggestions.map((loc) => (
+                    <button
+                      key={loc}
+                      className="locationCandidateBtn"
+                      type="button"
+                      onMouseDown={(e) => e.preventDefault()}
+                      onClick={() => applyLocalHarbor(loc)}
+                    >
+                      {loc}
+                    </button>
+                  ))}
+                </div>
+              )}
+              {locationCandidates.length > 0 && localHarborSuggestions.length === 0 && (
+                <div className="locationCandidates">
+                  {locationCandidates.map((candidate) => (
+                    <button
+                      key={candidate.id}
+                      className="locationCandidateBtn"
+                      type="button"
+                      onClick={() => applySelectedLocation(candidate)}
+                    >
+                      {candidate.placeName}
+                    </button>
+                  ))}
+                </div>
+              )}
+              {selectedAddress && (
+                <small className="hintText">Selected: {selectedAddress}</small>
+              )}
+              {locationLookupError && <small className="hintText locationError">{locationLookupError}</small>}
+            </div>
           </div>
-          <div className="formRow">
-            <label>Location</label>
-            <input
-              value={locationQuery}
-              onChange={(e) => {
-                const next = e.target.value
-                setLocationQuery(next)
-                setForm({ ...form, location: next })
-                setSelectedCoordinates(null)
-                setLocationFocused(true)
-              }}
-              onFocus={() => setLocationFocused(true)}
-              onBlur={() => setTimeout(() => setLocationFocused(false), 150)}
-              placeholder="Type a Chicago harbor or marina"
-            />
-            {localHarborSuggestions.length > 0 && (
-              <div className="locationCandidates">
-                {localHarborSuggestions.map((loc) => (
-                  <button
-                    key={loc}
-                    className="locationCandidateBtn"
-                    type="button"
-                    onMouseDown={(e) => e.preventDefault()}
-                    onClick={() => applyLocalHarbor(loc)}
-                  >
-                    {loc}
-                  </button>
-                ))}
+
+          <div className="formSection">
+            <div className="formRow split">
+              <div>
+                <label>Price (USD/person)</label>
+                <input
+                  value={form.price}
+                  placeholder="e.g. 85"
+                  onChange={(e) => setForm({ ...form, price: e.target.value })}
+                />
               </div>
-            )}
-            {locationCandidates.length > 0 && localHarborSuggestions.length === 0 && (
-              <div className="locationCandidates">
-                {locationCandidates.map((candidate) => (
-                  <button
-                    key={candidate.id}
-                    className="locationCandidateBtn"
-                    type="button"
-                    onClick={() => applySelectedLocation(candidate)}
-                  >
-                    {candidate.placeName}
-                  </button>
-                ))}
+              <div>
+                <label>Seats</label>
+                <input
+                  value={form.seats}
+                  placeholder="e.g. 6"
+                  onChange={(e) => setForm({ ...form, seats: e.target.value })}
+                />
               </div>
-            )}
-            {selectedAddress && (
-              <small className="hintText">Selected: {selectedAddress}</small>
-            )}
-            {locationLookupError && <small className="hintText locationError">{locationLookupError}</small>}
-          </div>
-          <div className="formRow split">
-            <div>
-              <label>Price (USD/person)</label>
-              <input
-                value={form.price}
-                placeholder="e.g. 85"
-                onChange={(e) => setForm({ ...form, price: e.target.value })}
-              />
             </div>
-            <div>
-              <label>Seats</label>
-              <input
-                value={form.seats}
-                placeholder="e.g. 6"
-                onChange={(e) => setForm({ ...form, seats: e.target.value })}
-              />
+            <div className="formRow split">
+              <div>
+                <label>Captain</label>
+                <input
+                  value={form.captain}
+                  onChange={(e) => setForm({ ...form, captain: e.target.value })}
+                  placeholder="Captain name (you)"
+                />
+              </div>
+              <div>
+                <label>Date</label>
+                <input
+                  type="date"
+                  value={form.date}
+                  onChange={(e) => setForm({ ...form, date: e.target.value })}
+                />
+              </div>
             </div>
-          </div>
-          <div className="formRow split">
-            <div>
-              <label>Captain</label>
-              <input
-                value={form.captain}
-                onChange={(e) => setForm({ ...form, captain: e.target.value })}
-                placeholder="Captain name (you)"
-              />
-            </div>
-            <div>
-              <label>Date</label>
-              <input
-                type="date"
-                value={form.date}
-                onChange={(e) => setForm({ ...form, date: e.target.value })}
-              />
+            <div className="formRow">
+              <label>Category</label>
+              <select
+                value={form.category}
+                onChange={(e) =>
+                  setForm({ ...form, category: e.target.value as Exclude<BoatCategory, 'all'> })
+                }
+              >
+                <option value="dayTrip">Day Trips</option>
+                <option value="sunset">Sunset Cruises</option>
+                <option value="training">Training</option>
+                <option value="cruise">Cruises</option>
+              </select>
             </div>
           </div>
-          <div className="formRow">
-            <label>Category</label>
-            <select
-              value={form.category}
-              onChange={(e) =>
-                setForm({ ...form, category: e.target.value as Exclude<BoatCategory, 'all'> })
-              }
-            >
-              <option value="dayTrip">Day Trips</option>
-              <option value="sunset">Sunset Cruises</option>
-              <option value="training">Training</option>
-              <option value="cruise">Cruises</option>
-            </select>
-          </div>
-          <div className="formRow">
-            <label>Boat photos (required)</label>
-            <input type="file" accept="image/*" multiple onChange={handleBoatImageUpload} />
-            <small className="hintText">
-              {form.images.length} / {maxBoatImages} images uploaded
-            </small>
-            {boatImageUploading && <small className="hintText">Uploading boat image, please wait...</small>}
-            {form.images.length > 1 && (
-              <small className="hintText">Drag and drop to reorder. The first image is the cover.</small>
-            )}
-            {form.images.length > 0 && (
-              <div className="uploadGallery">
-                {form.images.map((imageUrl, index) => (
-                  <div
-                    key={`${imageUrl}-${index}`}
-                    className={index === 0 ? 'uploadItem coverItem' : 'uploadItem'}
-                    draggable
-                    onDragStart={() => setDraggingImageIndex(index)}
-                    onDragOver={(event) => event.preventDefault()}
-                    onDrop={() => {
-                      if (draggingImageIndex === null) {
-                        return
-                      }
-                      moveFormImage(draggingImageIndex, index)
-                      setDraggingImageIndex(null)
-                    }}
-                    onDragEnd={() => setDraggingImageIndex(null)}
-                  >
-                    <img src={imageUrl} alt={`Uploaded boat image ${index + 1}`} />
-                    <div className="uploadMeta">
-                      <span>{index === 0 ? 'Cover image' : `Image ${index + 1}`}</span>
-                      <button
-                        className="ghostBtn compactActionBtn"
-                        onClick={() => removeFormImageAt(index)}
-                      >
-                        Remove
-                      </button>
+
+          <div className="formSection">
+            <div className="formRow">
+              <label>Boat photos (required)</label>
+              <input type="file" accept="image/*" multiple onChange={handleBoatImageUpload} />
+              <small className="hintText">
+                {form.images.length} / {maxBoatImages} images uploaded
+              </small>
+              {boatImageUploading && <small className="hintText">Uploading boat image, please wait...</small>}
+              {form.images.length > 1 && (
+                <small className="hintText">Drag and drop to reorder. The first image is the cover.</small>
+              )}
+              {form.images.length > 0 && (
+                <div className="uploadGallery">
+                  {form.images.map((imageUrl, index) => (
+                    <div
+                      key={`${imageUrl}-${index}`}
+                      className={index === 0 ? 'uploadItem coverItem' : 'uploadItem'}
+                      draggable
+                      onDragStart={() => setDraggingImageIndex(index)}
+                      onDragOver={(event) => event.preventDefault()}
+                      onDrop={() => {
+                        if (draggingImageIndex === null) {
+                          return
+                        }
+                        moveFormImage(draggingImageIndex, index)
+                        setDraggingImageIndex(null)
+                      }}
+                      onDragEnd={() => setDraggingImageIndex(null)}
+                    >
+                      <img src={imageUrl} alt={`Uploaded boat image ${index + 1}`} />
+                      <div className="uploadMeta">
+                        <span>{index === 0 ? 'Cover image' : `Image ${index + 1}`}</span>
+                        <button
+                          className="ghostBtn compactActionBtn"
+                          onClick={() => removeFormImageAt(index)}
+                        >
+                          Remove
+                        </button>
+                      </div>
                     </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-          <button className="publishBtn" onClick={publishBoat}>
-            {editingBoatId ? 'Update Listing' : 'Publish Listing'}
-          </button>
-          {editingBoatId && (
-            <button className="ghostBtn inlineActionBtn" onClick={cancelEditBoat}>
-              Cancel Edit
+                  ))}
+                </div>
+              )}
+            </div>
+            <button className="publishBtn" onClick={publishBoat}>
+              {editingBoatId ? 'Update Listing' : 'Publish Listing'}
             </button>
-          )}
-          {hostNotice && <p className="hostNotice">{hostNotice}</p>}
+            {editingBoatId && (
+              <button className="ghostBtn inlineActionBtn" onClick={cancelEditBoat}>
+                Cancel Edit
+              </button>
+            )}
+            {hostNotice && <p className="hostNotice">{hostNotice}</p>}
+          </div>
         </div>
 
         <div className="ownerCard">
@@ -377,7 +386,7 @@ export default function HostDashboard({
           {boatsLoading && <p className="muted">Loading your boats...</p>}
           {boatsError && <p className="hostNotice">{boatsError}</p>}
           {!boatsLoading && hostBoats.length === 0 && (
-            <p className="muted">No listings yet. Publish your first trip now.</p>
+            <p className="muted ownerEmptyState">No listings yet. Publish your first trip now.</p>
           )}
           <div className="ownerList">
             {hostBoats.map((boat) => (
