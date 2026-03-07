@@ -185,7 +185,10 @@ export default function MarketplaceMapView({
   }
 
   const resetFilters = () => {
-    setCategory('all')
+    setCruiseLength('all')
+    setCruiseType('all')
+    setHarborFilter('')
+    setBoatSizeSort('none')
     setSearchText('')
     setSeatFilter('')
   }
