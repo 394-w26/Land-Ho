@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useState, type ReactNode } from 'react'
 import {
   cruiseLengthOptions,
   cruiseTypeOptions,
@@ -17,6 +17,7 @@ interface MarketplaceControlsProps {
   setSearchText: (value: string) => void
   seatFilter: string
   setSeatFilter: (value: string) => void
+  weather?: ReactNode
   cruiseLength: CruiseLengthFilter
   setCruiseLength: (v: CruiseLengthFilter) => void
   cruiseType: CruiseTypeFilter
@@ -52,6 +53,7 @@ export default function MarketplaceControls({
   showWhen = true,
   searchSectionClassName = '',
   onSelectSuggestion,
+  weather,
 }: MarketplaceControlsProps) {
   const [whereFocused, setWhereFocused] = useState(false)
 

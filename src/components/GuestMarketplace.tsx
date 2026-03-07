@@ -6,6 +6,7 @@ import { chicagoLocations } from '../data/constants'
 import { formatTripDate } from '../utils/formatters'
 import { Header, UserButton, MenuDropdown } from './Header'
 import MarketplaceControls from './MarketplaceControls'
+import WeatherForecast from './WeatherForecast'
 
 interface GuestMarketplaceProps {
   viewer: User | null
@@ -169,6 +170,7 @@ export default function GuestMarketplace({
         boatSizeSort={boatSizeSort}
         setBoatSizeSort={setBoatSizeSort}
         suggestions={locationSuggestions.map((loc) => ({ id: loc, label: loc }))}
+        weather={<WeatherForecast variant="inline" />}
       />
 
       <section className="listHeader">
@@ -193,7 +195,6 @@ export default function GuestMarketplace({
             >
               <div className="cardImageWrap">
                 <img src={boat.image} alt={boat.title} className="cardImage" />
-                <button className="favoriteBtn">♡</button>
               </div>
               <div className="cardBody">
                 <div className="cardRow">

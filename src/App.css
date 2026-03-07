@@ -419,6 +419,44 @@
     justify-content: center;
   }
 
+  .searchSectionWeather {
+    flex-shrink: 0;
+    margin-left: 12px;
+    padding-left: 12px;
+    border-left: 1px solid var(--color-border);
+  }
+
+  .searchSection .weatherInline {
+    gap: 2px;
+    align-items: flex-start;
+  }
+
+  .searchSection .weatherInlineToday {
+    gap: 6px;
+  }
+
+  .searchSection .weatherInlineIcon {
+    width: 20px;
+    height: 20px;
+  }
+
+  .searchSection .weatherInlineTemp {
+    font-size: 0.9375rem;
+  }
+
+  .searchSection .weatherInlineDesc {
+    font-size: 0.6875rem;
+    max-width: 100px;
+  }
+
+  .searchSection .weatherInlineWeek {
+    gap: 6px 10px;
+  }
+
+  .searchSection .weatherInlineDay {
+    font-size: 0.625rem;
+  }
+
   .searchBtn--icon {
     width: 48px;
     height: 48px;
@@ -576,13 +614,188 @@
   border-bottom-color: var(--color-gold);
 }
 
+/* ── Weather Forecast (top of page) ─────────────── */
+
+.weatherForecast {
+  margin-bottom: 20px;
+  padding: 20px;
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-lg);
+  background: #ffffff;
+  box-shadow: var(--shadow-card);
+}
+
+.weatherToday {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--color-border-light);
+  margin-bottom: 16px;
+}
+
+.weatherTodayIcon {
+  width: 80px;
+  height: 80px;
+  flex-shrink: 0;
+  object-fit: contain;
+}
+
+.weatherTodayMain {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.weatherTodayTemp {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: var(--color-navy);
+  line-height: 1.1;
+  margin: 0;
+}
+
+.weatherTodayName {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+}
+
+.weatherTodayDesc {
+  font-size: 1rem;
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+
+.weatherWeek {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  padding-bottom: 4px;
+}
+
+.weatherWeek::-webkit-scrollbar {
+  display: none;
+}
+
+.weatherWeekDay {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
+  min-width: 72px;
+  padding: 10px 8px;
+  border-radius: var(--radius-md);
+  background: var(--color-bg);
+  border: 1px solid var(--color-border-light);
+}
+
+.weatherWeekIcon {
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+  margin-bottom: 6px;
+}
+
+.weatherForecastDayName {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  margin-bottom: 2px;
+}
+
+.weatherForecastDayTemp {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--color-navy);
+}
+
+.weatherForecastDayDesc {
+  font-size: 0.625rem;
+  color: var(--color-text-secondary);
+  margin-top: 4px;
+  text-align: center;
+  line-height: 1.2;
+  max-width: 70px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.weatherForecastError,
+.weatherForecastLoading {
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+
+/* ── Weather Inline (next to list header) ───────── */
+
+.weatherInline {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.weatherInlineToday {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.weatherInlineIcon {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+}
+
+.weatherInlineTemp {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--color-navy);
+}
+
+.weatherInlineDesc {
+  font-size: 0.8125rem;
+  color: var(--color-text-secondary);
+  max-width: 140px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.weatherInlineWeek {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.weatherInlineDay {
+  font-size: 0.75rem;
+  color: var(--color-text-secondary);
+}
+
 /* ── List Header ───────────────────────────────── */
 
 .listHeader {
   display: flex;
   justify-content: space-between;
-  align-items: baseline;
+  align-items: center;
+  gap: 16px;
   margin: 0 0 16px;
+  flex-wrap: wrap;
+}
+
+.listHeaderLeft {
+  flex: 1;
+  min-width: 0;
 }
 
 .listHeader h2 {
@@ -595,6 +808,99 @@
   margin: 0;
   color: var(--color-text-secondary);
   font-size: 0.875rem;
+}
+
+/* ── Weather Inline (next to list header) ────────── */
+
+.weatherInline {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.weatherInlineToday {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.weatherInlineIcon {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+}
+
+.weatherInlineTemp {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--color-navy);
+}
+
+.weatherInlineDesc {
+  font-size: 0.8125rem;
+  color: var(--color-text-secondary);
+  max-width: 140px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.weatherInlineWeek {
+  display: flex;
+  gap: 8px 12px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.weatherInlineDay {
+  font-size: 0.625rem;
+  color: var(--color-text-secondary);
+  font-weight: 500;
+}
+
+/* Weather inside search bar (flex with Where/When/Sailors) */
+.searchSection .searchSectionWeather {
+  flex-shrink: 0;
+  margin-left: 12px;
+  padding-left: 12px;
+  border-left: 1px solid var(--color-border);
+  display: flex;
+  align-items: center;
+}
+
+.searchSection .searchSectionWeather .weatherInline {
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+}
+
+.searchSection .searchSectionWeather .weatherInlineToday {
+  gap: 6px;
+}
+
+.searchSection .searchSectionWeather .weatherInlineIcon {
+  width: 22px;
+  height: 22px;
+}
+
+.searchSection .searchSectionWeather .weatherInlineTemp {
+  font-size: 1rem;
+}
+
+.searchSection .searchSectionWeather .weatherInlineDesc {
+  font-size: 0.75rem;
+  max-width: 100px;
+}
+
+.searchSection .searchSectionWeather .weatherInlineWeek {
+  gap: 6px 10px;
+  justify-content: flex-start;
+}
+
+.searchSection .searchSectionWeather .weatherInlineDay {
+  font-size: 0.5625rem;
 }
 
 /* ── Boat Grid ─────────────────────────────────── */
