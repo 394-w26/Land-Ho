@@ -23,6 +23,25 @@
   }
 }
 
+/* Sailor page uses the same dimensions as the home page (tagged copy) */
+.sailorPage {
+  padding: 0 16px 32px;
+}
+
+@media (min-width: 768px) {
+  .sailorPage {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 24px 40px;
+  }
+}
+
+@media (min-width: 1080px) {
+  .sailorPage {
+    padding: 0 40px 48px;
+  }
+}
+
 /* ── Top Bar / Header ──────────────────────────── */
 
 .topBar {
@@ -66,6 +85,12 @@
   .topBarInner {
     padding: 0 40px;
   }
+}
+
+/* Utility to disable page scrolling (used on full-screen setup flows) */
+.no-scroll {
+  overflow: hidden !important;
+  height: 100vh !important;
 }
 
 @media (min-width: 768px) {
@@ -670,14 +695,17 @@
    ════════════════════════════════════════════════ */
 
 .ownerPage {
-  padding: 0 16px 32px;
+  /* Owner page should have no outer padding or margin — layout handled by inner containers */
+  padding: 0;
+  margin: 0;
 }
 
 @media (min-width: 768px) {
   .ownerPage {
-    max-width: 1080px;
-    margin: 0 auto;
-    padding: 0 24px 40px;
+    /* keep same max-width as sailor/home pages, but no margins/padding */
+    max-width: 1280px;
+    margin: 0;
+    padding: 0;
   }
 }
 
@@ -2165,7 +2193,7 @@
   .reviewLabel {
     min-width: 140px;
   }
-}
+} 
 
 .reviewMissing {
   color: var(--color-danger);

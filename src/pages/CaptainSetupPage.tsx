@@ -102,6 +102,12 @@ function CaptainSetupPage() {
     return () => unsub()
   }, [])
 
+  /* lock background scrolling while on the captain setup page */
+  useEffect(() => {
+    document.body.classList.add('no-scroll')
+    return () => { document.body.classList.remove('no-scroll') }
+  }, [])
+
   /* load existing captain profile */
   useEffect(() => {
     if (!viewer) return
