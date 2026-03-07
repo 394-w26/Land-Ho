@@ -74,11 +74,11 @@ export default function GuestMarketplace({
     <div className="homePage">
       <Header brandText="Land Ho">
         <button className="ghostBtn" onClick={onBecomeHost}>
-          Sign up as a captain
+          Become a Host
         </button>
-        <button className="ghostBtn" onClick={onNavigateMap}>
+        {/* <button className="ghostBtn" onClick={onNavigateMap}>
           Map view
-        </button>
+        </button> */} 
         <UserButton
           viewer={viewer}
           authLoading={authLoading}
