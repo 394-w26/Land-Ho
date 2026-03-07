@@ -4,7 +4,7 @@ import Map, { Marker, NavigationControl, Popup, type MapRef } from 'react-map-gl
 import { type BoatCoordinates } from '../features/boats/boatsApi'
 import { searchLocationSuggestions, type LocationSuggestion } from '../features/location/mapboxGeocode'
 import { defaultCoordinates } from '../data/constants'
-import { type BoatCard, type BoatCategory } from '../types'
+import { type BoatCard, type CruiseLengthFilter, type CruiseTypeFilter, type BoatSizeSort } from '../types'
 import MarketplaceControls, { type SuggestionOption } from './MarketplaceControls'
 import { Header } from './Header'
 
@@ -19,12 +19,18 @@ interface MarketplaceMapViewProps {
   boats: BoatCard[]
   boatsLoading: boolean
   boatsError: string
-  category: BoatCategory
-  setCategory: (category: BoatCategory) => void
   searchText: string
   setSearchText: (value: string) => void
   seatFilter: string
   setSeatFilter: (value: string) => void
+  cruiseLength: CruiseLengthFilter
+  setCruiseLength: (v: CruiseLengthFilter) => void
+  cruiseType: CruiseTypeFilter
+  setCruiseType: (v: CruiseTypeFilter) => void
+  harborFilter: string
+  setHarborFilter: (value: string) => void
+  boatSizeSort: BoatSizeSort
+  setBoatSizeSort: (v: BoatSizeSort) => void
   onBackToList: () => void
   highlightBoatId?: string
   onHighlightHandled?: () => void
@@ -59,12 +65,18 @@ export default function MarketplaceMapView({
   boats,
   boatsLoading,
   boatsError,
-  category,
-  setCategory,
   searchText,
   setSearchText,
   seatFilter,
   setSeatFilter,
+  cruiseLength,
+  setCruiseLength,
+  cruiseType,
+  setCruiseType,
+  harborFilter,
+  setHarborFilter,
+  boatSizeSort,
+  setBoatSizeSort,
   onBackToList,
   highlightBoatId = '',
   onHighlightHandled,
@@ -187,12 +199,18 @@ export default function MarketplaceMapView({
       </Header>
 
       <MarketplaceControls
-        category={category}
-        setCategory={setCategory}
         searchText={searchText}
         setSearchText={setSearchText}
         seatFilter={seatFilter}
         setSeatFilter={setSeatFilter}
+        cruiseLength={cruiseLength}
+        setCruiseLength={setCruiseLength}
+        cruiseType={cruiseType}
+        setCruiseType={setCruiseType}
+        harborFilter={harborFilter}
+        setHarborFilter={setHarborFilter}
+        boatSizeSort={boatSizeSort}
+        setBoatSizeSort={setBoatSizeSort}
         suggestions={controlSuggestions}
         suggestionsLoading={suggestionsLoading}
         searchSectionClassName="mapSearchSection"

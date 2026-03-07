@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { type User } from 'firebase/auth'
 import { useNavigate } from 'react-router-dom'
-import { type BoatCard, type BoatCategory } from '../types'
+import { type BoatCard, type CruiseLengthFilter, type CruiseTypeFilter, type BoatSizeSort } from '../types'
 import { chicagoLocations } from '../data/constants'
 import { formatTripDate } from '../utils/formatters'
 import { Header, UserButton, MenuDropdown } from './Header'
@@ -15,12 +15,18 @@ interface GuestMarketplaceProps {
   userInitial: string
   menuOpen: boolean
   setMenuOpen: (open: boolean) => void
-  category: BoatCategory
-  setCategory: (category: BoatCategory) => void
   searchText: string
   setSearchText: (value: string) => void
   seatFilter: string
   setSeatFilter: (value: string) => void
+  cruiseLength: CruiseLengthFilter
+  setCruiseLength: (v: CruiseLengthFilter) => void
+  cruiseType: CruiseTypeFilter
+  setCruiseType: (v: CruiseTypeFilter) => void
+  harborFilter: string
+  setHarborFilter: (value: string) => void
+  boatSizeSort: BoatSizeSort
+  setBoatSizeSort: (v: BoatSizeSort) => void
   filteredBoats: BoatCard[]
   boatsLoading: boolean
   boatsError: string
@@ -43,12 +49,18 @@ export default function GuestMarketplace({
   userInitial,
   menuOpen,
   setMenuOpen,
-  category,
-  setCategory,
   searchText,
   setSearchText,
   seatFilter,
   setSeatFilter,
+  cruiseLength,
+  setCruiseLength,
+  cruiseType,
+  setCruiseType,
+  harborFilter,
+  setHarborFilter,
+  boatSizeSort,
+  setBoatSizeSort,
   filteredBoats,
   boatsLoading,
   boatsError,
@@ -144,12 +156,18 @@ export default function GuestMarketplace({
       </Header>
 
       <MarketplaceControls
-        category={category}
-        setCategory={setCategory}
         searchText={searchText}
         setSearchText={setSearchText}
         seatFilter={seatFilter}
         setSeatFilter={setSeatFilter}
+        cruiseLength={cruiseLength}
+        setCruiseLength={setCruiseLength}
+        cruiseType={cruiseType}
+        setCruiseType={setCruiseType}
+        harborFilter={harborFilter}
+        setHarborFilter={setHarborFilter}
+        boatSizeSort={boatSizeSort}
+        setBoatSizeSort={setBoatSizeSort}
         suggestions={locationSuggestions.map((loc) => ({ id: loc, label: loc }))}
       />
 
@@ -198,9 +216,12 @@ export default function GuestMarketplace({
           <p>No boats match your filters. Try resetting them.</p>
           <button
             onClick={() => {
-              setCategory('all')
               setSearchText('')
               setSeatFilter('')
+              setCruiseLength('all')
+              setCruiseType('all')
+              setHarborFilter('')
+              setBoatSizeSort('none')
             }}
           >
             Reset Filters

@@ -16,6 +16,12 @@ import { db } from '../../lib/firebase'
 
 export type BoatCategory = 'dayTrip' | 'sunset' | 'training' | 'cruise'
 
+/** Length of cruise for filtering */
+export type CruiseLength = '<3' | '3-5' | '6-8'
+
+/** Type of cruise for filtering */
+export type CruiseType = 'sporting' | 'leisure'
+
 export interface BoatCoordinates {
   lat: number
   lng: number
@@ -36,6 +42,8 @@ export interface BoatRecord {
   images: string[]
   ownerUid: string
   ownerName: string
+  durationCategory?: CruiseLength
+  cruiseType?: CruiseType
 }
 
 export interface CreateBoatInput {
@@ -71,6 +79,8 @@ const mapBoatDoc = (doc: QueryDocumentSnapshot): BoatRecord => {
       ? [String(data.image)]
       : []
   const coverImage = String(data.image ?? images[0] ?? '')
+  const durationCategory = data.durationCategory as BoatRecord['durationCategory']
+  const cruiseType = data.cruiseType as BoatRecord['cruiseType']
   return {
     id: doc.id,
     title: String(data.title ?? ''),
@@ -86,6 +96,8 @@ const mapBoatDoc = (doc: QueryDocumentSnapshot): BoatRecord => {
     images,
     ownerUid: String(data.ownerUid ?? ''),
     ownerName: String(data.ownerName ?? ''),
+    ...(durationCategory && { durationCategory }),
+    ...(cruiseType && { cruiseType }),
   }
 }
 

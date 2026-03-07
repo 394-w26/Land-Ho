@@ -55,6 +55,34 @@ export const locationCoordinatesLookup: Record<string, BoatCoordinates> = {
 
 export const chicagoLocations: string[] = Object.keys(locationCoordinatesLookup)
 
+/** Length of cruise filter options */
+export const cruiseLengthOptions: { value: string; label: string }[] = [
+  { value: 'all', label: 'All' },
+  { value: '<3', label: '<3 hours' },
+  { value: '3-5', label: '3-5 hours' },
+  { value: '6-8', label: '6-8 hours' },
+]
+
+/** Type of cruise filter options */
+export const cruiseTypeOptions: { value: string; label: string }[] = [
+  { value: 'all', label: 'All' },
+  { value: 'sporting', label: 'Sporting' },
+  { value: 'leisure', label: 'Leisure' },
+]
+
+/** Boat size sort options (by seats) */
+export const boatSizeSortOptions: { value: string; label: string }[] = [
+  { value: 'none', label: 'No sort' },
+  { value: 'smallToLarge', label: 'Small to large' },
+  { value: 'largeToSmall', label: 'Large to small' },
+]
+
+/** Harbors/Marinas filter: All + Chicago locations */
+export const harborFilterOptions: { value: string; label: string }[] = [
+  { value: '', label: 'All harbors' },
+  ...chicagoLocations.map((loc) => ({ value: loc, label: loc })),
+]
+
 export const defaultCoordinates: BoatCoordinates = { lat: 41.8781, lng: -87.6298 }
 
 export const findCoordinatesForLocation = (locationText: string): BoatCoordinates => {

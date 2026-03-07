@@ -16,6 +16,8 @@ export const initialBoatData: BoatCard[] = [
     images: ['https://images.unsplash.com/photo-1763310330085-1b605f803acd?auto=format&fit=crop&w=1200&q=80'],
     ownerUid: 'seed-demo',
     ownerName: 'Captain Maya',
+    durationCategory: '3-5',
+    cruiseType: 'leisure',
   },
   {
     id: 'b2',
@@ -32,6 +34,8 @@ export const initialBoatData: BoatCard[] = [
     images: ['https://images.unsplash.com/photo-1563819821630-ce8211d8139c?auto=format&fit=crop&w=1200&q=80'],
     ownerUid: 'seed-demo',
     ownerName: 'Captain DeSoto',
+    durationCategory: '<3',
+    cruiseType: 'sporting',
   },
   {
     id: 'b3',
@@ -48,6 +52,8 @@ export const initialBoatData: BoatCard[] = [
     images: ['https://images.unsplash.com/photo-1704912343431-3a4f2c0c0427?auto=format&fit=crop&w=1200&q=80'],
     ownerUid: 'seed-demo',
     ownerName: 'Captain Reeves',
+    durationCategory: '3-5',
+    cruiseType: 'sporting',
   },
   {
     id: 'b4',
@@ -64,6 +70,8 @@ export const initialBoatData: BoatCard[] = [
     images: ['https://images.unsplash.com/photo-1719921219747-0a1dcce2a35a?auto=format&fit=crop&w=1200&q=80'],
     ownerUid: 'seed-demo',
     ownerName: 'Captain Okafor',
+    durationCategory: '6-8',
+    cruiseType: 'leisure',
   },
   {
     id: 'b5',
@@ -80,6 +88,8 @@ export const initialBoatData: BoatCard[] = [
     images: ['https://images.unsplash.com/photo-1690379532821-8fb5b1f1941c?auto=format&fit=crop&w=1200&q=80'],
     ownerUid: 'seed-demo',
     ownerName: 'Captain Navarro',
+    durationCategory: '<3',
+    cruiseType: 'leisure',
   },
   {
     id: 'b6',
@@ -96,5 +106,7 @@ export const initialBoatData: BoatCard[] = [
     images: ['https://images.unsplash.com/photo-1662466617230-4e3310ea2767?auto=format&fit=crop&w=1200&q=80'],
     ownerUid: 'seed-demo',
     ownerName: 'Captain Lindqvist',
+    durationCategory: '6-8',
+    cruiseType: 'sporting',
   },
 ]

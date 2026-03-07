@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { Route, Routes, useLocation, useNavigate } from 'react-router-dom'
 import './App.css'
 import 'mapbox-gl/dist/mapbox-gl.css'
-import { type AppView, type BoatCategory } from './types'
+import { type AppView, type CruiseLengthFilter, type CruiseTypeFilter, type BoatSizeSort } from './types'
 import { useAuth } from './hooks/useAuth'
 import { useProfile } from './hooks/useProfile'
 import { useBoats } from './hooks/useBoats'
@@ -25,9 +25,12 @@ function MarketplacePage() {
   const [mode, setMode] = useState<'guest' | 'host'>('guest')
   const [appView, setAppView] = useState<AppView>('market')
   const [menuOpen, setMenuOpen] = useState(false)
-  const [category, setCategory] = useState<BoatCategory>('all')
   const [searchText, setSearchText] = useState('')
   const [seatFilter, setSeatFilter] = useState('')
+  const [cruiseLength, setCruiseLength] = useState<CruiseLengthFilter>('all')
+  const [cruiseType, setCruiseType] = useState<CruiseTypeFilter>('all')
+  const [harborFilter, setHarborFilter] = useState('')
+  const [boatSizeSort, setBoatSizeSort] = useState<BoatSizeSort>('none')
   const [highlightBoatId, setHighlightBoatId] = useState('')
 
   const { viewer, authLoading, authError, loginWithGoogle, signOutUser, userInitial } = useAuth()
@@ -52,9 +55,12 @@ function MarketplacePage() {
 
   const { filteredBoats, hostBoats, boatsLoading, boatsError } = useBoats({
     viewer,
-    category,
     searchText,
     seatFilter,
+    cruiseLength,
+    cruiseType,
+    harborFilter,
+    boatSizeSort,
   })
 
   const boatForm = useBoatForm({
@@ -219,12 +225,18 @@ function MarketplacePage() {
         boats={filteredBoats}
         boatsLoading={boatsLoading}
         boatsError={boatsError}
-        category={category}
-        setCategory={setCategory}
         searchText={searchText}
         setSearchText={setSearchText}
         seatFilter={seatFilter}
         setSeatFilter={setSeatFilter}
+        cruiseLength={cruiseLength}
+        setCruiseLength={setCruiseLength}
+        cruiseType={cruiseType}
+        setCruiseType={setCruiseType}
+        harborFilter={harborFilter}
+        setHarborFilter={setHarborFilter}
+        boatSizeSort={boatSizeSort}
+        setBoatSizeSort={setBoatSizeSort}
         onBackToList={() => setAppView('market')}
         highlightBoatId={highlightBoatId}
         onHighlightHandled={() => setHighlightBoatId('')}
@@ -241,12 +253,18 @@ function MarketplacePage() {
       userInitial={userInitial}
       menuOpen={menuOpen}
       setMenuOpen={setMenuOpen}
-      category={category}
-      setCategory={setCategory}
       searchText={searchText}
       setSearchText={setSearchText}
       seatFilter={seatFilter}
       setSeatFilter={setSeatFilter}
+      cruiseLength={cruiseLength}
+      setCruiseLength={setCruiseLength}
+      cruiseType={cruiseType}
+      setCruiseType={setCruiseType}
+      harborFilter={harborFilter}
+      setHarborFilter={setHarborFilter}
+      boatSizeSort={boatSizeSort}
+      setBoatSizeSort={setBoatSizeSort}
       filteredBoats={filteredBoats}
       boatsLoading={boatsLoading}
       boatsError={boatsError}

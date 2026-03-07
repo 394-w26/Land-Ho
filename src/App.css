@@ -449,7 +449,67 @@
   }
 }
 
-/* ── Category Tabs ─────────────────────────────── */
+/* ── Filter Row (horizontal dropdowns with icons) ── */
+
+.filterRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 20px;
+  padding: 16px 0;
+  margin-bottom: 20px;
+  border-bottom: 1px solid var(--color-border-light);
+}
+
+.filterItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.filterItem .filterIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  color: var(--color-text-secondary);
+}
+
+.filterItem .filterIcon svg {
+  width: 18px;
+  height: 18px;
+}
+
+.filterItem .filterSelect {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  padding: 8px 32px 8px 12px;
+  font-size: 0.875rem;
+  font-family: inherit;
+  background: #ffffff;
+  min-width: 130px;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  cursor: pointer;
+}
+
+.filterItem .filterSelect:focus {
+  border-color: var(--color-navy);
+  outline: none;
+}
+
+@media (min-width: 768px) {
+  .filterRow {
+    max-width: 960px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
 
 .categoryTabs {
   display: flex;
