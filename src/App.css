@@ -28,27 +28,61 @@
 .topBar {
   position: sticky;
   top: 0;
+  left: 0;
   z-index: 50;
   background: var(--color-navy);
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 14px 16px;
+  /* vertical padding; horizontal spacing is handled by inner container */
+  padding: 14px 0;
   border-bottom: none;
-  margin: 0 -16px;
+  /* full-bleed background while keeping inner content aligned */
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
   box-shadow: 0 2px 8px rgba(27,42,74,0.15);
+}
+
+/* Inner container to center header content while keeping full-bleed background */
+.topBarInner {
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+@media (min-width: 768px) {
+  .topBarInner {
+    padding: 0 24px;
+  }
+}
+
+@media (min-width: 1080px) {
+  .topBarInner {
+    padding: 0 40px;
+  }
 }
 
 @media (min-width: 768px) {
   .topBar {
-    margin: 0 -24px;
+    /* keep full-bleed but increase inner padding on wider screens */
+    width: 100vw;
+    margin-left: calc(50% - 50vw);
+    margin-right: calc(50% - 50vw);
     padding: 14px 24px;
   }
 }
 
 @media (min-width: 1080px) {
   .topBar {
-    margin: 0 -40px;
+    width: 100vw;
+    margin-left: calc(50% - 50vw);
+    margin-right: calc(50% - 50vw);
     padding: 14px 40px;
   }
 }

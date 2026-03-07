@@ -10,12 +10,14 @@ interface HeaderProps {
 export function Header({ brandText, children }: HeaderProps) {
   return (
     <header className="topBar">
-      <Link className="brand" to="/">
-        <img className="brandLogo" src="/logo.png" alt="Land Ho logo" />
-        <span>{brandText}</span>
-      </Link>
-      <div className="topActions">
-        {children}
+      <div className="topBarInner">
+        <Link className="brand" to="/">
+          <img className="brandLogo" src="/logo.png" alt="Land Ho logo" />
+          <span>{brandText}</span>
+        </Link>
+        <div className="topActions">
+          {children}
+        </div>
       </div>
     </header>
   )
