@@ -6,7 +6,6 @@ import { getUserPublicProfile, type UserPublicProfile } from '../features/users/
 import { createBookingRequest, hasPendingBookingRequest } from '../features/booking/bookingApi'
 import { getOrCreateConversation } from '../features/chat/chatApi'
 import { auth, isFirebaseReady } from '../lib/firebase'
-import { initialBoatData } from '../data/seedBoats'
 import FeedbackModal from '../components/FeedbackModal'
 
 const mapboxToken = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN as string | undefined
@@ -49,7 +48,7 @@ function BoatDetailPage() {
       setViewer(nextUser)
     })
     return () => unsubscribe()
-  }, [])
+  }, [auth, isFirebaseReady])
 
   useEffect(() => {
     if (!boatId) {
@@ -69,31 +68,8 @@ function BoatDetailPage() {
           return
         }
         if (!boatDoc) {
-          // Fallback to local seed data (for demo boats that aren't in Firestore yet)
-          const seedBoat = initialBoatData.find((b) => b.id === boatId)
-          if (!seedBoat) {
-            setBoat(null)
-            setBoatError('This boat listing does not exist.')
-            setLoading(false)
-            return
-          }
-          const mappedSeedBoat: BoatRecord = {
-            id: seedBoat.id,
-            title: seedBoat.title,
-            location: seedBoat.location,
-            coordinates: seedBoat.coordinates,
-            price: seedBoat.price,
-            rating: seedBoat.rating,
-            seats: seedBoat.seats,
-            captain: seedBoat.captain,
-            date: seedBoat.date,
-            category: seedBoat.category,
-            image: seedBoat.image,
-            images: seedBoat.images,
-            ownerUid: seedBoat.ownerUid,
-            ownerName: seedBoat.ownerName,
-          }
-          setBoat(mappedSeedBoat)
+          setBoat(null)
+          setBoatError('This boat listing does not exist.')
           setLoading(false)
           return
         }
@@ -142,7 +118,7 @@ function BoatDetailPage() {
     }
     const { lng, lat } = boat.coordinates
     return `https://api.mapbox.com/styles/v1/mapbox/streets-v12/static/pin-s+ff385c(${lng},${lat})/${lng},${lat},12,0/900x320?access_token=${mapboxToken}`
-  }, [boat])
+  }, [boat?.coordinates, mapboxToken])
 
   const handleReserve = async () => {
     if (!boat) {
@@ -206,6 +182,10 @@ function BoatDetailPage() {
       setReserveNotice('Please sign in to message the captain.')
       return
     }
+    if (!boat.ownerUid) {
+      setReserveNotice('Captain contact is unavailable for this listing.')
+      return
+    }
     if (viewer.uid === boat.ownerUid) {
       setReserveNotice('You cannot message yourself.')
       return
@@ -251,6 +231,8 @@ function BoatDetailPage() {
       </div>
     )
   }
+
+  const hasHostProfileLink = Boolean(boat.ownerUid)
 
   return (
     <div className="detailPage">
@@ -308,7 +290,23 @@ function BoatDetailPage() {
 
         <article className="detailInfoCard">
           <h2>Meet your captain</h2>
-          <div className="hostProfileHead hostProfileClickable" onClick={() => navigate(`/hosts/${boat.ownerUid}`)}>
+          <div
+            className={`hostProfileHead ${hasHostProfileLink ? 'hostProfileClickable' : ''}`}
+            onClick={() => {
+              if (hasHostProfileLink) {
+                navigate(`/hosts/${boat.ownerUid}`)
+              }
+            }}
+            role={hasHostProfileLink ? 'button' : undefined}
+            tabIndex={hasHostProfileLink ? 0 : undefined}
+            onKeyDown={(event) => {
+              if (!hasHostProfileLink) return
+              if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault()
+                navigate(`/hosts/${boat.ownerUid}`)
+              }
+            }}
+          >
             {hostProfile?.avatarUrl ? (
               <img src={hostProfile.avatarUrl} alt={hostProfile.displayName || boat.ownerName} />
             ) : (
@@ -322,7 +320,12 @@ function BoatDetailPage() {
             </div>
           </div>
           <div className="captainBtnRow">
-            <button className="ghostBtn hostProfileBtn" onClick={() => navigate(`/hosts/${boat.ownerUid}`)}>
+            <button
+              className="ghostBtn hostProfileBtn"
+              onClick={() => navigate(`/hosts/${boat.ownerUid}`)}
+              disabled={!hasHostProfileLink}
+              aria-disabled={!hasHostProfileLink}
+            >
               View full profile
             </button>
             <button

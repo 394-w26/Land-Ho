@@ -6,7 +6,6 @@ import { chicagoLocations } from '../data/constants'
 import { formatTripDate } from '../utils/formatters'
 import { Header, UserButton, MenuDropdown } from './Header'
 import MarketplaceControls from './MarketplaceControls'
-
 interface GuestMarketplaceProps {
   viewer: User | null
   authLoading: boolean

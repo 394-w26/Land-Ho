@@ -3,7 +3,7 @@ import { type User } from 'firebase/auth'
 import { db, isFirebaseReady } from '../lib/firebase'
 import { subscribePublishedBoats } from '../features/boats/boatsApi'
 import { type BoatCard, type CruiseLengthFilter, type CruiseTypeFilter, type BoatSizeSort } from '../types'
-import { initialBoatData } from '../data/seedBoats'
+
 
 interface UseBoatsOptions {
   viewer: User | null
@@ -30,13 +30,13 @@ export function useBoats({
 
   useEffect(() => {
     if (!db || !isFirebaseReady) {
-      setBoats(initialBoatData)
+      // setBoats(initialBoatData)
       setBoatsLoading(false)
       return
     }
     const unsubscribe = subscribePublishedBoats(
       (nextBoats) => {
-        setBoats(nextBoats.length === 0 ? initialBoatData : nextBoats)
+        setBoats(nextBoats.length === 0 ? [] : nextBoats)
         setBoatsLoading(false)
         setBoatsError('')
       },
