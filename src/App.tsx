@@ -36,6 +36,7 @@ function MarketplacePage() {
   const { viewer, authLoading, authError, loginWithGoogle, signOutUser, userInitial } = useAuth()
   const profile = useProfile(viewer)
   const [captainProfileCompleted, setCaptainProfileCompleted] = useState(false)
+  const [showCaptainGate, setShowCaptainGate] = useState(false)
 
   useEffect(() => {
     profile.syncFromAuth(viewer)
@@ -94,16 +95,22 @@ function MarketplacePage() {
   }, [location.state]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleHostModeClick = async () => {
-    if (viewer) {
-      setMode('host')
-      setAppView('market')
+    if (!viewer) {
+      const success = await loginWithGoogle()
+      // After login the viewer state updates async — navigate to captain setup
+      // so they complete it before hosting. The gate will enforce this on next click.
+      if (success) {
+        navigate('/setup/captain')
+      }
       return
     }
-    const success = await loginWithGoogle()
-    if (success) {
-      setMode('host')
-      setAppView('market')
+    // Already signed in — check captain profile completion
+    if (!captainProfileCompleted) {
+      setShowCaptainGate(true)
+      return
     }
+    setMode('host')
+    setAppView('market')
   }
 
   const openProfileEditor = async () => {
@@ -245,39 +252,65 @@ function MarketplacePage() {
   }
 
   return (
-    <GuestMarketplace
-      viewer={viewer}
-      authLoading={authLoading}
-      authError={authError}
-      resolvedAvatarUrl={profile.resolvedAvatarUrl}
-      userInitial={userInitial}
-      menuOpen={menuOpen}
-      setMenuOpen={setMenuOpen}
-      searchText={searchText}
-      setSearchText={setSearchText}
-      seatFilter={seatFilter}
-      setSeatFilter={setSeatFilter}
-      cruiseLength={cruiseLength}
-      setCruiseLength={setCruiseLength}
-      cruiseType={cruiseType}
-      setCruiseType={setCruiseType}
-      harborFilter={harborFilter}
-      setHarborFilter={setHarborFilter}
-      boatSizeSort={boatSizeSort}
-      setBoatSizeSort={setBoatSizeSort}
-      filteredBoats={filteredBoats}
-      boatsLoading={boatsLoading}
-      boatsError={boatsError}
-      onBecomeHost={() => void handleHostModeClick()}
-      onOpenProfile={() => void openProfileEditor()}
-      onSignOut={() => void handleSignOut()}
-      onLoginWithGoogle={() => void loginWithGoogle()}
-      onNavigateCaptainSetup={() => navigate('/setup/captain')}
-      onNavigateSailorSetup={() => navigate('/setup/sailor')}
-      onNavigateInstructorRequest={() => navigate('/request-instructor')}
-      onNavigateChat={() => navigate('/chat')}
-      onNavigateMap={() => setAppView('map')}
-    />
+    <>
+      <GuestMarketplace
+        viewer={viewer}
+        authLoading={authLoading}
+        authError={authError}
+        resolvedAvatarUrl={profile.resolvedAvatarUrl}
+        userInitial={userInitial}
+        menuOpen={menuOpen}
+        setMenuOpen={setMenuOpen}
+        searchText={searchText}
+        setSearchText={setSearchText}
+        seatFilter={seatFilter}
+        setSeatFilter={setSeatFilter}
+        cruiseLength={cruiseLength}
+        setCruiseLength={setCruiseLength}
+        cruiseType={cruiseType}
+        setCruiseType={setCruiseType}
+        harborFilter={harborFilter}
+        setHarborFilter={setHarborFilter}
+        boatSizeSort={boatSizeSort}
+        setBoatSizeSort={setBoatSizeSort}
+        filteredBoats={filteredBoats}
+        boatsLoading={boatsLoading}
+        boatsError={boatsError}
+        onBecomeHost={() => void handleHostModeClick()}
+        onOpenProfile={() => void openProfileEditor()}
+        onSignOut={() => void handleSignOut()}
+        onLoginWithGoogle={() => void loginWithGoogle()}
+        onNavigateCaptainSetup={() => navigate('/setup/captain')}
+        onNavigateSailorSetup={() => navigate('/setup/sailor')}
+        onNavigateInstructorRequest={() => navigate('/request-instructor')}
+        onNavigateChat={() => navigate('/chat')}
+        onNavigateMap={() => setAppView('map')}
+      />
+
+      {/* Captain setup gate modal */}
+      {showCaptainGate && (
+        <div className="modalOverlay" onClick={() => setShowCaptainGate(false)}>
+          <div className="modalCard" onClick={(e) => e.stopPropagation()}>
+            <h3>Captain setup required</h3>
+            <p>
+              You need to complete your captain profile before you can host a trip.
+              It only takes a few minutes — add your license, boat info, and agree to the waiver.
+            </p>
+            <div className="modalActions">
+              <button
+                className="publishBtn"
+                onClick={() => { setShowCaptainGate(false); navigate('/setup/captain') }}
+              >
+                Complete captain setup
+              </button>
+              <button className="ghostBtn" onClick={() => setShowCaptainGate(false)}>
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   )
 }
 
