@@ -274,7 +274,7 @@ export default function MarketplaceMapView({
                         className={active ? 'priceMarker active' : 'priceMarker'}
                         onClick={() => navigate(`/boats/${boat.id}`)}
                       >
-                        ${boat.price}
+                        Free
                       </button>
                     </Marker>
                   )
@@ -291,7 +291,6 @@ export default function MarketplaceMapView({
                   <div className="mapPopup">
                     <strong>{selectedBoat.title}</strong>
                     <p>{selectedBoat.location}</p>
-                    <p>$ {selectedBoat.price} / person</p>
                     <button
                       className="ghostBtn mapPopupBtn"
                       onClick={() => navigate(`/boats/${selectedBoat.id}`)}
@@ -350,7 +349,6 @@ export default function MarketplaceMapView({
                       <p>
                         Captain {boat.captain} · {boat.seats} seats
                       </p>
-                      <p className="price">$ {boat.price} / person</p>
                       {!hasCoordinates(boat.coordinates) && (
                         <p className="mapCardHint">Map pin unavailable for this listing.</p>
                       )}

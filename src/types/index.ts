@@ -14,7 +14,6 @@ export interface BoatCard {
   title: string
   location: string
   coordinates: BoatCoordinates | null
-  price: number
   rating: number
   seats: number
   captain: string
@@ -70,7 +69,6 @@ export interface ProfileDraft {
 export interface BoatFormData {
   title: string
   location: string
-  price: string
   seats: string
   captain: string
   date: string

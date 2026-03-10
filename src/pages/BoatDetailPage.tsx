@@ -251,7 +251,6 @@ function BoatDetailPage() {
         <p>
           {boat.location} · {formatTripDate(boat.date)} · {boat.seats} seats
         </p>
-        <p className="price">$ {boat.price} / person</p>
       </section>
 
       <section className="detailGallery">
@@ -401,10 +400,6 @@ function BoatDetailPage() {
       </section>
 
       <div className="detailStickyBar">
-        <div className="detailStickyPrice">
-          <span className="detailStickyAmount">$ {boat.price}</span>
-          <span className="detailStickyUnit"> / person</span>
-        </div>
         <button className="publishBtn detailStickyReserve" onClick={() => void handleReserve()} disabled={reserveSubmitting}>
           {reserveSubmitting ? 'Submitting...' : 'Reserve'}
         </button>

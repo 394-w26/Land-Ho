@@ -275,29 +275,11 @@ export default function HostDashboard({
           <div className="formSection">
             <div className="formRow split">
               <div>
-                <label>Price (USD/person)</label>
-                <input
-                  value={form.price}
-                  placeholder="e.g. 85"
-                  onChange={(e) => setForm({ ...form, price: e.target.value })}
-                />
-              </div>
-              <div>
                 <label>Seats</label>
                 <input
                   value={form.seats}
                   placeholder="e.g. 6"
                   onChange={(e) => setForm({ ...form, seats: e.target.value })}
-                />
-              </div>
-            </div>
-            <div className="formRow split">
-              <div>
-                <label>Captain</label>
-                <input
-                  value={form.captain}
-                  onChange={(e) => setForm({ ...form, captain: e.target.value })}
-                  placeholder="Captain name (you)"
                 />
               </div>
               <div>
@@ -308,6 +290,14 @@ export default function HostDashboard({
                   onChange={(e) => setForm({ ...form, date: e.target.value })}
                 />
               </div>
+            </div>
+            <div className="formRow">
+              <label>Captain</label>
+              <input
+                value={form.captain}
+                onChange={(e) => setForm({ ...form, captain: e.target.value })}
+                placeholder="Captain name (you)"
+              />
             </div>
             <div className="formRow">
               <label>Category</label>
@@ -397,7 +387,6 @@ export default function HostDashboard({
                   <p>
                     {boat.location} · {formatTripDate(boat.date)} · {boat.seats} seats
                   </p>
-                  <p>$ {boat.price} / person</p>
                   <button className="ghostBtn compactActionBtn" onClick={() => startEditBoat(boat)}>
                     Edit
                   </button>

@@ -202,7 +202,6 @@ export default function GuestMarketplace({
                 <p>
                   Captain {boat.captain} · {formatTripDate(boat.date)} · {boat.seats} seats
                 </p>
-                <p className="price">$ {boat.price} / person</p>
               </div>
             </article>
           ))

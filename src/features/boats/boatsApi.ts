@@ -32,7 +32,6 @@ export interface BoatRecord {
   title: string
   location: string
   coordinates: BoatCoordinates | null
-  price: number
   rating: number
   seats: number
   captain: string
@@ -50,7 +49,6 @@ export interface CreateBoatInput {
   title: string
   location: string
   coordinates: BoatCoordinates
-  price: number
   seats: number
   captain: string
   date: string
@@ -86,7 +84,6 @@ const mapBoatDoc = (doc: QueryDocumentSnapshot): BoatRecord => {
     title: String(data.title ?? ''),
     location: String(data.location ?? ''),
     coordinates,
-    price: Number(data.price ?? 0),
     rating: Number(data.rating ?? 5),
     seats: Number(data.seats ?? 1),
     captain: String(data.captain ?? ''),

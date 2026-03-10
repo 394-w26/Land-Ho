@@ -39,7 +39,6 @@ export function useBoatForm({ viewer, resumeCompleted, navigate, onNewListingPub
   const [form, setForm] = useState<BoatFormData>({
     title: '',
     location: '',
-    price: '699',
     seats: '4',
     captain: '',
     date: '',
@@ -239,7 +238,6 @@ export function useBoatForm({ viewer, resumeCompleted, navigate, onNewListingPub
           title: form.title,
           location: form.location,
           coordinates: resolvedCoordinates,
-          price: Number(form.price) || 0,
           seats: Number(form.seats) || 1,
           captain: form.captain || viewer.displayName || 'Captain',
           date: form.date,
@@ -254,7 +252,6 @@ export function useBoatForm({ viewer, resumeCompleted, navigate, onNewListingPub
           title: form.title,
           location: form.location,
           coordinates: resolvedCoordinates,
-          price: Number(form.price) || 0,
           seats: Number(form.seats) || 1,
           captain: form.captain || viewer.displayName || 'Captain',
           date: form.date,
@@ -274,7 +271,6 @@ export function useBoatForm({ viewer, resumeCompleted, navigate, onNewListingPub
       setForm({
         title: '',
         location: '',
-        price: '699',
         seats: '4',
         captain: form.captain || viewer.displayName || '',
         date: '',
@@ -303,7 +299,6 @@ export function useBoatForm({ viewer, resumeCompleted, navigate, onNewListingPub
     setForm({
       title: boat.title,
       location: boat.location,
-      price: String(boat.price),
       seats: String(boat.seats),
       captain: boat.captain,
       date: /^\d{4}-\d{2}-\d{2}$/.test(boat.date) ? boat.date : '',
@@ -330,7 +325,6 @@ export function useBoatForm({ viewer, resumeCompleted, navigate, onNewListingPub
     setForm({
       title: '',
       location: '',
-      price: '699',
       seats: '4',
       captain: viewer?.displayName || '',
       date: '',
