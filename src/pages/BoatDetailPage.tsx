@@ -28,7 +28,7 @@ const formatTripDate = (value: string): string => {
 function BoatDetailPage() {
   const { boatId = '' } = useParams()
   const navigate = useNavigate()
-  const { viewer, authLoading, authError, loginWithGoogle, signOutUser, userInitial } = useAuth()
+  const { viewer, authLoading, loginWithGoogle, signOutUser, userInitial } = useAuth()
   const [loading, setLoading] = useState(true)
   const [boatError, setBoatError] = useState('')
   const [hostError, setHostError] = useState('')
