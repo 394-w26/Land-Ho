@@ -85,7 +85,7 @@ export default function GuestMarketplace({
     <>
       <Header brandText="Land Ho">
         <button className="ghostBtn" onClick={onBecomeHost}>
-          Publish a Sail
+         Browse as Captain
         </button>
         {/* <button className="ghostBtn" onClick={onNavigateMap}>
           Map view

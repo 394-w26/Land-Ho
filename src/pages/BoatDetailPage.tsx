@@ -258,7 +258,7 @@ function BoatDetailPage() {
   const header = (
     <Header brandText="Land Ho">
       <button className="ghostBtn" onClick={() => void handleBecomeHost()}>
-        Publish a Sail
+        Browse as Captain
       </button>
       <UserButton
         viewer={viewer}
