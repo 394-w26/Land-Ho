@@ -107,6 +107,14 @@ export default function GuestMarketplace({
               💬 Messages
             </button>
           )}
+          {viewer && (
+            <button
+              className="menuItem"
+              onClick={() => { setMenuOpen(false); navigate('/my-reservations') }}
+            >
+              ⛵ My Sail Requests
+            </button>
+          )}
           <button
             className="menuItem"
             onClick={() => { setMenuOpen(false); onNavigateMap() }}

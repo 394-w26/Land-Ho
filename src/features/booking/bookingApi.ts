@@ -178,6 +178,30 @@ export const subscribeHostRequests = (
   )
 }
 
+/** Subscribe to ALL booking requests for a sailor — all statuses. */
+export const subscribeApplicantAllRequests = (
+  applicantUid: string,
+  onData: (requests: BookingRequestRecord[]) => void,
+  onError: (message: string) => void,
+): Unsubscribe => {
+  if (!db) {
+    onData([])
+    return () => undefined
+  }
+  const requestsRef = collection(db, 'bookingRequests')
+  const q = query(requestsRef, where('applicantUid', '==', applicantUid))
+  return onSnapshot(
+    q,
+    (snapshot) => {
+      const requests = snapshot.docs
+        .map(mapBookingDoc)
+        .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+      onData(requests)
+    },
+    (err) => onError(toReadableBookingError(err)),
+  )
+}
+
 /** Subscribe to approved booking requests for a sailor (applicant). */
 export const subscribeApplicantApprovedRequests = (
   applicantUid: string,

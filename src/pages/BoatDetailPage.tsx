@@ -538,8 +538,10 @@ function BoatDetailPage() {
 
         {reserveSuccessModal && (
         <FeedbackModal
-          title="Request Sent"
+          title="Request Sent! ⛵"
           message={reserveSuccessModal}
+          actionLabel="View my requests"
+          actionTo="/my-reservations"
           onClose={() => setReserveSuccessModal('')}
         />
         )}

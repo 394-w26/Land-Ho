@@ -18,6 +18,7 @@ import CaptainSetupPage from './pages/CaptainSetupPage'
 import SailorSetupPage from './pages/SailorSetupPage'
 import InstructorRequestPage from './pages/InstructorRequestPage'
 import ChatPage from './pages/ChatPage'
+import MyReservationsPage from './pages/MyReservationsPage'
 
 
 function MarketplacePage() {
@@ -329,6 +330,7 @@ function App() {
       <Route path="/request-instructor" element={<InstructorRequestPage />} />
       <Route path="/chat" element={<ChatPage />} />
       <Route path="/chat/:conversationId" element={<ChatPage />} />
+      <Route path="/my-reservations" element={<MyReservationsPage />} />
     </Routes>
     </>
   )
