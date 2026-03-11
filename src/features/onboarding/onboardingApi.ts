@@ -21,6 +21,7 @@ export const getCaptainProfile = async (uid: string): Promise<CaptainOnboardingP
     licenseType: String(d.licenseType ?? 'oupv_six_pack') as CaptainOnboardingProfile['licenseType'],
     licenseNumber: String(d.licenseNumber ?? ''),
     licenseImageUrl: String(d.licenseImageUrl ?? ''),
+    homeHarbor: String(d.homeHarbor ?? ''),
     boatRegistrationNumber: String(d.boatRegistrationNumber ?? ''),
     boatType: String(d.boatType ?? 'sailboat') as CaptainOnboardingProfile['boatType'],
     boatName: String(d.boatName ?? ''),

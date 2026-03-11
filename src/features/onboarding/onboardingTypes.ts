@@ -32,6 +32,7 @@ export interface CaptainOnboardingProfile {
   licenseImageUrl: string          // uploaded photo / scan of credential
 
   /* boat */
+  homeHarbor: string
   boatRegistrationNumber: string
   boatType: BoatType
   boatName: string
@@ -72,6 +73,37 @@ export interface SailorOnboardingProfile {
 
   /* overall */
   completedAt: string
+  updatedAt: string
+}
+
+/* ── Instructor Request ─────────────────────── */
+
+export type InstructorRequestStatus = 'pending' | 'matched' | 'confirmed' | 'completed' | 'cancelled'
+
+export type InstructorFocusArea =
+  | 'sailing_basics'
+  | 'navigation'
+  | 'docking_anchoring'
+  | 'knot_tying'
+  | 'safety_procedures'
+  | 'weather_reading'
+  | 'boat_handling'
+  | 'general'
+
+export interface InstructorRequest {
+  id: string
+  sailorUid: string
+  sailorName: string
+  boatId: string
+  boatTitle: string
+  tripDate: string                 // ISO date of the trip
+  focusAreas: InstructorFocusArea[]
+  experienceLevel: 'beginner' | 'intermediate' | 'advanced'
+  notes: string                    // free-text from the sailor
+  status: InstructorRequestStatus
+  matchedInstructorUid: string     // captain UID if matched
+  matchedInstructorName: string
+  createdAt: string
   updatedAt: string
 }
 

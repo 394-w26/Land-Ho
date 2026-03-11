@@ -1,9 +1,11 @@
 import {
   type BoatCategory as CloudBoatCategory,
   type BoatCoordinates,
+  type CruiseLength,
+  type CruiseType,
 } from '../features/boats/boatsApi'
 
-export type { BoatCoordinates }
+export type { BoatCoordinates, CruiseLength, CruiseType }
 
 export type BoatCategory = 'all' | CloudBoatCategory
 
@@ -12,9 +14,10 @@ export interface BoatCard {
   title: string
   location: string
   coordinates: BoatCoordinates | null
-  price: number
   rating: number
   seats: number
+  /** Filled by approved bookings; remaining = seats - (seatsTaken ?? 0) */
+  seatsTaken?: number
   captain: string
   date: string
   category: Exclude<BoatCategory, 'all'>
@@ -22,11 +25,22 @@ export interface BoatCard {
   images: string[]
   ownerUid: string
   ownerName: string
+  durationCategory?: CruiseLength
+  cruiseType?: CruiseType
 }
 
-export type AppView = 'market' | 'profile'
+/** Filter: length of cruise */
+export type CruiseLengthFilter = 'all' | CruiseLength
 
-export type ProfileSection = 'basic' | 'skills' | 'experiences' | 'certificates'
+/** Filter: type of cruise */
+export type CruiseTypeFilter = 'all' | CruiseType
+
+/** Sort: boat size (by seats) */
+export type BoatSizeSort = 'none' | 'smallToLarge' | 'largeToSmall'
+
+export type AppView = 'market' | 'map' | 'profile'
+
+export type ProfileSection = 'basic' | 'skills'
 
 export interface ExperienceItem {
   id: string
@@ -57,7 +71,6 @@ export interface ProfileDraft {
 export interface BoatFormData {
   title: string
   location: string
-  price: string
   seats: string
   captain: string
   date: string

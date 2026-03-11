@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════
-   Mobile-First Airbnb-Style — Land Ho
+   Mobile-First Nautical — Land Ho
    Base: phone (<480px), then min-width breakpoints
    ═══════════════════════════════════════════════ */
 
@@ -23,30 +23,195 @@
   }
 }
 
+/* Sailor page uses the same dimensions as the home page (tagged copy) */
+.sailorPage {
+  padding: 0 16px 32px;
+}
+
+@media (min-width: 768px) {
+  .sailorPage {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 24px 40px;
+  }
+}
+
+@media (min-width: 1080px) {
+  .sailorPage {
+    padding: 0 40px 48px;
+  }
+}
+
 /* ── Top Bar / Header ──────────────────────────── */
 
 .topBar {
   position: sticky;
   top: 0;
+  left: 0;
   z-index: 50;
-  background: var(--color-bg);
+  background: var(--color-navy);
   display: flex;
   justify-content: space-between;
   align-items: center;
+  /* vertical padding; horizontal spacing is handled by inner container */
   padding: 14px 0;
+  border-bottom: none;
+  /* full-bleed background while keeping inner content aligned */
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
+  box-shadow: 0 2px 8px rgba(27,42,74,0.15);
+}
+
+/* Inner container to center header content while keeping full-bleed background */
+.topBarInner {
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+@media (min-width: 768px) {
+  .topBarInner {
+    padding: 0 24px;
+  }
+}
+
+@media (min-width: 1080px) {
+  .topBarInner {
+    padding: 0 40px;
+  }
+}
+
+/* Utility to disable page scrolling (used on full-screen setup flows) */
+.no-scroll {
+  overflow: hidden !important;
+  height: 100vh !important;
+}
+
+@media (min-width: 768px) {
+  .topBar {
+    /* keep full-bleed but increase inner padding on wider screens */
+    width: 100vw;
+    margin-left: calc(50% - 50vw);
+    margin-right: calc(50% - 50vw);
+    padding: 14px 24px;
+  }
+}
+
+@media (min-width: 1080px) {
+  .topBar {
+    width: 100vw;
+    margin-left: calc(50% - 50vw);
+    margin-right: calc(50% - 50vw);
+    padding: 14px 40px;
+  }
+}
+
+/* Detail page uses same full-bleed topBar as home; no override needed */
+
+/* Sailor: approved trips notification dropdown */
+.approvedRequestsWrap {
+  position: relative;
+}
+
+.approvedRequestsBtn {
+  position: relative;
+  padding: 8px 12px;
+  font-size: 0.8125rem;
+  color: #F5F0E8;
+}
+
+.approvedRequestsBadge {
+  margin-left: 6px;
+  padding: 2px 6px;
+  border-radius: 10px;
+  background: var(--color-gold);
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+.approvedRequestsDropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 8px;
+  min-width: 260px;
+  max-width: 320px;
+  max-height: 70vh;
+  overflow: auto;
+  background: #fff;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
+  z-index: 100;
+}
+
+.approvedRequestsDropdownHeader {
+  padding: 12px 14px;
+  font-weight: 700;
+  font-size: 0.875rem;
   border-bottom: 1px solid var(--color-border-light);
+  color: var(--color-text);
+}
+
+.approvedRequestsList {
+  list-style: none;
+  margin: 0;
+  padding: 6px 0;
+}
+
+.approvedRequestItem {
+  display: block;
+  width: 100%;
+  text-align: left;
+  border: none;
+  background: none;
+  padding: 10px 14px;
+  font-family: inherit;
+  cursor: pointer;
+  color: var(--color-text);
+}
+
+.approvedRequestItem:hover {
+  background: var(--color-bg-hover);
+}
+
+.approvedRequestTitle {
+  display: block;
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
+.approvedRequestMeta {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--color-text-secondary);
+  margin-top: 2px;
+}
+
+/* Setup page: header content aligned with steps + card (same max-width 760px) */
+.setupTopBarInner {
+  max-width: 760px;
 }
 
 .brand {
   display: flex;
   align-items: center;
   gap: 8px;
-  color: var(--color-primary);
+  color: var(--color-gold);
   font-weight: 800;
   font-size: 1.25rem;
   line-height: 1;
   text-decoration: none;
   flex-shrink: 0;
+  font-family: var(--font-display);
+  letter-spacing: 0.01em;
 }
 
 .brandLogo {
@@ -84,12 +249,13 @@
     background: transparent;
     font-weight: 600;
     font-size: 0.875rem;
-    color: var(--color-text);
+    color: #F5F0E8;
     padding: 10px 14px;
     border-radius: var(--radius-pill);
   }
   .topActions > .ghostBtn:hover {
-    background: var(--color-bg-hover);
+    background: rgba(255,255,255,0.1);
+    color: #ffffff;
   }
 }
 
@@ -97,7 +263,7 @@
 
 .ghostBtn {
   border: 1px solid var(--color-border);
-  background: var(--color-bg);
+  background: #ffffff;
   border-radius: var(--radius-pill);
   font-weight: 600;
   font-size: 0.875rem;
@@ -109,24 +275,36 @@
   border-color: var(--color-dark);
 }
 
+.topBar .ghostBtn {
+  border-color: rgba(255,255,255,0.25);
+  background: transparent;
+  color: #F5F0E8;
+}
+
+.topBar .ghostBtn:hover {
+  background: rgba(255,255,255,0.1);
+  border-color: rgba(255,255,255,0.4);
+  color: #ffffff;
+}
+
 .iconBtn {
   border: none;
   background: transparent;
   padding: 8px;
   font-size: 1rem;
-  color: var(--color-text);
+  color: #F5F0E8;
   border-radius: var(--radius-pill);
 }
 
 .iconBtn:hover {
-  background: var(--color-bg-hover);
+  background: rgba(255,255,255,0.1);
 }
 
 .profileIconBtn {
   width: 32px;
   height: 32px;
-  border: 2px solid var(--color-border);
-  background: var(--color-bg);
+  border: 2px solid rgba(255,255,255,0.3);
+  background: rgba(255,255,255,0.1);
   border-radius: var(--radius-pill);
   display: grid;
   place-items: center;
@@ -136,13 +314,13 @@
 }
 
 .profileIconBtn.loggedIn {
-  border-color: var(--color-dark);
+  border-color: var(--color-gold);
 }
 
 .profileText {
   font-size: 0.75rem;
   font-weight: 700;
-  color: var(--color-text);
+  color: #F5F0E8;
 }
 
 .avatarImg {
@@ -171,7 +349,7 @@
   position: absolute;
   right: 0;
   top: calc(100% + 8px);
-  background: var(--color-bg);
+  background: #ffffff;
   border: 1px solid var(--color-border-light);
   border-radius: var(--radius-md);
   min-width: 200px;
@@ -204,11 +382,11 @@
 /* ── Search Section ────────────────────────────── */
 
 .searchSection {
-  margin: 16px 0;
+  margin: 20px 0;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
   padding: 16px;
-  background: var(--color-bg);
+  background: #ffffff;
   box-shadow: var(--shadow-search);
   display: flex;
   flex-direction: column;
@@ -259,7 +437,7 @@
   border: none;
   border-radius: var(--radius-pill);
   padding: 14px 24px;
-  background: linear-gradient(to right, #E61E4D, #E31C5F, #D70466);
+  background: var(--color-navy);
   color: #ffffff;
   font-weight: 700;
   font-size: 1rem;
@@ -268,7 +446,7 @@
 }
 
 .searchBtn:hover {
-  background: linear-gradient(to right, #D50C3C, #D00B50, #C2005A);
+  background: var(--color-navy-light);
   border: none;
 }
 
@@ -281,9 +459,9 @@
     flex-direction: row;
     align-items: center;
     border-radius: var(--radius-pill);
-    padding: 8px 8px 8px 16px;
-    margin: 20px auto;
-    max-width: 720px;
+    padding: 10px 10px 10px 20px;
+    margin: 28px auto 24px;
+    max-width: 960px;
     gap: 0;
   }
 
@@ -310,6 +488,44 @@
     display: flex;
     align-items: center;
     justify-content: center;
+  }
+
+  .searchSectionWeather {
+    flex-shrink: 0;
+    margin-left: 12px;
+    padding-left: 12px;
+    border-left: 1px solid var(--color-border);
+  }
+
+  .searchSection .weatherInline {
+    gap: 2px;
+    align-items: flex-start;
+  }
+
+  .searchSection .weatherInlineToday {
+    gap: 6px;
+  }
+
+  .searchSection .weatherInlineIcon {
+    width: 20px;
+    height: 20px;
+  }
+
+  .searchSection .weatherInlineTemp {
+    font-size: 0.9375rem;
+  }
+
+  .searchSection .weatherInlineDesc {
+    font-size: 0.6875rem;
+    max-width: 100px;
+  }
+
+  .searchSection .weatherInlineWeek {
+    gap: 6px 10px;
+  }
+
+  .searchSection .weatherInlineDay {
+    font-size: 0.625rem;
   }
 
   .searchBtn--icon {
@@ -342,7 +558,67 @@
   }
 }
 
-/* ── Category Tabs ─────────────────────────────── */
+/* ── Filter Row (horizontal dropdowns with icons) ── */
+
+.filterRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 20px;
+  padding: 16px 0;
+  margin-bottom: 20px;
+  border-bottom: 1px solid var(--color-border-light);
+}
+
+.filterItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.filterItem .filterIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  color: var(--color-text-secondary);
+}
+
+.filterItem .filterIcon svg {
+  width: 18px;
+  height: 18px;
+}
+
+.filterItem .filterSelect {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  padding: 8px 32px 8px 12px;
+  font-size: 0.875rem;
+  font-family: inherit;
+  background: #ffffff;
+  min-width: 130px;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  cursor: pointer;
+}
+
+.filterItem .filterSelect:focus {
+  border-color: var(--color-navy);
+  outline: none;
+}
+
+@media (min-width: 768px) {
+  .filterRow {
+    max-width: 960px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
 
 .categoryTabs {
   display: flex;
@@ -357,6 +633,20 @@
 
 .categoryTabs::-webkit-scrollbar {
   display: none;
+}
+
+@media (min-width: 768px) {
+  .categoryTabs {
+    max-width: 960px;
+    margin-left: auto;
+    margin-right: auto;
+    justify-content: space-between;
+  }
+
+  .categoryTabs .tab {
+    flex: 1;
+    text-align: center;
+  }
 }
 
 .tab {
@@ -391,8 +681,181 @@
 
 .tab.active {
   opacity: 1;
-  color: var(--color-text);
-  border-bottom-color: var(--color-dark);
+  color: var(--color-navy);
+  border-bottom-color: var(--color-gold);
+}
+
+/* ── Weather Forecast (top of page) ─────────────── */
+
+.weatherForecast {
+  margin-bottom: 20px;
+  padding: 20px;
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-lg);
+  background: #ffffff;
+  box-shadow: var(--shadow-card);
+}
+
+.weatherToday {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--color-border-light);
+  margin-bottom: 16px;
+}
+
+.weatherTodayIcon {
+  width: 80px;
+  height: 80px;
+  flex-shrink: 0;
+  object-fit: contain;
+}
+
+.weatherTodayMain {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.weatherTodayTemp {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: var(--color-text-secondary);
+  line-height: 1.1;
+  margin: 0;
+}
+
+.weatherTodayName {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+}
+
+.weatherTodayDesc {
+  font-size: 1rem;
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+
+.weatherWeek {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  padding-bottom: 4px;
+}
+
+.weatherWeek::-webkit-scrollbar {
+  display: none;
+}
+
+.weatherWeekDay {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
+  min-width: 72px;
+  padding: 10px 8px;
+  border-radius: var(--radius-md);
+  background: var(--color-bg);
+  border: 1px solid var(--color-border-light);
+}
+
+.weatherWeekIcon {
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+  margin-bottom: 6px;
+}
+
+.weatherForecastDayName {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  margin-bottom: 2px;
+}
+
+.weatherForecastDayTemp {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--color-text-secondary);
+}
+
+.weatherForecastDayDesc {
+  font-size: 0.625rem;
+  color: var(--color-text-secondary);
+  margin-top: 4px;
+  text-align: center;
+  line-height: 1.2;
+  max-width: 70px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.weatherForecastError,
+.weatherForecastLoading {
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+
+/* ── Weather Inline (next to list header) ───────── */
+
+.weatherInline {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+  flex-shrink: 0;
+  color: white !important;
+}
+
+.weatherInlineToday {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.weatherInlineIcon {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+}
+
+.weatherInlineTemp {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: white !important;
+}
+
+.weatherInlineDesc {
+  font-size: 0.8125rem;
+  color: var(--color-text-secondary);
+  max-width: 140px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.weatherInlineDate {
+  color: #5a6b82 !important;
+}
+
+.weatherInlineWeek {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.weatherInlineDay {
+  font-size: 0.75rem;
+  color: var(--color-text-secondary);
 }
 
 /* ── List Header ───────────────────────────────── */
@@ -400,8 +863,15 @@
 .listHeader {
   display: flex;
   justify-content: space-between;
-  align-items: baseline;
+  align-items: center;
+  gap: 16px;
   margin: 0 0 16px;
+  flex-wrap: wrap;
+}
+
+.listHeaderLeft {
+  flex: 1;
+  min-width: 0;
 }
 
 .listHeader h2 {
@@ -414,6 +884,99 @@
   margin: 0;
   color: var(--color-text-secondary);
   font-size: 0.875rem;
+}
+
+/* ── Weather Inline (next to list header) ────────── */
+
+.weatherInline {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.weatherInlineToday {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.weatherInlineIcon {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+}
+
+.weatherInlineTemp {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--color-navy);
+}
+
+.weatherInlineDesc {
+  font-size: 0.8125rem;
+  color: var(--color-text-secondary);
+  max-width: 140px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.weatherInlineWeek {
+  display: flex;
+  gap: 8px 12px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.weatherInlineDay {
+  font-size: 0.625rem;
+  color: var(--color-text-secondary);
+  font-weight: 500;
+}
+
+/* Weather inside search bar (flex with Where/When/Sailors) */
+.searchSection .searchSectionWeather {
+  flex-shrink: 0;
+  margin-left: 12px;
+  padding-left: 12px;
+  border-left: 1px solid var(--color-border);
+  display: flex;
+  align-items: center;
+}
+
+.searchSection .searchSectionWeather .weatherInline {
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+}
+
+.searchSection .searchSectionWeather .weatherInlineToday {
+  gap: 6px;
+}
+
+.searchSection .searchSectionWeather .weatherInlineIcon {
+  width: 22px;
+  height: 22px;
+}
+
+.searchSection .searchSectionWeather .weatherInlineTemp {
+  font-size: 1rem;
+}
+
+.searchSection .searchSectionWeather .weatherInlineDesc {
+  font-size: 0.75rem;
+  max-width: 100px;
+}
+
+.searchSection .searchSectionWeather .weatherInlineWeek {
+  gap: 6px 10px;
+  justify-content: flex-start;
+}
+
+.searchSection .searchSectionWeather .weatherInlineDay {
+  font-size: 0.5625rem;
 }
 
 /* ── Boat Grid ─────────────────────────────────── */
@@ -571,71 +1134,115 @@
 }
 
 /* ════════════════════════════════════════════════
-   Owner / Host Page
+   Owner / Host Page — same container as home/sailor
    ════════════════════════════════════════════════ */
 
+/* Ivy-style palette for owner/captain page */
 .ownerPage {
   padding: 0 16px 32px;
+  background: #f5f3ee;
 }
 
 @media (min-width: 768px) {
   .ownerPage {
-    max-width: 1080px;
+    max-width: 1280px;
     margin: 0 auto;
     padding: 0 24px 40px;
   }
 }
 
+@media (min-width: 1080px) {
+  .ownerPage {
+    padding: 0 40px 48px;
+  }
+}
+
 .ownerHero {
-  padding: 8px 0 16px;
+  margin: 28px 0 28px;
+  padding: 0;
 }
 
 .ownerHero h2 {
-  margin: 0 0 4px;
+  margin: 0 0 6px;
   font-size: 1.5rem;
   font-weight: 700;
+  color: #1b4332;
 }
 
 .ownerHero p {
   margin: 0;
-  color: var(--color-text-secondary);
+  color: #2d6a4f;
   font-size: 0.9375rem;
 }
 
 .ownerFormGrid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 20px;
+  gap: 24px;
+  align-items: start;
 }
 
 @media (min-width: 768px) {
   .ownerFormGrid {
-    grid-template-columns: 1.2fr 1fr;
-    gap: 24px;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
   }
 }
 
 .ownerCard {
-  border: 1px solid var(--color-border-light);
+  border: 1px solid #95d5b2;
   border-radius: var(--radius-lg);
-  background: var(--color-bg);
-  padding: 20px;
-  box-shadow: var(--shadow-card);
+  background: #fafaf8;
+  padding: 28px;
+  box-shadow: 0 2px 8px rgba(27, 67, 50, 0.08);
+}
+
+.ownerFormGrid > .ownerCard:nth-child(2) {
+  min-height: 280px;
+}
+
+.ownerEmptyState {
+  padding: 12px 0;
+  margin: 0;
 }
 
 .ownerCard h3 {
-  margin: 0 0 16px;
+  margin: 0 0 20px;
   font-size: 1.125rem;
   font-weight: 700;
+  color: #1b4332;
+}
+
+/* Form sections: group related fields with spacing and a light divider (no color change) */
+.ownerCard .formSection {
+  margin-bottom: 28px;
+}
+
+.ownerCard .formSection:last-child {
+  margin-bottom: 0;
+}
+
+.ownerCard .formSection:not(:first-child) {
+  padding-top: 24px;
+  border-top: 1px solid #b7e4c7;
+}
+
+.ownerCard .formSection .formRow:last-child {
+  margin-bottom: 0;
+}
+
+.ownerCard .uploadGallery {
+  margin-top: 12px;
+  gap: 14px;
 }
 
 /* ── Form Rows ─────────────────────────────────── */
 
 .formRow {
-  margin-bottom: 16px;
+  margin-bottom: 20px;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
 }
 
 .formRow label {
@@ -654,17 +1261,30 @@
   font-family: inherit;
 }
 
+.ownerCard .formRow input:focus,
+.ownerCard .formRow select:focus,
+.ownerCard .formRow textarea:focus {
+  border-color: #1b4332;
+  box-shadow: 0 0 0 2px rgba(27, 67, 50, 0.15);
+}
+
 .formRow input:focus,
 .formRow select:focus,
 .formRow textarea:focus {
-  border-color: var(--color-dark);
-  box-shadow: 0 0 0 2px var(--color-dark);
+  border-color: var(--color-navy);
+  box-shadow: 0 0 0 2px rgba(27,42,74,0.18);
 }
 
 .formRow.split {
   display: grid;
   grid-template-columns: 1fr;
   gap: 12px;
+}
+
+.formRow.split > div {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 @media (min-width: 480px) {
@@ -733,17 +1353,22 @@
 .publishBtn {
   width: 100%;
   border: none;
-  background: linear-gradient(to right, #E61E4D, #E31C5F, #D70466);
+  background: var(--color-gold);
   color: #ffffff;
   font-weight: 700;
   font-size: 1rem;
   padding: 14px 24px;
   border-radius: var(--radius-sm);
   margin-top: 8px;
+  letter-spacing: 0.01em;
+}
+
+.ownerCard .formSection .publishBtn {
+  margin-top: 20px;
 }
 
 .publishBtn:hover {
-  background: linear-gradient(to right, #D50C3C, #D00B50, #C2005A);
+  background: var(--color-gold-hover);
   border: none;
 }
 
@@ -763,16 +1388,40 @@
   display: grid;
   grid-template-columns: 80px 1fr;
   gap: 12px;
-  border: 1px solid var(--color-border-light);
+  border: 1px solid #95d5b2;
   border-radius: var(--radius-md);
   padding: 12px;
+  background: #fff;
 }
 
-.ownerListItem img {
+.ownerListItemImgWrap {
+  position: relative;
+  display: inline-block;
+}
+
+.ownerListItemImgWrap img {
   width: 80px;
   height: 64px;
   object-fit: cover;
   border-radius: var(--radius-sm);
+  display: block;
+}
+
+.ownerRequestBadge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 10px;
+  background: #dc2626;
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .ownerListItem p {
@@ -781,11 +1430,16 @@
   font-size: 0.8125rem;
 }
 
+.ownerListItem .seatsLeft {
+  color: var(--color-text);
+  font-weight: 500;
+}
+
 @media (min-width: 480px) {
   .ownerListItem {
     grid-template-columns: 100px 1fr;
   }
-  .ownerListItem img {
+  .ownerListItemImgWrap img {
     width: 100px;
     height: 76px;
   }
@@ -944,6 +1598,40 @@
   align-items: center;
 }
 
+/* Single approve/disapprove toggle for captain */
+.requestToggleBtn {
+  padding: 6px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.requestToggleOff {
+  background: transparent;
+  border-color: var(--color-border);
+  color: var(--color-text);
+}
+
+.requestToggleOff:hover {
+  background: var(--color-bg-hover);
+  border-color: var(--color-navy);
+}
+
+.requestToggleOn {
+  background: #16a34a;
+  border-color: #16a34a;
+  color: #fff;
+}
+
+.requestToggleOn:hover {
+  background: #15803d;
+  border-color: #15803d;
+  color: #fff;
+}
+
 .requestError {
   margin-top: 0;
   text-align: left;
@@ -984,7 +1672,7 @@
 .profileEditorCard {
   border: 1px solid var(--color-border-light);
   border-radius: var(--radius-lg);
-  background: var(--color-bg);
+  background: #ffffff;
   padding: 20px;
   box-shadow: var(--shadow-card);
 }
@@ -1066,8 +1754,8 @@
   background: var(--color-bg-hover);
   color: var(--color-text);
   font-weight: 600;
-  border-color: var(--color-dark);
-  border-left: 3px solid var(--color-dark);
+  border-color: var(--color-gold);
+  border-left: 3px solid var(--color-gold);
 }
 
 @media (min-width: 768px) {
@@ -1077,7 +1765,7 @@
     border-radius: var(--radius-sm);
   }
   .profileNavBtn.active {
-    border-left: 3px solid var(--color-dark);
+    border-left: 3px solid var(--color-gold);
   }
 }
 
@@ -1297,7 +1985,7 @@
 .detailInfoCard {
   border: 1px solid var(--color-border-light);
   border-radius: var(--radius-lg);
-  background: var(--color-bg);
+  background: #ffffff;
   padding: 20px;
   box-shadow: var(--shadow-card);
 }
@@ -1319,6 +2007,22 @@
   margin-top: 16px;
 }
 
+.instructorCta {
+  margin-top: 10px;
+  font-size: 0.9rem;
+  color: var(--color-dark);
+  text-align: center;
+  display: block;
+  width: 100%;
+  padding: 8px 0;
+  border-radius: 8px;
+  transition: background 0.15s ease;
+}
+
+.instructorCta:hover {
+  background: var(--color-bg-hover);
+}
+
 /* Sticky Reserve Bar (mobile) */
 .detailStickyBar {
   position: fixed;
@@ -1326,7 +2030,7 @@
   left: 0;
   right: 0;
   z-index: 50;
-  background: var(--color-bg);
+  background: #ffffff;
   border-top: 1px solid var(--color-border-light);
   padding: 12px 16px;
   display: flex;
@@ -1440,6 +2144,12 @@
 }
 
 .hostProfileBtn {
+  margin: 0;
+}
+
+.captainBtnRow {
+  display: flex;
+  gap: 8px;
   margin: 12px 0;
 }
 
@@ -1544,66 +2254,15 @@
    Map Explore Page
    ════════════════════════════════════════════════ */
 
-.mapPage {
-  padding: 0 12px 0;
-  display: flex;
-  flex-direction: column;
-  height: 100dvh;
-  overflow: hidden;
-}
-
-@media (min-width: 768px) {
-  .mapPage {
-    padding: 0 20px 0;
-  }
-}
-
-@media (min-width: 1080px) {
-  .mapPage {
-    max-width: 1400px;
-    margin: 0 auto;
-  }
-}
-
-.mapTopBar {
-  padding-bottom: 8px;
-  flex-shrink: 0;
-}
-
-.mapTopActions {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.mapNavBtn {
-  padding: 8px 14px;
-  text-decoration: none;
-  color: var(--color-text);
-  font-size: 0.875rem;
-  font-weight: 600;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-pill);
-}
-
-.mapNavBtn:hover {
-  border-color: var(--color-dark);
-}
-
 .mapSearchSection {
   flex-shrink: 0;
-  margin: 0 0 8px;
+  margin: 20px 0;
 }
 
 @media (min-width: 768px) {
   .mapSearchSection {
-    max-width: 580px;
-  }
-  .mapSearchSection.searchSection {
-    flex-direction: row;
-    border-radius: var(--radius-pill);
-    padding: 4px 4px 4px 12px;
-    gap: 0;
+    max-width: 960px;
+    margin: 28px auto 24px;
   }
 }
 
@@ -1658,19 +2317,19 @@
 }
 
 .priceMarker {
-  border: 1px solid var(--color-dark);
-  background: var(--color-bg);
-  color: var(--color-dark);
+  border: 1px solid var(--color-navy);
+  background: #ffffff;
+  color: var(--color-navy);
   border-radius: var(--radius-pill);
   padding: 4px 10px;
   font-weight: 700;
   font-size: 0.8125rem;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  box-shadow: 0 2px 8px rgba(27,42,74,0.15);
   transition: background 0.15s, color 0.15s;
 }
 
 .priceMarker.active {
-  background: var(--color-dark);
+  background: var(--color-navy);
   color: #ffffff;
 }
 
@@ -1696,7 +2355,7 @@
   border: 1px solid var(--color-border-light);
   border-radius: var(--radius-lg);
   padding: 14px;
-  background: var(--color-bg);
+  background: #ffffff;
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -1779,9 +2438,9 @@
 }
 
 @keyframes mapCardFlashPulse {
-  0% { box-shadow: 0 0 0 0 rgba(255, 56, 92, 0.45); }
-  50% { box-shadow: 0 0 0 6px rgba(255, 56, 92, 0.14); }
-  100% { box-shadow: 0 0 0 0 rgba(255, 56, 92, 0); }
+  0% { box-shadow: 0 0 0 0 rgba(196, 153, 62, 0.45); }
+  50% { box-shadow: 0 0 0 6px rgba(196, 153, 62, 0.18); }
+  100% { box-shadow: 0 0 0 0 rgba(196, 153, 62, 0); }
 }
 
 /* ── Suggestions Dropdown ──────────────────────── */
@@ -1794,7 +2453,7 @@
   z-index: 40;
   border: 1px solid var(--color-border-light);
   border-radius: var(--radius-md);
-  background: var(--color-bg);
+  background: #ffffff;
   box-shadow: var(--shadow-dropdown);
   overflow: hidden;
   display: grid;
@@ -1875,8 +2534,8 @@
 }
 
 .coverItem {
-  border-color: var(--color-primary);
-  box-shadow: 0 0 0 1px rgba(255, 56, 92, 0.2) inset;
+  border-color: var(--color-gold);
+  box-shadow: 0 0 0 1px rgba(196, 153, 62, 0.25) inset;
 }
 
 /* ════════════════════════════════════════════════
@@ -1885,6 +2544,7 @@
 
 .setupPage {
   padding: 0 16px 48px;
+  min-height: 100vh;
 }
 
 @media (min-width: 768px) {
@@ -1933,8 +2593,8 @@
 }
 
 .setupStepBtn.active {
-  border-color: var(--color-dark);
-  background: var(--color-dark);
+  border-color: var(--color-navy);
+  background: var(--color-navy);
   color: #ffffff;
 }
 
@@ -1946,7 +2606,7 @@
 .setupCard {
   border: 1px solid var(--color-border-light);
   border-radius: var(--radius-lg);
-  background: var(--color-bg);
+  background: #ffffff;
   padding: 20px;
   box-shadow: var(--shadow-card);
 }
@@ -2092,7 +2752,7 @@
   .reviewLabel {
     min-width: 140px;
   }
-}
+} 
 
 .reviewMissing {
   color: var(--color-danger);
@@ -2215,4 +2875,682 @@
 
 .certPreview {
   margin-top: 8px;
+}
+
+/* ═══════════════════════════════════════════════
+   Instructor Request Page
+   ═══════════════════════════════════════════════ */
+
+.instructorPage .setupCard {
+  max-width: 700px;
+}
+
+.instructorBenefits {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin: 20px 0 8px;
+}
+
+.benefitItem {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+}
+
+.benefitIcon {
+  font-size: 1.6rem;
+  flex-shrink: 0;
+  line-height: 1.2;
+}
+
+.benefitItem strong {
+  display: block;
+  margin-bottom: 2px;
+}
+
+.benefitItem p {
+  margin: 0;
+  font-size: 0.92rem;
+  color: var(--color-text-secondary);
+}
+
+.instructorDivider {
+  border: none;
+  border-top: 1px solid var(--color-border-light);
+  margin: 24px 0;
+}
+
+.expLevelList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.radioRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+.radioRow input[type="radio"] {
+  accent-color: var(--color-dark);
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+.focusAreaGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.focusAreaChip {
+  padding: 8px 14px;
+  font-size: 0.88rem;
+  border-radius: 20px;
+  border: 1px solid var(--color-border-light);
+  background: #ffffff;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.focusAreaChip:hover {
+  border-color: var(--color-dark);
+}
+
+.focusAreaActive {
+  background: var(--color-navy);
+  color: #fff;
+  border-color: var(--color-navy);
+}
+
+.focusAreaActive:hover {
+  background: var(--color-navy-light);
+}
+
+.optionalLabel {
+  font-weight: 400;
+  color: var(--color-text-muted);
+  font-size: 0.85rem;
+}
+
+/* History */
+
+.emptyHistory {
+  text-align: center;
+  padding: 32px 0;
+}
+
+.instructorHistoryList {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.instructorHistoryCard {
+  border: 1px solid var(--color-border-light);
+  border-radius: 12px;
+  padding: 16px;
+  background: #ffffff;
+}
+
+.historyCardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.historyCardHeader h3 {
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+.statusBadge {
+  font-size: 0.8rem;
+  padding: 4px 10px;
+  border-radius: 12px;
+  white-space: nowrap;
+}
+
+.status-pending { background: #fff3cd; color: #856404; }
+.status-matched { background: #d1ecf1; color: #0c5460; }
+.status-confirmed { background: #d4edda; color: #155724; }
+.status-completed { background: #e2e3e5; color: #383d41; }
+.status-cancelled { background: #f8d7da; color: #721c24; }
+
+.historyCardBody p {
+  margin: 4px 0;
+  font-size: 0.92rem;
+}
+
+.matchedInstructor {
+  margin-top: 8px !important;
+  padding: 8px 12px;
+  background: #ECFDF5;
+  border-radius: 8px;
+  font-size: 0.93rem;
+}
+
+.historyCardActions {
+  margin-top: 10px;
+  display: flex;
+  gap: 8px;
+}
+
+.historyTimestamp {
+  margin-top: 8px;
+  font-size: 0.82rem;
+}
+
+.setupCard textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--color-border-light);
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 0.95rem;
+  resize: vertical;
+}
+
+.setupCard textarea:focus {
+  outline: none;
+  border-color: var(--color-dark);
+}
+
+/* ── Modal ────────────────────────────────────── */
+
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.45);
+  padding: 16px;
+}
+
+.modalCard {
+  background: #ffffff;
+  border-radius: var(--radius-lg);
+  box-shadow: 0 8px 28px rgba(27,42,74,0.2);
+  max-width: 420px;
+  width: 100%;
+  padding: 28px 24px 24px;
+  text-align: center;
+}
+
+.modalCard h3 {
+  margin: 0 0 12px;
+  font-size: 1.2rem;
+  color: var(--color-dark);
+}
+
+.modalCard p {
+  margin: 0 0 24px;
+  font-size: 0.95rem;
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+}
+
+.modalActions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  align-items: stretch;
+}
+
+.modalActions .publishBtn,
+.modalActions .ghostBtn {
+  min-width: 130px;
+  padding: 12px 24px;
+  font-size: 0.95rem;
+  margin-top: 0;
+}
+
+/* ═══════════════════════════════════════════════
+   Chat / Messaging
+   ═══════════════════════════════════════════════ */
+
+/* Full chat page layout */
+.chatPage {
+  display: flex;
+  height: 100dvh;
+  overflow: hidden;
+  background: var(--color-bg);
+}
+
+/* ── Sidebar ─────────────────────────────────── */
+.chatSidebar {
+  width: 320px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid var(--color-border-light);
+  background: #ffffff;
+  overflow: hidden;
+}
+
+@media (max-width: 640px) {
+  .chatSidebar {
+    width: 100%;
+    display: none;
+  }
+  .chatPage.hasSidebar .chatSidebar {
+    display: flex;
+  }
+}
+
+.chatSidebarHeader {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 16px 12px;
+  border-bottom: 1px solid var(--color-border-light);
+  background: var(--color-navy);
+}
+
+.chatBackBtn {
+  color: #ffffff;
+  background: rgba(255,255,255,0.12);
+  border-color: rgba(255,255,255,0.35);
+  padding: 6px 12px;
+  font-size: 0.85rem;
+  flex-shrink: 0;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.chatBackBtn:hover {
+  background: rgba(255,255,255,0.22);
+  border-color: rgba(255,255,255,0.6);
+}
+
+.chatSidebarTitle {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.chatEmpty {
+  padding: 24px 16px;
+  color: var(--color-text-secondary);
+  font-size: 0.9375rem;
+}
+
+.chatConvoList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.chatConvoItem {
+  width: 100%;
+  text-align: left;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 16px;
+  border: none;
+  border-bottom: 1px solid var(--color-border-light);
+  border-radius: 0;
+  background: transparent;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.chatConvoItem:hover {
+  background: var(--color-bg-hover);
+}
+
+.chatConvoActive {
+  background: var(--color-sand) !important;
+  border-left: 3px solid var(--color-navy);
+}
+
+.chatConvoAvatar {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.chatConvoAvatar img {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.chatAvatarFallback {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--color-navy-light);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.chatAvatarSmall {
+  width: 32px;
+  height: 32px;
+  font-size: 0.85rem;
+}
+
+.chatUnreadDot {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--color-gold);
+  border: 2px solid #ffffff;
+}
+
+.chatConvoMeta {
+  flex: 1;
+  min-width: 0;
+}
+
+.chatConvoTop {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 2px;
+}
+
+.chatConvoName {
+  font-weight: 600;
+  font-size: 0.9375rem;
+  color: var(--color-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.chatConvoTime {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  flex-shrink: 0;
+}
+
+.chatConvoBoat {
+  margin: 0 0 2px;
+  font-size: 0.78rem;
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.chatConvoPreview {
+  margin: 0;
+  font-size: 0.8375rem;
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.chatConvoUnread {
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+/* ── Main thread ─────────────────────────────── */
+.chatMain {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.chatSignInPrompt {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 32px;
+  color: var(--color-text-secondary);
+}
+
+.chatPlaceholder {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  color: var(--color-text-muted);
+  font-size: 1rem;
+}
+
+.chatPlaceholderIcon {
+  font-size: 3rem;
+}
+
+/* Thread header */
+.chatThreadHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 20px;
+  background: #ffffff;
+  border-bottom: 1px solid var(--color-border-light);
+  flex-shrink: 0;
+}
+
+.chatThreadInfo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.chatThreadAvatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.chatThreadName {
+  margin: 0 0 2px;
+  font-weight: 600;
+  font-size: 1rem;
+  color: var(--color-text);
+}
+
+.chatViewProfileLink {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 0.8rem;
+  color: var(--color-navy-light);
+  cursor: pointer;
+  font-weight: 500;
+  text-decoration: underline;
+}
+
+.chatViewProfileLink:hover {
+  color: var(--color-navy);
+}
+
+.chatThreadBoat {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  color: var(--color-text-secondary);
+}
+
+.chatBoatLink {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 0.85rem;
+  color: var(--color-navy-light);
+  cursor: pointer;
+  font-weight: 500;
+  text-decoration: underline;
+}
+
+.chatBoatLink:hover {
+  color: var(--color-navy);
+}
+
+/* Messages area */
+.chatMessages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px 20px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: var(--color-cream);
+}
+
+.chatMessagesEmpty {
+  text-align: center;
+  color: var(--color-text-muted);
+  font-size: 0.9375rem;
+  margin-top: 40px;
+}
+
+/* Bubble rows */
+.chatBubbleRow {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.chatBubbleMine {
+  flex-direction: row-reverse;
+}
+
+.chatBubbleTheirs {
+  flex-direction: row;
+}
+
+.chatBubbleAvatar img,
+.chatBubbleAvatar .chatAvatarFallback {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.chatBubbleWrap {
+  display: flex;
+  flex-direction: column;
+  max-width: 65%;
+  gap: 3px;
+}
+
+.chatBubbleMine .chatBubbleWrap {
+  align-items: flex-end;
+}
+
+.chatBubbleTheirs .chatBubbleWrap {
+  align-items: flex-start;
+}
+
+.chatBubble {
+  padding: 10px 14px;
+  border-radius: 16px;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  word-break: break-word;
+  white-space: pre-wrap;
+}
+
+.chatBubbleSent {
+  background: var(--color-navy);
+  color: #ffffff;
+  border-bottom-right-radius: 4px;
+}
+
+.chatBubbleReceived {
+  background: #ffffff;
+  color: var(--color-text);
+  border: 1px solid var(--color-border-light);
+  border-bottom-left-radius: 4px;
+}
+
+.chatBubbleTime {
+  font-size: 0.72rem;
+  color: var(--color-text-muted);
+  padding: 0 4px;
+}
+
+/* Composer */
+.chatComposer {
+  padding: 12px 16px 16px;
+  background: #ffffff;
+  border-top: 1px solid var(--color-border-light);
+  flex-shrink: 0;
+}
+
+.chatSendError {
+  font-size: 0.85rem;
+  color: var(--color-danger);
+  margin: 0 0 8px;
+}
+
+.chatComposerRow {
+  display: flex;
+  gap: 10px;
+  align-items: flex-end;
+}
+
+.chatInput {
+  flex: 1;
+  resize: none;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 10px 14px;
+  font-size: 0.9375rem;
+  font-family: inherit;
+  line-height: 1.5;
+  min-height: 48px;
+  max-height: 140px;
+  overflow-y: auto;
+  background: var(--color-bg);
+  color: var(--color-text);
+  transition: border-color 0.15s ease;
+}
+
+.chatInput:focus {
+  outline: none;
+  border-color: var(--color-navy);
+}
+
+.chatSendBtn {
+  flex-shrink: 0;
+  width: auto !important;
+  padding: 10px 18px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  margin-top: 0;
+  border-radius: var(--radius-sm);
+  white-space: nowrap;
 }

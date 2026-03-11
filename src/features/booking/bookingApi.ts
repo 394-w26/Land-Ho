@@ -3,6 +3,7 @@ import {
   addDoc,
   collection,
   doc,
+  getDoc,
   getDocs,
   limit,
   onSnapshot,
@@ -141,6 +142,67 @@ export const subscribeHostRequestsByBoat = (
       onData(requests)
     },
     (error) => onError(toReadableBookingError(error)),
+  )
+}
+
+export const getBookingRequest = async (
+  requestId: string,
+): Promise<BookingRequestRecord | null> => {
+  if (!db) throw new Error('db-not-configured')
+  const snap = await getDoc(doc(db, 'bookingRequests', requestId))
+  if (!snap.exists()) return null
+  return mapBookingDoc(snap as QueryDocumentSnapshot)
+}
+
+/** Subscribe to all booking requests for a host (all their boats). */
+export const subscribeHostRequests = (
+  hostUid: string,
+  onData: (requests: BookingRequestRecord[]) => void,
+  onError: (message: string) => void,
+): Unsubscribe => {
+  if (!db) {
+    onData([])
+    return () => undefined
+  }
+  const requestsRef = collection(db, 'bookingRequests')
+  const q = query(requestsRef, where('hostUid', '==', hostUid))
+  return onSnapshot(
+    q,
+    (snapshot) => {
+      const requests = snapshot.docs
+        .map(mapBookingDoc)
+        .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+      onData(requests)
+    },
+    (err) => onError(toReadableBookingError(err)),
+  )
+}
+
+/** Subscribe to approved booking requests for a sailor (applicant). */
+export const subscribeApplicantApprovedRequests = (
+  applicantUid: string,
+  onData: (requests: BookingRequestRecord[]) => void,
+  onError: (message: string) => void,
+): Unsubscribe => {
+  if (!db) {
+    onData([])
+    return () => undefined
+  }
+  const requestsRef = collection(db, 'bookingRequests')
+  const q = query(
+    requestsRef,
+    where('applicantUid', '==', applicantUid),
+    where('status', '==', 'approved'),
+  )
+  return onSnapshot(
+    q,
+    (snapshot) => {
+      const requests = snapshot.docs
+        .map(mapBookingDoc)
+        .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+      onData(requests)
+    },
+    (err) => onError(toReadableBookingError(err)),
   )
 }
 

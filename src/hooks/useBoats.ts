@@ -2,30 +2,41 @@ import { useEffect, useState, useMemo } from 'react'
 import { type User } from 'firebase/auth'
 import { db, isFirebaseReady } from '../lib/firebase'
 import { subscribePublishedBoats } from '../features/boats/boatsApi'
-import { type BoatCard, type BoatCategory } from '../types'
-import { initialBoatData } from '../data/seedBoats'
+import { type BoatCard, type CruiseLengthFilter, type CruiseTypeFilter, type BoatSizeSort } from '../types'
+
 
 interface UseBoatsOptions {
   viewer: User | null
-  category: BoatCategory
   searchText: string
   seatFilter: string
+  cruiseLength: CruiseLengthFilter
+  cruiseType: CruiseTypeFilter
+  harborFilter: string
+  boatSizeSort: BoatSizeSort
 }
 
-export function useBoats({ viewer, category, searchText, seatFilter }: UseBoatsOptions) {
+export function useBoats({
+  viewer,
+  searchText,
+  seatFilter,
+  cruiseLength,
+  cruiseType,
+  harborFilter,
+  boatSizeSort,
+}: UseBoatsOptions) {
   const [boats, setBoats] = useState<BoatCard[]>([])
   const [boatsLoading, setBoatsLoading] = useState(true)
   const [boatsError, setBoatsError] = useState('')
 
   useEffect(() => {
     if (!db || !isFirebaseReady) {
-      setBoats(initialBoatData)
+      // setBoats(initialBoatData)
       setBoatsLoading(false)
       return
     }
     const unsubscribe = subscribePublishedBoats(
       (nextBoats) => {
-        setBoats(nextBoats)
+        setBoats(nextBoats.length === 0 ? [] : nextBoats)
         setBoatsLoading(false)
         setBoatsError('')
       },
@@ -38,17 +49,29 @@ export function useBoats({ viewer, category, searchText, seatFilter }: UseBoatsO
   }, [])
 
   const filteredBoats = useMemo(() => {
-    return boats.filter((boat) => {
-      const byCategory = category === 'all' || boat.category === category
+    let list = boats.filter((boat) => {
+      const keyword = searchText.trim().toLowerCase()
       const bySearch =
-        searchText.trim().length === 0 ||
-        boat.title.includes(searchText) ||
-        boat.location.includes(searchText)
+        keyword.length === 0 ||
+        boat.title.toLowerCase().includes(keyword) ||
+        boat.location.toLowerCase().includes(keyword)
       const seats = Number(seatFilter || 0)
       const bySeats = seats === 0 || boat.seats >= seats
-      return byCategory && bySearch && bySeats
+      const byCruiseLength =
+        cruiseLength === 'all' || boat.durationCategory === cruiseLength
+      const byCruiseType =
+        cruiseType === 'all' || boat.cruiseType === cruiseType
+      const byHarbor =
+        !harborFilter.trim() || boat.location === harborFilter.trim()
+      return bySearch && bySeats && byCruiseLength && byCruiseType && byHarbor
     })
-  }, [boats, category, searchText, seatFilter])
+    if (boatSizeSort === 'smallToLarge') {
+      list = [...list].sort((a, b) => a.seats - b.seats)
+    } else if (boatSizeSort === 'largeToSmall') {
+      list = [...list].sort((a, b) => b.seats - a.seats)
+    }
+    return list
+  }, [boats, searchText, seatFilter, cruiseLength, cruiseType, harborFilter, boatSizeSort])
 
   const hostBoats = useMemo(() => {
     if (!viewer) {

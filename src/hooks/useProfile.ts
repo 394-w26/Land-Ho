@@ -4,12 +4,7 @@ import {
   profileStorageKey,
   loadStoredProfileDraft,
 } from '../data/constants'
-import {
-  type ProfileDraft,
-  type ProfileSection,
-  type ExperienceItem,
-  type CertificateItem,
-} from '../types'
+import { type ProfileDraft, type ProfileSection } from '../types'
 import { uploadImageToStorage } from '../lib/storage'
 import { upsertUserPublicProfile } from '../features/users/usersApi'
 import { getUploadErrorText } from '../utils/formatters'
@@ -18,6 +13,7 @@ export function useProfile(viewer: User | null) {
   const [profileDraft, setProfileDraft] = useState<ProfileDraft>(() => loadStoredProfileDraft())
   const [profileSection, setProfileSection] = useState<ProfileSection>('basic')
   const [profileNotice, setProfileNotice] = useState('')
+  const [profileSuccessModal, setProfileSuccessModal] = useState('')
   const [skillInput, setSkillInput] = useState('')
   const [avatarUploading, setAvatarUploading] = useState(false)
 
@@ -31,7 +27,6 @@ export function useProfile(viewer: User | null) {
       { key: 'city', ok: profileDraft.city.trim().length > 0, label: 'Add your city' },
       { key: 'bio', ok: profileDraft.bio.trim().length >= 30, label: 'Bio must be at least 30 characters' },
       { key: 'skills', ok: profileDraft.skills.length >= 2, label: 'Add at least 2 skills' },
-      { key: 'experiences', ok: profileDraft.experiences.length >= 1, label: 'Add at least 1 experience' },
     ]
   }, [profileDraft])
 
@@ -77,67 +72,13 @@ export function useProfile(viewer: User | null) {
     updateProfileDraft((prev) => ({ ...prev, skills: prev.skills.filter((item) => item !== skill) }))
   }
 
-  const addExperience = () => {
-    updateProfileDraft((prev) => ({
-      ...prev,
-      experiences: [
-        ...prev.experiences,
-        {
-          id: `exp-${Date.now()}`,
-          title: '',
-          organization: '',
-          start: '',
-          end: '',
-          description: '',
-        },
-      ],
-    }))
-  }
-
-  const updateExperience = (id: string, field: keyof Omit<ExperienceItem, 'id'>, value: string) => {
-    updateProfileDraft((prev) => ({
-      ...prev,
-      experiences: prev.experiences.map((item) => (item.id === id ? { ...item, [field]: value } : item)),
-    }))
-  }
-
-  const removeExperience = (id: string) => {
-    updateProfileDraft((prev) => ({
-      ...prev,
-      experiences: prev.experiences.filter((item) => item.id !== id),
-    }))
-  }
-
-  const addCertificate = () => {
-    updateProfileDraft((prev) => ({
-      ...prev,
-      certificates: [...prev.certificates, { id: `cert-${Date.now()}`, name: '', issuer: '', year: '' }],
-    }))
-  }
-
-  const updateCertificate = (id: string, field: keyof Omit<CertificateItem, 'id'>, value: string) => {
-    updateProfileDraft((prev) => ({
-      ...prev,
-      certificates: prev.certificates.map((item) =>
-        item.id === id ? { ...item, [field]: value } : item,
-      ),
-    }))
-  }
-
-  const removeCertificate = (id: string) => {
-    updateProfileDraft((prev) => ({
-      ...prev,
-      certificates: prev.certificates.filter((item) => item.id !== id),
-    }))
-  }
-
   const saveProfile = async () => {
     window.localStorage.setItem(profileStorageKey, JSON.stringify(profileDraft))
     if (viewer) {
       try {
         await upsertUserPublicProfile({
           uid: viewer.uid,
-          displayName: profileDraft.displayName || viewer.displayName || viewer.email || 'Host',
+          displayName: profileDraft.displayName || viewer.displayName || viewer.email || 'Captain',
           avatarUrl: resolvedAvatarUrl,
           city: profileDraft.city,
           bio: profileDraft.bio,
@@ -150,7 +91,7 @@ export function useProfile(viewer: User | null) {
         return
       }
     }
-    setProfileNotice('Profile draft saved.')
+    setProfileSuccessModal('Profile draft saved.')
   }
 
   const saveAndFinishProfile = async () => {
@@ -159,7 +100,7 @@ export function useProfile(viewer: User | null) {
       setProfileNotice(`${missingItems.length} item(s) remaining: ${missingItems.join(', ')}`)
       return
     }
-    setProfileNotice('Profile completed. You can now book and publish boats.')
+    setProfileSuccessModal('Profile completed! You can now book and publish boats.')
   }
 
   const handleAvatarUpload = async (event: ChangeEvent<HTMLInputElement>) => {
@@ -177,7 +118,7 @@ export function useProfile(viewer: User | null) {
     try {
       const uploadedUrl = await uploadImageToStorage(`avatars/${viewer.uid}`, file)
       updateProfileDraft((prev) => ({ ...prev, avatarUrl: uploadedUrl }))
-      setProfileNotice('Avatar uploaded successfully.')
+      setProfileSuccessModal('Avatar uploaded successfully.')
     } catch (error) {
       setProfileNotice(getUploadErrorText(error))
     } finally {
@@ -191,6 +132,8 @@ export function useProfile(viewer: User | null) {
     setProfileSection,
     profileNotice,
     setProfileNotice,
+    profileSuccessModal,
+    setProfileSuccessModal,
     skillInput,
     setSkillInput,
     avatarUploading,
@@ -202,12 +145,6 @@ export function useProfile(viewer: User | null) {
     syncFromAuth,
     addSkill,
     removeSkill,
-    addExperience,
-    updateExperience,
-    removeExperience,
-    addCertificate,
-    updateCertificate,
-    removeCertificate,
     saveProfile,
     saveAndFinishProfile,
     handleAvatarUpload,

@@ -4,6 +4,7 @@ import {
   deleteDoc,
   doc,
   getDoc,
+  increment,
   onSnapshot,
   orderBy,
   query,
@@ -14,7 +15,13 @@ import {
 } from 'firebase/firestore'
 import { db } from '../../lib/firebase'
 
-export type BoatCategory = 'dayTrip' | 'sunset' | 'training' | 'island'
+export type BoatCategory = 'dayTrip' | 'sunset' | 'training' | 'cruise'
+
+/** Length of cruise for filtering */
+export type CruiseLength = '<3' | '3-5' | '6-8'
+
+/** Type of cruise for filtering */
+export type CruiseType = 'sporting' | 'leisure'
 
 export interface BoatCoordinates {
   lat: number
@@ -26,7 +33,6 @@ export interface BoatRecord {
   title: string
   location: string
   coordinates: BoatCoordinates | null
-  price: number
   rating: number
   seats: number
   captain: string
@@ -36,13 +42,16 @@ export interface BoatRecord {
   images: string[]
   ownerUid: string
   ownerName: string
+  /** Number of seats filled by approved bookings (managed by booking flow). */
+  seatsTaken?: number
+  durationCategory?: CruiseLength
+  cruiseType?: CruiseType
 }
 
 export interface CreateBoatInput {
   title: string
   location: string
   coordinates: BoatCoordinates
-  price: number
   seats: number
   captain: string
   date: string
@@ -71,12 +80,14 @@ const mapBoatDoc = (doc: QueryDocumentSnapshot): BoatRecord => {
       ? [String(data.image)]
       : []
   const coverImage = String(data.image ?? images[0] ?? '')
+  const durationCategory = data.durationCategory as BoatRecord['durationCategory']
+  const cruiseType = data.cruiseType as BoatRecord['cruiseType']
+  const seatsTaken = Number(data.seatsTaken ?? 0)
   return {
     id: doc.id,
     title: String(data.title ?? ''),
     location: String(data.location ?? ''),
     coordinates,
-    price: Number(data.price ?? 0),
     rating: Number(data.rating ?? 5),
     seats: Number(data.seats ?? 1),
     captain: String(data.captain ?? ''),
@@ -86,7 +97,22 @@ const mapBoatDoc = (doc: QueryDocumentSnapshot): BoatRecord => {
     images,
     ownerUid: String(data.ownerUid ?? ''),
     ownerName: String(data.ownerName ?? ''),
+    ...(Number.isFinite(seatsTaken) && seatsTaken > 0 ? { seatsTaken } : {}),
+    ...(durationCategory && { durationCategory }),
+    ...(cruiseType && { cruiseType }),
   }
+}
+
+/** Increment or decrement seatsTaken for a boat (e.g. when approving/rejecting a booking). */
+export const incrementBoatSeatsTaken = async (
+  boatId: string,
+  delta: 1 | -1,
+): Promise<void> => {
+  if (!db) throw new Error('db-not-configured')
+  await updateDoc(doc(db, 'boats', boatId), {
+    seatsTaken: increment(delta),
+    updatedAt: serverTimestamp(),
+  })
 }
 
 export const subscribePublishedBoats = (

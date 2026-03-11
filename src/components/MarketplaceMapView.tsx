@@ -1,15 +1,12 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import Map, { Marker, NavigationControl, Popup, type MapRef } from 'react-map-gl/mapbox'
-import { db, isFirebaseReady } from '../lib/firebase'
-import {
-  subscribePublishedBoats,
-  type BoatCategory,
-  type BoatCoordinates,
-  type BoatRecord,
-} from '../features/boats/boatsApi'
+import { type BoatCoordinates } from '../features/boats/boatsApi'
 import { searchLocationSuggestions, type LocationSuggestion } from '../features/location/mapboxGeocode'
-import 'mapbox-gl/dist/mapbox-gl.css'
+import { defaultCoordinates } from '../data/constants'
+import { type BoatCard, type CruiseLengthFilter, type CruiseTypeFilter, type BoatSizeSort } from '../types'
+import MarketplaceControls, { type SuggestionOption } from './MarketplaceControls'
+import { Header } from './Header'
 
 interface LngLatBounds {
   west: number
@@ -18,15 +15,28 @@ interface LngLatBounds {
   north: number
 }
 
-const mapboxToken = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN as string | undefined
+interface MarketplaceMapViewProps {
+  boats: BoatCard[]
+  boatsLoading: boolean
+  boatsError: string
+  searchText: string
+  setSearchText: (value: string) => void
+  seatFilter: string
+  setSeatFilter: (value: string) => void
+  cruiseLength: CruiseLengthFilter
+  setCruiseLength: (v: CruiseLengthFilter) => void
+  cruiseType: CruiseTypeFilter
+  setCruiseType: (v: CruiseTypeFilter) => void
+  harborFilter: string
+  setHarborFilter: (value: string) => void
+  boatSizeSort: BoatSizeSort
+  setBoatSizeSort: (v: BoatSizeSort) => void
+  onBackToList: () => void
+  highlightBoatId?: string
+  onHighlightHandled?: () => void
+}
 
-const categories: { key: 'all' | BoatCategory; label: string }[] = [
-  { key: 'all', label: 'All' },
-  { key: 'dayTrip', label: 'Day Trips' },
-  { key: 'sunset', label: 'Sunset Cruises' },
-  { key: 'training', label: 'Training' },
-  { key: 'island', label: 'Island Hops' },
-]
+const mapboxToken = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN as string | undefined
 
 const hasCoordinates = (coordinates: BoatCoordinates | null): coordinates is BoatCoordinates => {
   if (!coordinates) {
@@ -35,7 +45,7 @@ const hasCoordinates = (coordinates: BoatCoordinates | null): coordinates is Boa
   return Number.isFinite(coordinates.lat) && Number.isFinite(coordinates.lng)
 }
 
-const hasMapCoordinates = (boat: BoatRecord): boat is BoatRecord & { coordinates: BoatCoordinates } => {
+const hasMapCoordinates = (boat: BoatCard): boat is BoatCard & { coordinates: BoatCoordinates } => {
   return hasCoordinates(boat.coordinates)
 }
 
@@ -51,96 +61,65 @@ const inBounds = (coordinates: BoatCoordinates, bounds: LngLatBounds | null): bo
   )
 }
 
-function MapExplorePage() {
-  const location = useLocation()
+export default function MarketplaceMapView({
+  boats,
+  boatsLoading,
+  boatsError,
+  searchText,
+  setSearchText,
+  seatFilter,
+  setSeatFilter,
+  cruiseLength,
+  setCruiseLength,
+  cruiseType,
+  setCruiseType,
+  harborFilter,
+  setHarborFilter,
+  boatSizeSort,
+  setBoatSizeSort,
+  onBackToList,
+  highlightBoatId = '',
+  onHighlightHandled,
+}: MarketplaceMapViewProps) {
   const navigate = useNavigate()
   const mapRef = useRef<MapRef | null>(null)
   const cardRefs = useRef<Record<string, HTMLElement | null>>({})
-  const [boats, setBoats] = useState<BoatRecord[]>([])
-  const [boatsLoading, setBoatsLoading] = useState(Boolean(db && isFirebaseReady))
-  const [boatsError, setBoatsError] = useState('')
-  const [category, setCategory] = useState<'all' | BoatCategory>('all')
-  const [searchText, setSearchText] = useState('')
-  const [seatFilter, setSeatFilter] = useState('')
   const [suggestions, setSuggestions] = useState<LocationSuggestion[]>([])
   const [suggestionsLoading, setSuggestionsLoading] = useState(false)
-  const [showSuggestions, setShowSuggestions] = useState(false)
   const [bounds, setBounds] = useState<LngLatBounds | null>(null)
   const [selectedBoatIdManual, setSelectedBoatIdManual] = useState('')
-  const highlightBoatId = useMemo(() => {
-    const params = new URLSearchParams(location.search)
-    return params.get('highlight') ?? ''
-  }, [location.search])
   const selectedBoatId = selectedBoatIdManual || highlightBoatId
 
-  useEffect(() => {
-    if (!db || !isFirebaseReady) {
-      return
-    }
-    const unsubscribe = subscribePublishedBoats(
-      (nextBoats) => {
-        setBoats(nextBoats)
-        setBoatsLoading(false)
-        setBoatsError('')
-      },
-      (message) => {
-        setBoatsLoading(false)
-        setBoatsError(message)
-      },
-    )
-    return () => unsubscribe()
-  }, [])
-
-  const filteredBoats = useMemo(() => {
-    return boats.filter((boat) => {
-      const byCategory = category === 'all' || boat.category === category
-      const keyword = searchText.trim().toLowerCase()
-      // When typing in the "Where" input we should only filter by location
-      const bySearch = keyword.length === 0 || boat.location.toLowerCase().includes(keyword)
-      const seats = Number(seatFilter || 0)
-      const bySeats = seats === 0 || boat.seats >= seats
-      return byCategory && bySearch && bySeats
-    })
-  }, [boats, category, searchText, seatFilter])
-
   const visibleBoats = useMemo(() => {
-    return filteredBoats.filter((boat) => {
+    return boats.filter((boat) => {
       if (!hasCoordinates(boat.coordinates)) {
         return true
       }
       return inBounds(boat.coordinates, bounds)
     })
-  }, [filteredBoats, bounds])
+  }, [boats, bounds])
 
   const selectedBoat = useMemo(() => {
     return visibleBoats.find((item) => item.id === selectedBoatId) ?? null
   }, [visibleBoats, selectedBoatId])
 
   const centeredBoats = useMemo(() => {
-    return filteredBoats.filter(hasMapCoordinates)
-  }, [filteredBoats])
+    return boats.filter(hasMapCoordinates)
+  }, [boats])
+
+  const controlSuggestions = useMemo<SuggestionOption[]>(() => {
+    return suggestions.map((item) => ({ id: item.id, label: item.placeName }))
+  }, [suggestions])
 
   const initialViewState = useMemo(() => {
     if (centeredBoats.length === 0) {
-      return { longitude: 118.0894, latitude: 24.4798, zoom: 5.2 }
+      return { longitude: defaultCoordinates.lng, latitude: defaultCoordinates.lat, zoom: 10.2 }
     }
     const lat = centeredBoats.reduce((sum, item) => sum + item.coordinates.lat, 0) / centeredBoats.length
     const lng = centeredBoats.reduce((sum, item) => sum + item.coordinates.lng, 0) / centeredBoats.length
-    return { longitude: lng, latitude: lat, zoom: 5.4 }
+    return { longitude: lng, latitude: lat, zoom: 10.2 }
   }, [centeredBoats])
 
-  const handleCardSelect = (boat: BoatRecord) => {
-    setSelectedBoatIdManual(boat.id)
-    if (hasCoordinates(boat.coordinates)) {
-      mapRef.current?.flyTo({
-        center: [boat.coordinates.lng, boat.coordinates.lat],
-        zoom: 10.5,
-        duration: 600,
-      })
-    }
-  }
-
-  // Debounced location suggestions
   useEffect(() => {
     if (!mapboxToken || !searchText || searchText.trim().length < 2) {
       setSuggestions([])
@@ -168,28 +147,7 @@ function MapExplorePage() {
       active = false
       window.clearTimeout(id)
     }
-  }, [searchText, mapboxToken])
-
-  // click outside to close suggestions
-  useEffect(() => {
-    const onDoc = (e: MouseEvent) => {
-      const target = e.target as Node | null
-      if (!target) return
-      const el = document.querySelector('.suggestionsList')
-      const input = document.querySelector('.searchItem input')
-      if (el && !el.contains(target) && input && !input.contains(target)) {
-        setShowSuggestions(false)
-      }
-    }
-    document.addEventListener('click', onDoc)
-    return () => document.removeEventListener('click', onDoc)
-  }, [])
-
-  const resetFilters = () => {
-    setCategory('all')
-    setSearchText('')
-    setSeatFilter('')
-  }
+  }, [searchText])
 
   useEffect(() => {
     if (!highlightBoatId) {
@@ -199,6 +157,7 @@ function MapExplorePage() {
     if (!target) {
       return
     }
+    setSelectedBoatIdManual(target.id)
     const card = cardRefs.current[target.id]
     card?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
     if (hasCoordinates(target.coordinates)) {
@@ -209,92 +168,74 @@ function MapExplorePage() {
       })
     }
     const timer = window.setTimeout(() => {
-      navigate('/map', { replace: true })
-    }, 1800)
+      onHighlightHandled?.()
+    }, 900)
     return () => window.clearTimeout(timer)
-  }, [highlightBoatId, boats, navigate])
+  }, [highlightBoatId, boats, onHighlightHandled])
+
+  const handleCardSelect = (boat: BoatCard) => {
+    setSelectedBoatIdManual(boat.id)
+    if (hasCoordinates(boat.coordinates)) {
+      mapRef.current?.flyTo({
+        center: [boat.coordinates.lng, boat.coordinates.lat],
+        zoom: 10.5,
+        duration: 600,
+      })
+    }
+  }
+
+  const resetFilters = () => {
+    setCruiseLength('all')
+    setCruiseType('all')
+    setHarborFilter('')
+    setBoatSizeSort('none')
+    setSearchText('')
+    setSeatFilter('')
+  }
 
   return (
-    <div className="mapPage">
-      <header className="topBar mapTopBar">
-        <Link className="brand" to="/" state={{ initialMode: 'guest' }}>
-          <img className="brandLogo" src="/logo.png" alt="Land Ho logo" />
-          <span>Land Ho</span>
-        </Link>
-        <div className="mapTopActions">
-          <Link className="ghostBtn mapNavBtn" to="/">
-            Home listings
-          </Link>
-        </div>
-      </header>
-
-      <section className="searchSection mapSearchSection">
-        <div className="searchItem">
-          <label>Where</label>
-          <input
-            placeholder="Search ports or bays"
-            value={searchText}
-            onFocus={() => setShowSuggestions(true)}
-            onChange={(e) => {
-              setSearchText(e.target.value)
-              setShowSuggestions(true)
-            }}
-          />
-          {showSuggestions && (suggestions.length > 0 || suggestionsLoading) && (
-            <div className="suggestionsList">
-              {suggestionsLoading && <div className="suggestionItem muted">Searching...</div>}
-              {suggestions.map((s) => (
-                <button
-                  key={s.id}
-                  className="suggestionItem"
-                  onClick={() => {
-                    setSearchText(s.placeName)
-                    setShowSuggestions(false)
-                    // set bounds to center around selection
-                    const delta = 0.08
-                    setBounds({
-                      west: s.coordinates.lng - delta,
-                      south: s.coordinates.lat - delta,
-                      east: s.coordinates.lng + delta,
-                      north: s.coordinates.lat + delta,
-                    })
-                    mapRef.current?.flyTo({
-                      center: [s.coordinates.lng, s.coordinates.lat],
-                      zoom: 10.5,
-                      duration: 600,
-                    })
-                  }}
-                >
-                  <div className="suggestionTitle">{s.placeName}</div>
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
-        <div className="searchItem">
-          <label>Guests</label>
-          <input
-            placeholder="Minimum seats"
-            value={seatFilter}
-            onChange={(e) => setSeatFilter(e.target.value)}
-          />
-        </div>
-        <button className="searchBtn" onClick={resetFilters}>
-          Reset
+    <div className="homePage">
+      <Header brandText="Land Ho">
+        <button className="ghostBtn" onClick={onBackToList}>
+          List view
         </button>
-      </section>
+      </Header>
 
-      <section className="categoryTabs">
-        {categories.map((item) => (
-          <button
-            key={item.key}
-            className={category === item.key ? 'tab active' : 'tab'}
-            onClick={() => setCategory(item.key)}
-          >
-            {item.label}
-          </button>
-        ))}
-      </section>
+      <MarketplaceControls
+        searchText={searchText}
+        setSearchText={setSearchText}
+        seatFilter={seatFilter}
+        setSeatFilter={setSeatFilter}
+        cruiseLength={cruiseLength}
+        setCruiseLength={setCruiseLength}
+        cruiseType={cruiseType}
+        setCruiseType={setCruiseType}
+        harborFilter={harborFilter}
+        setHarborFilter={setHarborFilter}
+        boatSizeSort={boatSizeSort}
+        setBoatSizeSort={setBoatSizeSort}
+        suggestions={controlSuggestions}
+        suggestionsLoading={suggestionsLoading}
+        searchSectionClassName="mapSearchSection"
+        onSelectSuggestion={(item) => {
+          const selectedSuggestion = suggestions.find((entry) => entry.id === item.id)
+          if (!selectedSuggestion) {
+            return
+          }
+          const delta = 0.08
+          setBounds({
+            west: selectedSuggestion.coordinates.lng - delta,
+            south: selectedSuggestion.coordinates.lat - delta,
+            east: selectedSuggestion.coordinates.lng + delta,
+            north: selectedSuggestion.coordinates.lat + delta,
+          })
+          mapRef.current?.flyTo({
+            center: [selectedSuggestion.coordinates.lng, selectedSuggestion.coordinates.lat],
+            zoom: 10.5,
+            duration: 600,
+          })
+        }}
+      />
 
       {!mapboxToken && (
         <p className="authNotice">Mapbox token is missing. Set VITE_MAPBOX_ACCESS_TOKEN in your environment.</p>
@@ -333,7 +274,7 @@ function MapExplorePage() {
                         className={active ? 'priceMarker active' : 'priceMarker'}
                         onClick={() => navigate(`/boats/${boat.id}`)}
                       >
-                        ${boat.price}
+                        Free
                       </button>
                     </Marker>
                   )
@@ -350,7 +291,6 @@ function MapExplorePage() {
                   <div className="mapPopup">
                     <strong>{selectedBoat.title}</strong>
                     <p>{selectedBoat.location}</p>
-                    <p>$ {selectedBoat.price} / person</p>
                     <button
                       className="ghostBtn mapPopupBtn"
                       onClick={() => navigate(`/boats/${selectedBoat.id}`)}
@@ -409,7 +349,6 @@ function MapExplorePage() {
                       <p>
                         Captain {boat.captain} · {boat.seats} seats
                       </p>
-                      <p className="price">$ {boat.price} / person</p>
                       {!hasCoordinates(boat.coordinates) && (
                         <p className="mapCardHint">Map pin unavailable for this listing.</p>
                       )}
@@ -432,4 +371,3 @@ function MapExplorePage() {
   )
 }
 
-export default MapExplorePage

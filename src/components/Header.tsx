@@ -1,6 +1,7 @@
 import { useEffect, type ReactNode } from 'react'
 import { type User } from 'firebase/auth'
 import { Link } from 'react-router-dom'
+import { WeatherInline } from './Weather'
 
 interface HeaderProps {
   brandText: string
@@ -10,12 +11,15 @@ interface HeaderProps {
 export function Header({ brandText, children }: HeaderProps) {
   return (
     <header className="topBar">
-      <Link className="brand" to="/" state={{ initialMode: 'guest' }}>
-        <img className="brandLogo" src="/logo.png" alt="Land Ho logo" />
-        <span>{brandText}</span>
-      </Link>
-      <div className="topActions">
-        {children}
+      <div className="topBarInner">
+        <Link className="brand" to="/" state={{ initialMode: 'guest' }}>
+          <img className="brandLogo" src="/logo.png" alt="Land Ho logo" />
+          <span>{brandText}</span>
+        </Link>
+        <div className="topActions">
+          <WeatherInline />
+          {children}
+        </div>
       </div>
     </header>
   )

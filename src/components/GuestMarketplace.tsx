@@ -1,10 +1,12 @@
+import { useMemo } from 'react'
 import { type User } from 'firebase/auth'
 import { useNavigate } from 'react-router-dom'
-import { type BoatCard, type BoatCategory } from '../types'
-import { categories } from '../data/constants'
+import { type BoatCard, type CruiseLengthFilter, type CruiseTypeFilter, type BoatSizeSort } from '../types'
+import { chicagoLocations } from '../data/constants'
 import { formatTripDate } from '../utils/formatters'
 import { Header, UserButton, MenuDropdown } from './Header'
-
+import { ApprovedRequestsDropdown } from './ApprovedRequestsDropdown'
+import MarketplaceControls from './MarketplaceControls'
 interface GuestMarketplaceProps {
   viewer: User | null
   authLoading: boolean
@@ -13,12 +15,18 @@ interface GuestMarketplaceProps {
   userInitial: string
   menuOpen: boolean
   setMenuOpen: (open: boolean) => void
-  category: BoatCategory
-  setCategory: (category: BoatCategory) => void
   searchText: string
   setSearchText: (value: string) => void
   seatFilter: string
   setSeatFilter: (value: string) => void
+  cruiseLength: CruiseLengthFilter
+  setCruiseLength: (v: CruiseLengthFilter) => void
+  cruiseType: CruiseTypeFilter
+  setCruiseType: (v: CruiseTypeFilter) => void
+  harborFilter: string
+  setHarborFilter: (value: string) => void
+  boatSizeSort: BoatSizeSort
+  setBoatSizeSort: (v: BoatSizeSort) => void
   filteredBoats: BoatCard[]
   boatsLoading: boolean
   boatsError: string
@@ -26,9 +34,9 @@ interface GuestMarketplaceProps {
   onOpenProfile: () => void
   onSignOut: () => void
   onLoginWithGoogle: () => void
-  onNavigateCaptainSetup: () => void
-  onNavigateSailorSetup: () => void
+  onNavigateInstructorRequest: () => void
   onNavigateMap: () => void
+  onNavigateChat: () => void
 }
 
 export default function GuestMarketplace({
@@ -39,12 +47,18 @@ export default function GuestMarketplace({
   userInitial,
   menuOpen,
   setMenuOpen,
-  category,
-  setCategory,
   searchText,
   setSearchText,
   seatFilter,
   setSeatFilter,
+  cruiseLength,
+  setCruiseLength,
+  cruiseType,
+  setCruiseType,
+  harborFilter,
+  setHarborFilter,
+  boatSizeSort,
+  setBoatSizeSort,
   filteredBoats,
   boatsLoading,
   boatsError,
@@ -52,18 +66,25 @@ export default function GuestMarketplace({
   onOpenProfile,
   onSignOut,
   onLoginWithGoogle,
-  onNavigateCaptainSetup,
-  onNavigateSailorSetup,
+  onNavigateInstructorRequest,
   onNavigateMap,
+  onNavigateChat,
 }: GuestMarketplaceProps) {
   const navigate = useNavigate()
 
+  const locationSuggestions = useMemo(() => {
+    const keyword = searchText.trim().toLowerCase()
+    if (keyword.length === 0) return []
+    return chicagoLocations.filter((loc) => loc.toLowerCase().includes(keyword))
+  }, [searchText])
+
   return (
-    <div className="homePage">
+    <>
       <Header brandText="Land Ho">
         <button className="ghostBtn" onClick={onBecomeHost}>
-          Become a Host
+         Browse as Captain
         </button>
+        <ApprovedRequestsDropdown />
         <UserButton
           viewer={viewer}
           authLoading={authLoading}
@@ -74,27 +95,23 @@ export default function GuestMarketplace({
         <MenuDropdown menuOpen={menuOpen} setMenuOpen={setMenuOpen}>
           <button
             className="menuItem"
-            onClick={() => { setMenuOpen(false); onBecomeHost() }}
+            onClick={() => { setMenuOpen(false); onNavigateInstructorRequest() }}
           >
-            Become a Host
+            🎓 Request Instructor
           </button>
-          <button
-            className="menuItem"
-            onClick={() => { setMenuOpen(false); onNavigateCaptainSetup() }}
-          >
-            Captain Setup
-          </button>
-          <button
-            className="menuItem"
-            onClick={() => { setMenuOpen(false); onNavigateSailorSetup() }}
-          >
-            Sailor Setup
-          </button>
+          {viewer && (
+            <button
+              className="menuItem"
+              onClick={() => { setMenuOpen(false); onNavigateChat() }}
+            >
+              💬 Messages
+            </button>
+          )}
           <button
             className="menuItem"
             onClick={() => { setMenuOpen(false); onNavigateMap() }}
           >
-            Explore Map
+            Map view
           </button>
           {viewer ? (
             <button className="menuItem dangerText" onClick={onSignOut}>
@@ -113,110 +130,85 @@ export default function GuestMarketplace({
           )}
         </MenuDropdown>
       </Header>
+      <div className="homePage">
+        <MarketplaceControls
+          searchText={searchText}
+          setSearchText={setSearchText}
+          seatFilter={seatFilter}
+          setSeatFilter={setSeatFilter}
+          cruiseLength={cruiseLength}
+          setCruiseLength={setCruiseLength}
+          cruiseType={cruiseType}
+          setCruiseType={setCruiseType}
+          harborFilter={harborFilter}
+          setHarborFilter={setHarborFilter}
+          boatSizeSort={boatSizeSort}
+          setBoatSizeSort={setBoatSizeSort}
+          suggestions={locationSuggestions.map((loc) => ({ id: loc, label: loc }))}
+        />
 
-      <section className="searchSection">
-        <div className="searchItem">
-          <label>Where</label>
-          <input
-            placeholder="Search destinations"
-            value={searchText}
-            onChange={(e) => setSearchText(e.target.value)}
-          />
-        </div>
-        <div className="searchItem">
-          <label>When</label>
-          <input placeholder="Any week" />
-        </div>
-        <div className="searchItem">
-          <label>Guests</label>
-          <input
-            placeholder="Add guests"
-            value={seatFilter}
-            onChange={(e) => setSeatFilter(e.target.value)}
-          />
-        </div>
-        <button type="button" className="searchBtn searchBtn--icon" aria-label="Search">
-          <span className="searchBtnText">Search</span>
-          <span className="searchBtnIcon" aria-hidden>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <circle cx="11" cy="11" r="8" />
-              <path d="m21 21-4.35-4.35" />
-            </svg>
-          </span>
-        </button>
-      </section>
+        <section className="listHeader">
+          <h2>Explore Popular Boats</h2>
+        </section>
+        {boatsError && <p className="authNotice">{boatsError}</p>}
 
-      <section className="categoryTabs">
-        {categories.map((item) => (
-          <button
-            key={item.key}
-            className={category === item.key ? 'tab active' : 'tab'}
-            onClick={() => setCategory(item.key)}
-          >
-            <span>{item.icon}</span>
-            {item.label}
-          </button>
-        ))}
-      </section>
-
-      <section className="listHeader">
-        <h2>Explore Popular Boats</h2>
-        <p>{boatsLoading ? 'Loading trips...' : `${filteredBoats.length} trips available`}</p>
-      </section>
-      {boatsError && <p className="authNotice">{boatsError}</p>}
-
-      <section className="boatGrid">
-        {boatsLoading ? (
-          <article className="boatCard">
-            <div className="cardBody">
-              <p className="muted">Loading boats from cloud...</p>
-            </div>
-          </article>
-        ) : (
-          filteredBoats.map((boat) => (
-            <article
-              className="boatCard clickableCard"
-              key={boat.id}
-              onClick={() => navigate(`/boats/${boat.id}`)}
-            >
-              <div className="cardImageWrap">
-                <img src={boat.image} alt={boat.title} className="cardImage" />
-                <button className="favoriteBtn">♡</button>
-              </div>
+        <section className="boatGrid">
+          {boatsLoading ? (
+            <article className="boatCard">
               <div className="cardBody">
-                <div className="cardRow">
-                  <h3>{boat.title}</h3>
-                  <span>★ {boat.rating.toFixed(2)}</span>
-                </div>
-                <p>{boat.location}</p>
-                <p>
-                  Captain {boat.captain} · {formatTripDate(boat.date)} · {boat.seats} seats
-                </p>
-                <p className="price">$ {boat.price} / person</p>
+                <p className="muted">Loading boats from cloud...</p>
               </div>
             </article>
-          ))
-        )}
-      </section>
+          ) : (
+            filteredBoats.map((boat) => (
+              <article
+                className="boatCard clickableCard"
+                key={boat.id}
+                onClick={() => navigate(`/boats/${boat.id}`)}
+              >
+                <div className="cardImageWrap">
+                  <img src={boat.image} alt={boat.title} className="cardImage" />
+                </div>
+                <div className="cardBody">
+                  <div className="cardRow">
+                    <h3>{boat.title}</h3>
+                    <span>★ {boat.rating.toFixed(2)}</span>
+                  </div>
+                  <p>{boat.location}</p>
+                  <p>
+                    Captain {boat.captain} · {formatTripDate(boat.date)} · {boat.seats} seats
+                  {(boat.seatsTaken ?? 0) > 0 && (
+                    <span> · {Math.max(0, boat.seats - (boat.seatsTaken ?? 0))} left</span>
+                  )}
+                  </p>
+                </div>
+              </article>
+            ))
+          )}
+        </section>
 
-      {!boatsLoading && filteredBoats.length === 0 && (
-        <div className="emptyState">
-          <p>No boats match your filters. Try resetting them.</p>
-          <button
-            onClick={() => {
-              setCategory('all')
-              setSearchText('')
-              setSeatFilter('')
-            }}
-          >
-            Reset Filters
-          </button>
-        </div>
-      )}
-      <footer className="footerText">
-        Browsing UI first, then connect your live listing and booking data.
-      </footer>
-      {authError && <p className="authNotice">{authError}</p>}
-    </div>
+        {!boatsLoading && filteredBoats.length === 0 && (
+          <div className="emptyState">
+            <p>No boats match your filters. Try resetting them.</p>
+            <button
+              onClick={() => {
+                setSearchText('')
+                setSeatFilter('')
+                setCruiseLength('all')
+                setCruiseType('all')
+                setHarborFilter('')
+                setBoatSizeSort('none')
+              }}
+            >
+              Reset Filters
+            </button>
+          </div>
+        )}
+        <footer className="footerText">
+          Browsing UI first, then connect your live listing and booking data.
+        </footer>
+        {authError && <p className="authNotice">{authError}</p>}
+      </div>
+    </>
   )
 }

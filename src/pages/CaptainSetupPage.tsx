@@ -1,6 +1,6 @@
-import { useEffect, useState, type ChangeEvent } from 'react'
+import { useEffect, useMemo, useState, type ChangeEvent } from 'react'
 import { onAuthStateChanged, signInWithPopup, type User } from 'firebase/auth'
-import { Link, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { auth, googleProvider, isFirebaseReady } from '../lib/firebase'
 import { uploadImageToStorage } from '../lib/storage'
 import {
@@ -12,6 +12,8 @@ import type {
   CaptainLicenseType,
   CaptainOnboardingProfile,
 } from '../features/onboarding/onboardingTypes'
+import FeedbackModal from '../components/FeedbackModal'
+import { chicagoLocations } from '../data/constants'
 
 type Step = 'identity' | 'credential' | 'boat' | 'compliance' | 'review'
 const STEPS: { key: Step; label: string }[] = [
@@ -47,6 +49,7 @@ const emptyDraft: Omit<CaptainOnboardingProfile, 'updatedAt'> = {
   licenseType: 'oupv_six_pack',
   licenseNumber: '',
   licenseImageUrl: '',
+  homeHarbor: '',
   boatRegistrationNumber: '',
   boatType: 'sailboat',
   boatName: '',
@@ -64,9 +67,11 @@ function CaptainSetupPage() {
   const [step, setStep] = useState<Step>('identity')
   const [draft, setDraft] = useState(emptyDraft)
   const [notice, setNotice] = useState('')
+  const [successModal, setSuccessModal] = useState('')
   const [saving, setSaving] = useState(false)
   const [uploading, setUploading] = useState(false)
   const [signingIn, setSigningIn] = useState(false)
+  const [harborFocused, setHarborFocused] = useState(false)
 
   const handleSignIn = async () => {
     if (!auth || !isFirebaseReady || !googleProvider) {
@@ -96,6 +101,7 @@ function CaptainSetupPage() {
     })
     return () => unsub()
   }, [])
+
 
   /* load existing captain profile */
   useEffect(() => {
@@ -138,7 +144,7 @@ function CaptainSetupPage() {
     try {
       const url = await uploadImageToStorage(`captain-credentials/${viewer.uid}`, file)
       patch({ licenseImageUrl: url })
-      setNotice('Credential image uploaded.')
+      setSuccessModal('Credential image uploaded.')
     } catch {
       setNotice('Upload failed. Please try again.')
     } finally {
@@ -152,10 +158,19 @@ function CaptainSetupPage() {
     draft.licenseNumber.trim().length >= 2 &&
     draft.licenseImageUrl.length > 0
   const boatValid =
+    draft.homeHarbor.trim().length > 0 &&
     draft.boatRegistrationNumber.trim().length >= 2 &&
     draft.boatType.length > 0
   const complianceValid = draft.backgroundCheckConsent && draft.liabilityWaiverAccepted
   const allValid = identityValid && credentialValid && boatValid && complianceValid
+
+  const harborSuggestions = useMemo(() => {
+    const keyword = draft.homeHarbor.trim().toLowerCase()
+    if (!harborFocused || keyword.length === 0) {
+      return []
+    }
+    return chicagoLocations.filter((loc) => loc.toLowerCase().includes(keyword))
+  }, [draft.homeHarbor, harborFocused])
 
   const saveAndContinue = async (nextStep: Step) => {
     if (!viewer) { setNotice('Please sign in first.'); return }
@@ -181,10 +196,12 @@ function CaptainSetupPage() {
       await upsertCaptainProfile({
         ...draft,
         uid: viewer.uid,
-        backgroundCheckStatus: 'pending',
+        backgroundCheckStatus: 'approved',
         completedAt: new Date().toISOString(),
       })
-      setNotice('Captain profile submitted! Your background check is now pending review.')
+      setSuccessModal('Captain profile submitted! You’re all set to publish trips.')
+      // After successful captain setup, send the user to the captain listing management page.
+      navigate('/', { state: { initialMode: 'host' } })
     } catch {
       setNotice('Submission failed. Please try again.')
     } finally {
@@ -202,11 +219,13 @@ function CaptainSetupPage() {
     return (
       <div className="setupPage">
         <header className="topBar">
-          <Link className="brand" to="/" state={{ initialMode: 'guest' }}>
-            <img className="brandLogo" src="/logo.png" alt="Land Ho logo" />
-            <span>Captain Setup</span>
-          </Link>
-          <button className="ghostBtn" onClick={() => navigate('/')}>Back to home</button>
+          <div className="topBarInner setupTopBarInner">
+            <div className="brand">
+              <img className="brandLogo" src="/logo.png" alt="Land Ho logo" />
+              <span>Captain Setup</span>
+            </div>
+            <button className="ghostBtn" onClick={() => navigate('/')}>Back to home</button>
+          </div>
         </header>
         <section className="setupCard">
           <h2>Sign in to get started</h2>
@@ -225,11 +244,13 @@ function CaptainSetupPage() {
   return (
     <div className="setupPage">
       <header className="topBar">
-        <Link className="brand" to="/" state={{ initialMode: 'guest' }}>
-          <img className="brandLogo" src="/logo.png" alt="Land Ho logo" />
-          <span>Captain Setup</span>
-        </Link>
-        <button className="ghostBtn" onClick={() => navigate('/')}>Back to home</button>
+        <div className="topBarInner setupTopBarInner">
+          <div className="brand">
+            <img className="brandLogo" src="/logo.png" alt="Land Ho logo" />
+            <span>Captain Setup</span>
+          </div>
+          <button className="ghostBtn" onClick={() => navigate('/')}>Back to home</button>
+        </div>
       </header>
 
       {/* step indicator */}
@@ -320,6 +341,37 @@ function CaptainSetupPage() {
         {step === 'boat' && (
           <>
             <h2>Boat Information</h2>
+            <div className="formRow">
+              <label>Home Harbor *</label>
+              <input
+                value={draft.homeHarbor}
+                onChange={(e) => patch({ homeHarbor: e.target.value })}
+                onFocus={() => setHarborFocused(true)}
+                onBlur={() => {
+                  // small delay so click can register
+                  setTimeout(() => setHarborFocused(false), 120)
+                }}
+                placeholder="e.g. Monroe Harbor"
+              />
+              {harborSuggestions.length > 0 && (
+                <div className="locationCandidates">
+                  {harborSuggestions.map((loc) => (
+                    <button
+                      key={loc}
+                      type="button"
+                      className="locationCandidateBtn"
+                      onMouseDown={(event) => event.preventDefault()}
+                      onClick={() => {
+                        patch({ homeHarbor: loc })
+                        setHarborFocused(false)
+                      }}
+                    >
+                      {loc}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
             <div className="formRow">
               <label>Boat Registration Number *</label>
               <input
@@ -450,6 +502,7 @@ function CaptainSetupPage() {
               <div className="reviewItem">
                 <span className="reviewLabel">Boat</span>
                 <span>
+                  Home harbor: {draft.homeHarbor || '—'} ·{' '}
                   {BOAT_TYPE_OPTIONS.find((o) => o.value === draft.boatType)?.label ?? draft.boatType}{' '}
                   — Reg# {draft.boatRegistrationNumber || '—'}
                   {draft.boatName ? ` — "${draft.boatName}"` : ''}
@@ -468,7 +521,7 @@ function CaptainSetupPage() {
 
             {draft.completedAt && (
               <p className="setupCompletedBadge">
-                ✅ Profile submitted on {new Date(draft.completedAt).toLocaleDateString()}
+                ✅ Profile approved — submitted on {new Date(draft.completedAt).toLocaleDateString()}
               </p>
             )}
 
@@ -487,6 +540,14 @@ function CaptainSetupPage() {
 
         {notice && <p className="setupNotice">{notice}</p>}
       </section>
+
+      {successModal && (
+        <FeedbackModal
+          title="Captain Setup"
+          message={successModal}
+          onClose={() => setSuccessModal('')}
+        />
+      )}
     </div>
   )
 }

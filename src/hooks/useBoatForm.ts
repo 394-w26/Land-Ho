@@ -5,9 +5,11 @@ import { type NavigateFunction } from 'react-router-dom'
 import {
   createBoatListing,
   deleteBoatListing,
+  incrementBoatSeatsTaken,
   updateBoatListing,
 } from '../features/boats/boatsApi'
 import {
+  subscribeHostRequests,
   subscribeHostRequestsByBoat,
   updateBookingRequestStatus,
   type BookingRequestRecord,
@@ -39,7 +41,6 @@ export function useBoatForm({ viewer, resumeCompleted, navigate, onNewListingPub
   const [form, setForm] = useState<BoatFormData>({
     title: '',
     location: '',
-    price: '699',
     seats: '4',
     captain: '',
     date: '',
@@ -49,6 +50,7 @@ export function useBoatForm({ viewer, resumeCompleted, navigate, onNewListingPub
   const [editingBoatId, setEditingBoatId] = useState('')
   const [deletingBoatId, setDeletingBoatId] = useState('')
   const [hostNotice, setHostNotice] = useState('')
+  const [hostSuccessModal, setHostSuccessModal] = useState('')
   const [boatImageUploading, setBoatImageUploading] = useState(false)
   const [draggingImageIndex, setDraggingImageIndex] = useState<number | null>(null)
 
@@ -66,8 +68,32 @@ export function useBoatForm({ viewer, resumeCompleted, navigate, onNewListingPub
   const [requestsLoading, setRequestsLoading] = useState(false)
   const [requestsError, setRequestsError] = useState('')
   const [requestActionId, setRequestActionId] = useState('')
+  const [allHostRequests, setAllHostRequests] = useState<BookingRequestRecord[]>([])
 
   const onNewListingRef = useRef(onNewListingPublished)
+
+  /** Per-boat counts for badge (pending) and seats (approved). */
+  const requestCountsByBoat = useMemo(() => {
+    const byBoat: Record<string, { pending: number; approved: number }> = {}
+    for (const r of allHostRequests) {
+      if (!byBoat[r.boatId]) byBoat[r.boatId] = { pending: 0, approved: 0 }
+      if (r.status === 'pending') byBoat[r.boatId].pending += 1
+      if (r.status === 'approved') byBoat[r.boatId].approved += 1
+    }
+    return byBoat
+  }, [allHostRequests])
+
+  useEffect(() => {
+    if (!viewer) {
+      setAllHostRequests([])
+      return
+    }
+    return subscribeHostRequests(
+      viewer.uid,
+      setAllHostRequests,
+      () => setAllHostRequests([]),
+    )
+  }, [viewer])
   onNewListingRef.current = onNewListingPublished
 
   const hostPickerCenter = useMemo(() => {
@@ -115,7 +141,7 @@ export function useBoatForm({ viewer, resumeCompleted, navigate, onNewListingPub
       return
     }
     if (!resumeCompleted) {
-      setHostNotice('Please complete your profile before publishing a boat.')
+      setHostNotice('Please complete the Captain Setup before publishing a boat.')
       return
     }
     const remainingSlots = maxBoatImages - form.images.length
@@ -215,7 +241,7 @@ export function useBoatForm({ viewer, resumeCompleted, navigate, onNewListingPub
       return
     }
     if (!resumeCompleted) {
-      setHostNotice('Please complete your profile before publishing a boat.')
+      setHostNotice('Please complete the Captain Setup before publishing a boat.')
       return
     }
     if (!form.title || !form.location || !form.captain) {
@@ -238,7 +264,6 @@ export function useBoatForm({ viewer, resumeCompleted, navigate, onNewListingPub
           title: form.title,
           location: form.location,
           coordinates: resolvedCoordinates,
-          price: Number(form.price) || 0,
           seats: Number(form.seats) || 1,
           captain: form.captain || viewer.displayName || 'Captain',
           date: form.date,
@@ -247,13 +272,12 @@ export function useBoatForm({ viewer, resumeCompleted, navigate, onNewListingPub
           images: form.images,
         })
         setEditingBoatId('')
-        setHostNotice('Listing updated successfully.')
+        setHostSuccessModal('Listing updated successfully.')
       } else {
         const nextBoatId = await createBoatListing({
           title: form.title,
           location: form.location,
           coordinates: resolvedCoordinates,
-          price: Number(form.price) || 0,
           seats: Number(form.seats) || 1,
           captain: form.captain || viewer.displayName || 'Captain',
           date: form.date,
@@ -261,14 +285,18 @@ export function useBoatForm({ viewer, resumeCompleted, navigate, onNewListingPub
           image: form.images[0],
           images: form.images,
           ownerUid: viewer.uid,
-          ownerName: viewer.displayName || viewer.email || 'Host',
+          ownerName: viewer.displayName || viewer.email || 'Captain',
         })
-        navigate(`/map?highlight=${nextBoatId}`)
+        navigate('/', {
+          state: {
+            openMap: true,
+            highlightBoatId: nextBoatId,
+          },
+        })
       }
       setForm({
         title: '',
         location: '',
-        price: '699',
         seats: '4',
         captain: form.captain || viewer.displayName || '',
         date: '',
@@ -280,7 +308,7 @@ export function useBoatForm({ viewer, resumeCompleted, navigate, onNewListingPub
       setSelectedCoordinates(null)
       setSelectedAddress('')
       if (!editingBoatId) {
-        setHostNotice('Published successfully.')
+        setHostSuccessModal('Published successfully!')
         onNewListingRef.current?.()
       }
     } catch {
@@ -297,7 +325,6 @@ export function useBoatForm({ viewer, resumeCompleted, navigate, onNewListingPub
     setForm({
       title: boat.title,
       location: boat.location,
-      price: String(boat.price),
       seats: String(boat.seats),
       captain: boat.captain,
       date: /^\d{4}-\d{2}-\d{2}$/.test(boat.date) ? boat.date : '',
@@ -324,7 +351,6 @@ export function useBoatForm({ viewer, resumeCompleted, navigate, onNewListingPub
     setForm({
       title: '',
       location: '',
-      price: '699',
       seats: '4',
       captain: viewer?.displayName || '',
       date: '',
@@ -368,7 +394,7 @@ export function useBoatForm({ viewer, resumeCompleted, navigate, onNewListingPub
     setHostNotice('Deleting listing...')
     try {
       await deleteBoatListing(boatId)
-      setHostNotice('Listing deleted.')
+      setHostSuccessModal('Listing deleted.')
     } catch {
       setHostNotice('Delete failed. Check Firestore permissions and retry.')
     } finally {
@@ -384,12 +410,22 @@ export function useBoatForm({ viewer, resumeCompleted, navigate, onNewListingPub
     setActiveRequestBoatId(boatId)
   }
 
-  const handleBookingDecision = async (requestId: string, status: 'approved' | 'rejected') => {
+  const handleBookingDecision = async (
+    requestId: string,
+    status: 'approved' | 'rejected',
+    opts: { boatId: string; previousStatus: BookingRequestRecord['status'] },
+  ) => {
+    const { boatId, previousStatus } = opts
     setRequestActionId(requestId)
     setHostNotice(status === 'approved' ? 'Approving request...' : 'Rejecting request...')
     try {
       await updateBookingRequestStatus(requestId, status)
-      setHostNotice(status === 'approved' ? 'Request approved.' : 'Request rejected.')
+      if (status === 'approved') {
+        await incrementBoatSeatsTaken(boatId, 1)
+      } else if (previousStatus === 'approved') {
+        await incrementBoatSeatsTaken(boatId, -1)
+      }
+      setHostSuccessModal(status === 'approved' ? 'Request approved.' : 'Request rejected.')
     } catch (error) {
       if (error instanceof Error && error.message) {
         setHostNotice(error.message)
@@ -417,6 +453,8 @@ export function useBoatForm({ viewer, resumeCompleted, navigate, onNewListingPub
     deletingBoatId,
     hostNotice,
     setHostNotice,
+    hostSuccessModal,
+    setHostSuccessModal,
     boatImageUploading,
     draggingImageIndex,
     setDraggingImageIndex,
@@ -444,6 +482,7 @@ export function useBoatForm({ viewer, resumeCompleted, navigate, onNewListingPub
     moveFormImage,
     removeBoat,
     toggleBoatRequests,
+    requestCountsByBoat,
     handleBookingDecision,
     openApplicantProfile,
     handleBoatImageUpload,
