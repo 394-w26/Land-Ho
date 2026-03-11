@@ -82,7 +82,7 @@ export default function GuestMarketplace({
   }, [searchText])
 
   return (
-    <div className="homePage">
+    <>
       <Header brandText="Land Ho">
         <button className="ghostBtn" onClick={onBecomeHost}>
           Publish a Sail
@@ -153,82 +153,83 @@ export default function GuestMarketplace({
           )}
         </MenuDropdown>
       </Header>
+      <div className="homePage">
+        <MarketplaceControls
+          searchText={searchText}
+          setSearchText={setSearchText}
+          seatFilter={seatFilter}
+          setSeatFilter={setSeatFilter}
+          cruiseLength={cruiseLength}
+          setCruiseLength={setCruiseLength}
+          cruiseType={cruiseType}
+          setCruiseType={setCruiseType}
+          harborFilter={harborFilter}
+          setHarborFilter={setHarborFilter}
+          boatSizeSort={boatSizeSort}
+          setBoatSizeSort={setBoatSizeSort}
+          suggestions={locationSuggestions.map((loc) => ({ id: loc, label: loc }))}
+        />
 
-      <MarketplaceControls
-        searchText={searchText}
-        setSearchText={setSearchText}
-        seatFilter={seatFilter}
-        setSeatFilter={setSeatFilter}
-        cruiseLength={cruiseLength}
-        setCruiseLength={setCruiseLength}
-        cruiseType={cruiseType}
-        setCruiseType={setCruiseType}
-        harborFilter={harborFilter}
-        setHarborFilter={setHarborFilter}
-        boatSizeSort={boatSizeSort}
-        setBoatSizeSort={setBoatSizeSort}
-        suggestions={locationSuggestions.map((loc) => ({ id: loc, label: loc }))}
-      />
+        <section className="listHeader">
+          <h2>Explore Popular Boats</h2>
+          <p>{boatsLoading ? 'Loading trips...' : `${filteredBoats.length} trips available`}</p>
+        </section>
+        {boatsError && <p className="authNotice">{boatsError}</p>}
 
-      <section className="listHeader">
-        <h2>Explore Popular Boats</h2>
-        <p>{boatsLoading ? 'Loading trips...' : `${filteredBoats.length} trips available`}</p>
-      </section>
-      {boatsError && <p className="authNotice">{boatsError}</p>}
-
-      <section className="boatGrid">
-        {boatsLoading ? (
-          <article className="boatCard">
-            <div className="cardBody">
-              <p className="muted">Loading boats from cloud...</p>
-            </div>
-          </article>
-        ) : (
-          filteredBoats.map((boat) => (
-            <article
-              className="boatCard clickableCard"
-              key={boat.id}
-              onClick={() => navigate(`/boats/${boat.id}`)}
-            >
-              <div className="cardImageWrap">
-                <img src={boat.image} alt={boat.title} className="cardImage" />
-              </div>
+        <section className="boatGrid">
+          {boatsLoading ? (
+            <article className="boatCard">
               <div className="cardBody">
-                <div className="cardRow">
-                  <h3>{boat.title}</h3>
-                  <span>★ {boat.rating.toFixed(2)}</span>
-                </div>
-                <p>{boat.location}</p>
-                <p>
-                  Captain {boat.captain} · {formatTripDate(boat.date)} · {boat.seats} seats
-                </p>
+                <p className="muted">Loading boats from cloud...</p>
               </div>
             </article>
-          ))
-        )}
-      </section>
+          ) : (
+            filteredBoats.map((boat) => (
+              <article
+                className="boatCard clickableCard"
+                key={boat.id}
+                onClick={() => navigate(`/boats/${boat.id}`)}
+              >
+                <div className="cardImageWrap">
+                  <img src={boat.image} alt={boat.title} className="cardImage" />
+                </div>
+                <div className="cardBody">
+                  <div className="cardRow">
+                    <h3>{boat.title}</h3>
+                    <span>★ {boat.rating.toFixed(2)}</span>
+                  </div>
+                  <p>{boat.location}</p>
+                  <p>
+                    Captain {boat.captain} · {formatTripDate(boat.date)} · {boat.seats} seats
+                  </p>
+                </div>
+              </article>
+            ))
+          )}
+        </section>
 
-      {!boatsLoading && filteredBoats.length === 0 && (
-        <div className="emptyState">
-          <p>No boats match your filters. Try resetting them.</p>
-          <button
-            onClick={() => {
-              setSearchText('')
-              setSeatFilter('')
-              setCruiseLength('all')
-              setCruiseType('all')
-              setHarborFilter('')
-              setBoatSizeSort('none')
-            }}
-          >
-            Reset Filters
-          </button>
-        </div>
-      )}
-      <footer className="footerText">
-        Browsing UI first, then connect your live listing and booking data.
-      </footer>
-      {authError && <p className="authNotice">{authError}</p>}
-    </div>
+        {!boatsLoading && filteredBoats.length === 0 && (
+          <div className="emptyState">
+            <p>No boats match your filters. Try resetting them.</p>
+            <button
+              onClick={() => {
+                setSearchText('')
+                setSeatFilter('')
+                setCruiseLength('all')
+                setCruiseType('all')
+                setHarborFilter('')
+                setBoatSizeSort('none')
+              }}
+            >
+              Reset Filters
+            </button>
+          </div>
+        )}
+        <footer className="footerText">
+          Browsing UI first, then connect your live listing and booking data.
+        </footer>
+        {authError && <p className="authNotice">{authError}</p>}
+      </div>
+    </>
   )
 }

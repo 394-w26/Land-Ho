@@ -112,17 +112,7 @@
   }
 }
 
-.detailPage > .topBar {
-  margin: 0 -16px;
-  padding: 14px 16px;
-}
-
-@media (min-width: 768px) {
-  .detailPage > .topBar {
-    margin: 0 -24px;
-    padding: 14px 24px;
-  }
-}
+/* Detail page uses same full-bleed topBar as home; no override needed */
 
 /* Setup page: header content aligned with steps + card (same max-width 760px) */
 .setupTopBarInner {

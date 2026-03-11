@@ -1,11 +1,11 @@
 import { useEffect, useMemo, useState } from 'react'
-import { onAuthStateChanged, type User } from 'firebase/auth'
 import { useNavigate, useParams } from 'react-router-dom'
 import { getBoatListingById, type BoatRecord } from '../features/boats/boatsApi'
 import { getUserPublicProfile, type UserPublicProfile } from '../features/users/usersApi'
 import { createBookingRequest, hasPendingBookingRequest } from '../features/booking/bookingApi'
 import { getOrCreateConversation } from '../features/chat/chatApi'
-import { auth, isFirebaseReady } from '../lib/firebase'
+import { useAuth } from '../hooks/useAuth'
+import { Header, UserButton, MenuDropdown } from '../components/Header'
 import FeedbackModal from '../components/FeedbackModal'
 
 const mapboxToken = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN as string | undefined
@@ -28,7 +28,7 @@ const formatTripDate = (value: string): string => {
 function BoatDetailPage() {
   const { boatId = '' } = useParams()
   const navigate = useNavigate()
-  const [viewer, setViewer] = useState<User | null>(null)
+  const { viewer, authLoading, authError, loginWithGoogle, signOutUser, userInitial } = useAuth()
   const [loading, setLoading] = useState(true)
   const [boatError, setBoatError] = useState('')
   const [hostError, setHostError] = useState('')
@@ -39,16 +39,7 @@ function BoatDetailPage() {
   const [reserveSuccessModal, setReserveSuccessModal] = useState('')
   const [showProfileModal, setShowProfileModal] = useState(false)
   const [messagingHost, setMessagingHost] = useState(false)
-
-  useEffect(() => {
-    if (!auth || !isFirebaseReady) {
-      return
-    }
-    const unsubscribe = onAuthStateChanged(auth, (nextUser) => {
-      setViewer(nextUser)
-    })
-    return () => unsubscribe()
-  }, [auth, isFirebaseReady])
+  const [menuOpen, setMenuOpen] = useState(false)
 
   useEffect(() => {
     if (!boatId) {
@@ -213,47 +204,154 @@ function BoatDetailPage() {
     }
   }
 
+  const handleBecomeHost = async () => {
+    if (!viewer) {
+      const success = await loginWithGoogle()
+      if (!success) return
+    }
+    navigate('/', { state: { initialMode: 'host' } })
+  }
+
+  const handleOpenProfile = async () => {
+    if (!viewer) {
+      const success = await loginWithGoogle()
+      if (!success) return
+    }
+    navigate('/', { state: { openProfile: true } })
+  }
+
+  const handleSignOut = async () => {
+    await signOutUser()
+    setMenuOpen(false)
+  }
+
+  const handleNavigateCaptainSetup = () => {
+    setMenuOpen(false)
+    navigate('/setup/captain')
+  }
+
+  const handleNavigateSailorSetup = () => {
+    setMenuOpen(false)
+    navigate('/setup/sailor')
+  }
+
+  const handleNavigateInstructorRequest = () => {
+    setMenuOpen(false)
+    navigate('/request-instructor')
+  }
+
+  const handleNavigateMap = () => {
+    setMenuOpen(false)
+    navigate('/', {
+      state: {
+        openMap: true,
+        highlightBoatId: boat?.id ?? '',
+      },
+    })
+  }
+
+  const handleNavigateChat = () => {
+    setMenuOpen(false)
+    navigate('/chat')
+  }
+
+  const header = (
+    <Header brandText="Land Ho">
+      <button className="ghostBtn" onClick={() => void handleBecomeHost()}>
+        Publish a Sail
+      </button>
+      <UserButton
+        viewer={viewer}
+        authLoading={authLoading}
+        resolvedAvatarUrl={''}
+        userInitial={userInitial}
+        onClick={() => void handleOpenProfile()}
+      />
+      <MenuDropdown menuOpen={menuOpen} setMenuOpen={setMenuOpen}>
+        <button
+          className="menuItem"
+          onClick={() => {
+            setMenuOpen(false)
+            void handleBecomeHost()
+          }}
+        >
+          Sign up as a captain
+        </button>
+        <button className="menuItem" onClick={handleNavigateCaptainSetup}>
+          Captain Setup
+        </button>
+        <button className="menuItem" onClick={handleNavigateSailorSetup}>
+          Sailor Setup
+        </button>
+        <button className="menuItem" onClick={handleNavigateInstructorRequest}>
+          🎓 Request Instructor
+        </button>
+        {viewer && (
+          <button className="menuItem" onClick={handleNavigateChat}>
+            💬 Messages
+          </button>
+        )}
+        <button className="menuItem" onClick={handleNavigateMap}>
+          Map view
+        </button>
+        {viewer ? (
+          <button className="menuItem dangerText" onClick={() => void handleSignOut()}>
+            Sign out
+          </button>
+        ) : (
+          <button
+            className="menuItem"
+            onClick={() => {
+              setMenuOpen(false)
+              void loginWithGoogle()
+            }}
+          >
+            Sign in
+          </button>
+        )}
+      </MenuDropdown>
+    </Header>
+  )
+
   if (loading) {
     return (
-      <div className="detailPage">
-        <p className="muted">Loading boat details...</p>
-      </div>
+      <>
+        {header}
+        <div className="detailPage">
+          <p className="muted">Loading boat details...</p>
+        </div>
+      </>
     )
   }
 
   if (!boat) {
     return (
-      <div className="detailPage">
-        <button className="ghostBtn" onClick={() => navigate('/')}>
-          Back to home
-        </button>
-        <p className="authNotice">{boatError || 'Boat not found.'}</p>
-      </div>
+      <>
+        {header}
+        <div className="detailPage">
+          <button className="ghostBtn" onClick={() => navigate('/')}>
+            Back to home
+          </button>
+          <p className="authNotice">{boatError || 'Boat not found.'}</p>
+        </div>
+      </>
     )
   }
 
   const hasHostProfileLink = Boolean(boat.ownerUid)
 
   return (
-    <div className="detailPage">
-      <header className="topBar">
-        <div className="brand">
-          <img className="brandLogo" src="/logo.png" alt="Land Ho logo" />
-          <span>Land Ho</span>
-        </div>
-        <button className="ghostBtn" onClick={() => navigate('/')}>
-          Back to listings
-        </button>
-      </header>
-
-      <section className="detailHeader">
+    <>
+      {header}
+      <div className="detailPage">
+        <section className="detailHeader">
         <h1>{boat.title}</h1>
         <p>
           {boat.location} · {formatTripDate(boat.date)} · {boat.seats} seats
         </p>
       </section>
 
-      <section className="detailGallery">
+        <section className="detailGallery">
         {galleryImages.length === 0 ? (
           <div className="detailGalleryEmpty">No photos uploaded.</div>
         ) : (
@@ -266,9 +364,9 @@ function BoatDetailPage() {
             </div>
           </>
         )}
-      </section>
+        </section>
 
-      <section className="detailInfoGrid">
+        <section className="detailInfoGrid">
         <article className="detailInfoCard">
           <h2>Trip information</h2>
           <p>Category: {boat.category}</p>
@@ -347,7 +445,7 @@ function BoatDetailPage() {
         </article>
       </section>
 
-      <section className="detailMapSection">
+        <section className="detailMapSection">
         <article className="detailInfoCard detailMapCard">
           <div className="detailMapHeader">
             <h2>Location on map</h2>
@@ -397,15 +495,15 @@ function BoatDetailPage() {
             </div>
           )}
         </article>
-      </section>
+        </section>
 
-      <div className="detailStickyBar">
-        <button className="publishBtn detailStickyReserve" onClick={() => void handleReserve()} disabled={reserveSubmitting}>
-          {reserveSubmitting ? 'Submitting...' : 'Reserve'}
-        </button>
-      </div>
+        <div className="detailStickyBar">
+          <button className="publishBtn detailStickyReserve" onClick={() => void handleReserve()} disabled={reserveSubmitting}>
+            {reserveSubmitting ? 'Submitting...' : 'Reserve'}
+          </button>
+        </div>
 
-      {showProfileModal && (
+        {showProfileModal && (
         <div className="modalOverlay" onClick={() => setShowProfileModal(false)}>
           <div className="modalCard" onClick={(e) => e.stopPropagation()}>
             <h3>Complete your profile</h3>
@@ -427,16 +525,17 @@ function BoatDetailPage() {
             </div>
           </div>
         </div>
-      )}
+        )}
 
-      {reserveSuccessModal && (
+        {reserveSuccessModal && (
         <FeedbackModal
           title="Request Sent"
           message={reserveSuccessModal}
           onClose={() => setReserveSuccessModal('')}
         />
-      )}
-    </div>
+        )}
+      </div>
+    </>
   )
 }
 
