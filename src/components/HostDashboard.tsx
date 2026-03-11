@@ -200,7 +200,7 @@ export default function HostDashboard({
 
       <section className="ownerFormGrid">
         <div className="ownerCard">
-          <h3>Your Published Boats</h3>
+          <h3>Your Published Sails</h3>
           {boatsLoading && <p className="muted">Loading your boats...</p>}
           {boatsError && <p className="hostNotice">{boatsError}</p>}
           {!boatsLoading && hostBoats.length === 0 && (
