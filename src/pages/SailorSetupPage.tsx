@@ -1,6 +1,6 @@
 import { useEffect, useState, type ChangeEvent } from 'react'
 import { onAuthStateChanged, signInWithPopup, type User } from 'firebase/auth'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { auth, googleProvider, isFirebaseReady } from '../lib/firebase'
 import { uploadImageToStorage } from '../lib/storage'
 import {
@@ -42,6 +42,8 @@ const emptyDraft: Omit<SailorOnboardingProfile, 'updatedAt'> = {
 
 function SailorSetupPage() {
   const navigate = useNavigate()
+  const location = useLocation()
+  const returnTo = (location.state as { returnTo?: string } | null)?.returnTo ?? '/'
   const [viewer, setViewer] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
   const [step, setStep] = useState<Step>('identity')
@@ -569,7 +571,10 @@ function SailorSetupPage() {
         <FeedbackModal
           title="Sailor Setup"
           message={successModal}
-          onClose={() => setSuccessModal('')}
+          onClose={() => {
+            setSuccessModal('')
+            navigate(returnTo, { replace: true })
+          }}
         />
       )}
     </div>

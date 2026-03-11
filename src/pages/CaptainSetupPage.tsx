@@ -200,6 +200,8 @@ function CaptainSetupPage() {
         completedAt: new Date().toISOString(),
       })
       setSuccessModal('Captain profile submitted! You’re all set to publish trips.')
+      // After successful captain setup, send the user to the captain listing management page.
+      navigate('/', { state: { initialMode: 'host' } })
     } catch {
       setNotice('Submission failed. Please try again.')
     } finally {

@@ -176,8 +176,6 @@ function MarketplacePage() {
         onOpenProfile={() => void openProfileEditor()}
         onSignOut={() => void handleSignOut()}
         onLoginWithGoogle={() => void loginWithGoogle()}
-        onNavigateCaptainSetup={() => navigate('/setup/captain')}
-        onNavigateSailorSetup={() => navigate('/setup/sailor')}
         onNavigateInstructorRequest={() => navigate('/request-instructor')}
         onNavigateChat={() => navigate('/chat')}
         form={boatForm.form}
@@ -207,6 +205,7 @@ function MarketplacePage() {
         requestsLoading={boatForm.requestsLoading}
         requestsError={boatForm.requestsError}
         requestActionId={boatForm.requestActionId}
+        requestCountsByBoat={boatForm.requestCountsByBoat}
         hostBoats={hostBoats}
         boatsLoading={boatsLoading}
         boatsError={boatsError}
@@ -281,8 +280,6 @@ function MarketplacePage() {
         onOpenProfile={() => void openProfileEditor()}
         onSignOut={() => void handleSignOut()}
         onLoginWithGoogle={() => void loginWithGoogle()}
-        onNavigateCaptainSetup={() => navigate('/setup/captain')}
-        onNavigateSailorSetup={() => navigate('/setup/sailor')}
         onNavigateInstructorRequest={() => navigate('/request-instructor')}
         onNavigateChat={() => navigate('/chat')}
         onNavigateMap={() => setAppView('map')}

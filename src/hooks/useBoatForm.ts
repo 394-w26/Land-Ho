@@ -5,9 +5,11 @@ import { type NavigateFunction } from 'react-router-dom'
 import {
   createBoatListing,
   deleteBoatListing,
+  incrementBoatSeatsTaken,
   updateBoatListing,
 } from '../features/boats/boatsApi'
 import {
+  subscribeHostRequests,
   subscribeHostRequestsByBoat,
   updateBookingRequestStatus,
   type BookingRequestRecord,
@@ -66,8 +68,32 @@ export function useBoatForm({ viewer, resumeCompleted, navigate, onNewListingPub
   const [requestsLoading, setRequestsLoading] = useState(false)
   const [requestsError, setRequestsError] = useState('')
   const [requestActionId, setRequestActionId] = useState('')
+  const [allHostRequests, setAllHostRequests] = useState<BookingRequestRecord[]>([])
 
   const onNewListingRef = useRef(onNewListingPublished)
+
+  /** Per-boat counts for badge (pending) and seats (approved). */
+  const requestCountsByBoat = useMemo(() => {
+    const byBoat: Record<string, { pending: number; approved: number }> = {}
+    for (const r of allHostRequests) {
+      if (!byBoat[r.boatId]) byBoat[r.boatId] = { pending: 0, approved: 0 }
+      if (r.status === 'pending') byBoat[r.boatId].pending += 1
+      if (r.status === 'approved') byBoat[r.boatId].approved += 1
+    }
+    return byBoat
+  }, [allHostRequests])
+
+  useEffect(() => {
+    if (!viewer) {
+      setAllHostRequests([])
+      return
+    }
+    return subscribeHostRequests(
+      viewer.uid,
+      setAllHostRequests,
+      () => setAllHostRequests([]),
+    )
+  }, [viewer])
   onNewListingRef.current = onNewListingPublished
 
   const hostPickerCenter = useMemo(() => {
@@ -384,11 +410,21 @@ export function useBoatForm({ viewer, resumeCompleted, navigate, onNewListingPub
     setActiveRequestBoatId(boatId)
   }
 
-  const handleBookingDecision = async (requestId: string, status: 'approved' | 'rejected') => {
+  const handleBookingDecision = async (
+    requestId: string,
+    status: 'approved' | 'rejected',
+    opts: { boatId: string; previousStatus: BookingRequestRecord['status'] },
+  ) => {
+    const { boatId, previousStatus } = opts
     setRequestActionId(requestId)
     setHostNotice(status === 'approved' ? 'Approving request...' : 'Rejecting request...')
     try {
       await updateBookingRequestStatus(requestId, status)
+      if (status === 'approved') {
+        await incrementBoatSeatsTaken(boatId, 1)
+      } else if (previousStatus === 'approved') {
+        await incrementBoatSeatsTaken(boatId, -1)
+      }
       setHostSuccessModal(status === 'approved' ? 'Request approved.' : 'Request rejected.')
     } catch (error) {
       if (error instanceof Error && error.message) {
@@ -446,6 +482,7 @@ export function useBoatForm({ viewer, resumeCompleted, navigate, onNewListingPub
     moveFormImage,
     removeBoat,
     toggleBoatRequests,
+    requestCountsByBoat,
     handleBookingDecision,
     openApplicantProfile,
     handleBoatImageUpload,

@@ -21,8 +21,6 @@ interface HostDashboardProps {
   onOpenProfile: () => void
   onSignOut: () => void
   onLoginWithGoogle: () => void
-  onNavigateCaptainSetup: () => void
-  onNavigateSailorSetup: () => void
   onNavigateInstructorRequest: () => void
   onNavigateChat: () => void
   form: BoatFormData
@@ -52,6 +50,7 @@ interface HostDashboardProps {
   requestsLoading: boolean
   requestsError: string
   requestActionId: string
+  requestCountsByBoat: Record<string, { pending: number; approved: number }>
   hostBoats: BoatCard[]
   boatsLoading: boolean
   boatsError: string
@@ -62,7 +61,11 @@ interface HostDashboardProps {
   moveFormImage: (fromIndex: number, toIndex: number) => void
   removeBoat: (boatId: string) => Promise<void>
   toggleBoatRequests: (boatId: string) => void
-  handleBookingDecision: (requestId: string, status: 'approved' | 'rejected') => Promise<void>
+  handleBookingDecision: (
+    requestId: string,
+    status: 'approved' | 'rejected',
+    opts: { boatId: string; previousStatus: BookingRequestRecord['status'] },
+  ) => Promise<void>
   openApplicantProfile: (request: BookingRequestRecord) => void
   handleBoatImageUpload: (event: ChangeEvent<HTMLInputElement>) => Promise<void>
   applySelectedLocation: (next: LocationSuggestion) => void
@@ -81,8 +84,6 @@ export default function HostDashboard({
   onOpenProfile,
   onSignOut,
   onLoginWithGoogle,
-  onNavigateCaptainSetup,
-  onNavigateSailorSetup,
   onNavigateInstructorRequest,
   onNavigateChat,
   form,
@@ -106,6 +107,7 @@ export default function HostDashboard({
   requestsLoading,
   requestsError,
   requestActionId,
+  requestCountsByBoat,
   hostBoats,
   boatsLoading,
   boatsError,
@@ -161,18 +163,6 @@ export default function HostDashboard({
           </button>
           <button
             className="menuItem"
-            onClick={() => { setMenuOpen(false); onNavigateCaptainSetup() }}
-          >
-            Captain Setup
-          </button>
-          <button
-            className="menuItem"
-            onClick={() => { setMenuOpen(false); onNavigateSailorSetup() }}
-          >
-            Sailor Setup
-          </button>
-          <button
-            className="menuItem"
             onClick={() => { setMenuOpen(false); onNavigateInstructorRequest() }}
           >
             🎓 Request Instructor
@@ -209,6 +199,111 @@ export default function HostDashboard({
       </section>
 
       <section className="ownerFormGrid">
+        <div className="ownerCard">
+          <h3>Your Published Boats</h3>
+          {boatsLoading && <p className="muted">Loading your boats...</p>}
+          {boatsError && <p className="hostNotice">{boatsError}</p>}
+          {!boatsLoading && hostBoats.length === 0 && (
+            <p className="muted ownerEmptyState">No listings yet. Publish your first trip now.</p>
+          )}
+          <div className="ownerList">
+            {hostBoats.map((boat) => {
+              const counts = requestCountsByBoat[boat.id]
+              const pendingCount = counts?.pending ?? 0
+              const approvedCount = counts?.approved ?? boat.seatsTaken ?? 0
+              const seatsLeft = Math.max(0, boat.seats - approvedCount)
+              return (
+              <div key={boat.id} className="ownerListItem">
+                <div className="ownerListItemImgWrap">
+                  <img src={boat.image} alt={boat.title} />
+                  {pendingCount > 0 && (
+                    <span className="ownerRequestBadge" aria-label={`${pendingCount} pending request(s)`}>
+                      {pendingCount}
+                    </span>
+                  )}
+                </div>
+                <div>
+                  <strong>{boat.title}</strong>
+                  <p>
+                    {boat.location} · {formatTripDate(boat.date)} · {boat.seats} seats
+                    {approvedCount > 0 && (
+                      <span className="seatsLeft"> · {seatsLeft} left</span>
+                    )}
+                  </p>
+                  <button className="ghostBtn compactActionBtn" onClick={() => startEditBoat(boat)}>
+                    Edit
+                  </button>
+                  <button className="ghostBtn compactActionBtn" onClick={() => toggleBoatRequests(boat.id)}>
+                    {activeRequestBoatId === boat.id ? 'Hide Requests' : 'View Requests'}
+                    {pendingCount > 0 && ` (${pendingCount})`}
+                  </button>
+                  <button
+                    className="dangerBtn compactDangerBtn"
+                    onClick={() => void removeBoat(boat.id)}
+                    disabled={deletingBoatId === boat.id}
+                  >
+                    {deletingBoatId === boat.id ? 'Deleting...' : 'Delete'}
+                  </button>
+                  {activeRequestBoatId === boat.id && (
+                    <div className="requestPanel">
+                      {requestsLoading && <p className="muted">Loading requests...</p>}
+                      {requestsError && <p className="authNotice requestError">{requestsError}</p>}
+                      {!requestsLoading && !requestsError && activeBoatRequests.length === 0 && (
+                        <p className="muted">No requests yet.</p>
+                      )}
+                      {!requestsLoading &&
+                        !requestsError &&
+                        activeBoatRequests.map((request) => (
+                          <div key={request.id} className="requestItem">
+                            <button
+                              className="requestUserLink"
+                              type="button"
+                              onClick={() => openApplicantProfile(request)}
+                              title="View applicant resume"
+                            >
+                              {request.applicantAvatar ? (
+                                <img src={request.applicantAvatar} alt={request.applicantName} />
+                              ) : (
+                                <div className="requestAvatarFallback">
+                                  {(request.applicantName || 'G').charAt(0).toUpperCase()}
+                                </div>
+                              )}
+                              <div className="requestMain">
+                                <strong>{request.applicantName || 'Sailor'}</strong>
+                                <p>{formatDateTime(request.createdAt)}</p>
+                                <span className={`requestStatus status-${request.status}`}>
+                                  {request.status}
+                                </span>
+                              </div>
+                            </button>
+                            {(request.status === 'pending' || request.status === 'approved') && (
+                              <div className="requestActions">
+                                <button
+                                  type="button"
+                                  className={request.status === 'approved' ? 'requestToggleBtn requestToggleOn' : 'requestToggleBtn requestToggleOff'}
+                                  onClick={() =>
+                                    void handleBookingDecision(
+                                      request.id,
+                                      request.status === 'approved' ? 'rejected' : 'approved',
+                                      { boatId: request.boatId, previousStatus: request.status },
+                                    )
+                                  }
+                                  disabled={requestActionId === request.id}
+                                >
+                                  {request.status === 'approved' ? 'Approved ✓' : 'Approve'}
+                                </button>
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            )})}
+          </div>
+        </div>
+
         <div className="ownerCard">
           <h3>Boat and Trip Information</h3>
 
@@ -368,95 +463,6 @@ export default function HostDashboard({
               </button>
             )}
             {hostNotice && <p className="hostNotice">{hostNotice}</p>}
-          </div>
-        </div>
-
-        <div className="ownerCard">
-          <h3>Your Published Boats</h3>
-          {boatsLoading && <p className="muted">Loading your boats...</p>}
-          {boatsError && <p className="hostNotice">{boatsError}</p>}
-          {!boatsLoading && hostBoats.length === 0 && (
-            <p className="muted ownerEmptyState">No listings yet. Publish your first trip now.</p>
-          )}
-          <div className="ownerList">
-            {hostBoats.map((boat) => (
-              <div key={boat.id} className="ownerListItem">
-                <img src={boat.image} alt={boat.title} />
-                <div>
-                  <strong>{boat.title}</strong>
-                  <p>
-                    {boat.location} · {formatTripDate(boat.date)} · {boat.seats} seats
-                  </p>
-                  <button className="ghostBtn compactActionBtn" onClick={() => startEditBoat(boat)}>
-                    Edit
-                  </button>
-                  <button className="ghostBtn compactActionBtn" onClick={() => toggleBoatRequests(boat.id)}>
-                    {activeRequestBoatId === boat.id ? 'Hide Requests' : 'View Requests'}
-                  </button>
-                  <button
-                    className="dangerBtn compactDangerBtn"
-                    onClick={() => void removeBoat(boat.id)}
-                    disabled={deletingBoatId === boat.id}
-                  >
-                    {deletingBoatId === boat.id ? 'Deleting...' : 'Delete'}
-                  </button>
-                  {activeRequestBoatId === boat.id && (
-                    <div className="requestPanel">
-                      {requestsLoading && <p className="muted">Loading requests...</p>}
-                      {requestsError && <p className="authNotice requestError">{requestsError}</p>}
-                      {!requestsLoading && !requestsError && activeBoatRequests.length === 0 && (
-                        <p className="muted">No requests yet.</p>
-                      )}
-                      {!requestsLoading &&
-                        !requestsError &&
-                        activeBoatRequests.map((request) => (
-                          <div key={request.id} className="requestItem">
-                            <button
-                              className="requestUserLink"
-                              type="button"
-                              onClick={() => openApplicantProfile(request)}
-                              title="View applicant resume"
-                            >
-                              {request.applicantAvatar ? (
-                                <img src={request.applicantAvatar} alt={request.applicantName} />
-                              ) : (
-                                <div className="requestAvatarFallback">
-                                  {(request.applicantName || 'G').charAt(0).toUpperCase()}
-                                </div>
-                              )}
-                              <div className="requestMain">
-                                <strong>{request.applicantName || 'Sailor'}</strong>
-                                <p>{formatDateTime(request.createdAt)}</p>
-                                <span className={`requestStatus status-${request.status}`}>
-                                  {request.status}
-                                </span>
-                              </div>
-                            </button>
-                            {request.status === 'pending' && (
-                              <div className="requestActions">
-                                <button
-                                  className="ghostBtn compactActionBtn"
-                                  onClick={() => void handleBookingDecision(request.id, 'approved')}
-                                  disabled={requestActionId === request.id}
-                                >
-                                  Approve
-                                </button>
-                                <button
-                                  className="dangerBtn compactDangerBtn"
-                                  onClick={() => void handleBookingDecision(request.id, 'rejected')}
-                                  disabled={requestActionId === request.id}
-                                >
-                                  Reject
-                                </button>
-                              </div>
-                            )}
-                          </div>
-                        ))}
-                    </div>
-                  )}
-                </div>
-              </div>
-            ))}
           </div>
         </div>
       </section>

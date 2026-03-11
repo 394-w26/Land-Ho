@@ -16,6 +16,8 @@ export interface BoatCard {
   coordinates: BoatCoordinates | null
   rating: number
   seats: number
+  /** Filled by approved bookings; remaining = seats - (seatsTaken ?? 0) */
+  seatsTaken?: number
   captain: string
   date: string
   category: Exclude<BoatCategory, 'all'>

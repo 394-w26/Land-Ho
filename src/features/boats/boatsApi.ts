@@ -4,6 +4,7 @@ import {
   deleteDoc,
   doc,
   getDoc,
+  increment,
   onSnapshot,
   orderBy,
   query,
@@ -41,6 +42,8 @@ export interface BoatRecord {
   images: string[]
   ownerUid: string
   ownerName: string
+  /** Number of seats filled by approved bookings (managed by booking flow). */
+  seatsTaken?: number
   durationCategory?: CruiseLength
   cruiseType?: CruiseType
 }
@@ -79,6 +82,7 @@ const mapBoatDoc = (doc: QueryDocumentSnapshot): BoatRecord => {
   const coverImage = String(data.image ?? images[0] ?? '')
   const durationCategory = data.durationCategory as BoatRecord['durationCategory']
   const cruiseType = data.cruiseType as BoatRecord['cruiseType']
+  const seatsTaken = Number(data.seatsTaken ?? 0)
   return {
     id: doc.id,
     title: String(data.title ?? ''),
@@ -93,9 +97,22 @@ const mapBoatDoc = (doc: QueryDocumentSnapshot): BoatRecord => {
     images,
     ownerUid: String(data.ownerUid ?? ''),
     ownerName: String(data.ownerName ?? ''),
+    ...(Number.isFinite(seatsTaken) && seatsTaken > 0 ? { seatsTaken } : {}),
     ...(durationCategory && { durationCategory }),
     ...(cruiseType && { cruiseType }),
   }
+}
+
+/** Increment or decrement seatsTaken for a boat (e.g. when approving/rejecting a booking). */
+export const incrementBoatSeatsTaken = async (
+  boatId: string,
+  delta: 1 | -1,
+): Promise<void> => {
+  if (!db) throw new Error('db-not-configured')
+  await updateDoc(doc(db, 'boats', boatId), {
+    seatsTaken: increment(delta),
+    updatedAt: serverTimestamp(),
+  })
 }
 
 export const subscribePublishedBoats = (

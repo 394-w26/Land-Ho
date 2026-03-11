@@ -5,7 +5,9 @@ import { getUserPublicProfile, type UserPublicProfile } from '../features/users/
 import { createBookingRequest, hasPendingBookingRequest } from '../features/booking/bookingApi'
 import { getOrCreateConversation } from '../features/chat/chatApi'
 import { useAuth } from '../hooks/useAuth'
+import { getCaptainProfile } from '../features/onboarding/onboardingApi'
 import { Header, UserButton, MenuDropdown } from '../components/Header'
+import { ApprovedRequestsDropdown } from '../components/ApprovedRequestsDropdown'
 import FeedbackModal from '../components/FeedbackModal'
 
 const mapboxToken = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN as string | undefined
@@ -133,13 +135,41 @@ function BoatDetailPage() {
       }
 
       const applicantProfile = await getUserPublicProfile(viewer.uid)
+
+      /* Debug: see exactly what the reserve check sees after you update your profile */
+      const displayName = applicantProfile?.displayName ?? ''
+      const city = applicantProfile?.city ?? ''
+      const bio = applicantProfile?.bio ?? ''
+      const skills = applicantProfile?.skills ?? []
+      const experiences = applicantProfile?.experiences ?? []
+      const okDisplayName = displayName.trim().length >= 2
+      const okCity = city.trim().length > 0
+      const okBio = bio.trim().length >= 30
+      const okSkills = skills.length >= 2
+      const okExperiences = experiences.length >= 1
+      console.log('[Reserve] applicantProfile from API:', applicantProfile)
+      console.log('[Reserve] checks:', {
+        displayName: `"${displayName}"`,
+        okDisplayName,
+        city: `"${city}"`,
+        okCity,
+        bioLength: bio.trim().length,
+        okBio,
+        skillsCount: skills.length,
+        okSkills,
+        experiencesCount: experiences.length,
+        okExperiences,
+      })
+
       const profileReady =
         applicantProfile &&
-        applicantProfile.displayName.trim().length >= 2 &&
-        applicantProfile.city.trim().length > 0 &&
-        applicantProfile.bio.trim().length >= 30 &&
-        applicantProfile.skills.length >= 2 &&
-        applicantProfile.experiences.length >= 1
+        okDisplayName &&
+        okCity &&
+        okBio &&
+        okSkills &&
+        okExperiences
+
+      console.log('[Reserve] profileReady:', profileReady)
 
       if (!profileReady) {
         setShowProfileModal(true)
@@ -205,11 +235,28 @@ function BoatDetailPage() {
   }
 
   const handleBecomeHost = async () => {
+    // If not signed in, sign in first and send to captain setup.
     if (!viewer) {
       const success = await loginWithGoogle()
       if (!success) return
+      navigate('/setup/captain')
+      return
     }
-    navigate('/', { state: { initialMode: 'host' } })
+
+    // Signed in: check captain profile completion in Firestore.
+    try {
+      const captain = await getCaptainProfile(viewer.uid)
+      if (captain?.completedAt) {
+        // Captain requirements met – go straight to host dashboard / listing management.
+        navigate('/', { state: { initialMode: 'host' } })
+      } else {
+        // Not completed yet – send to captain setup flow.
+        navigate('/setup/captain')
+      }
+    } catch {
+      // On error, be safe and route to captain setup.
+      navigate('/setup/captain')
+    }
   }
 
   const handleOpenProfile = async () => {
@@ -223,16 +270,6 @@ function BoatDetailPage() {
   const handleSignOut = async () => {
     await signOutUser()
     setMenuOpen(false)
-  }
-
-  const handleNavigateCaptainSetup = () => {
-    setMenuOpen(false)
-    navigate('/setup/captain')
-  }
-
-  const handleNavigateSailorSetup = () => {
-    setMenuOpen(false)
-    navigate('/setup/sailor')
   }
 
   const handleNavigateInstructorRequest = () => {
@@ -260,6 +297,7 @@ function BoatDetailPage() {
       <button className="ghostBtn" onClick={() => void handleBecomeHost()}>
         Browse as Captain
       </button>
+      <ApprovedRequestsDropdown />
       <UserButton
         viewer={viewer}
         authLoading={authLoading}
@@ -268,21 +306,6 @@ function BoatDetailPage() {
         onClick={() => void handleOpenProfile()}
       />
       <MenuDropdown menuOpen={menuOpen} setMenuOpen={setMenuOpen}>
-        <button
-          className="menuItem"
-          onClick={() => {
-            setMenuOpen(false)
-            void handleBecomeHost()
-          }}
-        >
-          Sign up as a captain
-        </button>
-        <button className="menuItem" onClick={handleNavigateCaptainSetup}>
-          Captain Setup
-        </button>
-        <button className="menuItem" onClick={handleNavigateSailorSetup}>
-          Sailor Setup
-        </button>
         <button className="menuItem" onClick={handleNavigateInstructorRequest}>
           🎓 Request Instructor
         </button>
@@ -348,6 +371,9 @@ function BoatDetailPage() {
         <h1>{boat.title}</h1>
         <p>
           {boat.location} · {formatTripDate(boat.date)} · {boat.seats} seats
+          {(boat.seatsTaken ?? 0) > 0 && (
+            <span> · {Math.max(0, boat.seats - (boat.seatsTaken ?? 0))} left</span>
+          )}
         </p>
       </section>
 

@@ -5,6 +5,7 @@ import { type BoatCard, type CruiseLengthFilter, type CruiseTypeFilter, type Boa
 import { chicagoLocations } from '../data/constants'
 import { formatTripDate } from '../utils/formatters'
 import { Header, UserButton, MenuDropdown } from './Header'
+import { ApprovedRequestsDropdown } from './ApprovedRequestsDropdown'
 import MarketplaceControls from './MarketplaceControls'
 interface GuestMarketplaceProps {
   viewer: User | null
@@ -33,8 +34,6 @@ interface GuestMarketplaceProps {
   onOpenProfile: () => void
   onSignOut: () => void
   onLoginWithGoogle: () => void
-  onNavigateCaptainSetup: () => void
-  onNavigateSailorSetup: () => void
   onNavigateInstructorRequest: () => void
   onNavigateMap: () => void
   onNavigateChat: () => void
@@ -67,8 +66,6 @@ export default function GuestMarketplace({
   onOpenProfile,
   onSignOut,
   onLoginWithGoogle,
-  onNavigateCaptainSetup,
-  onNavigateSailorSetup,
   onNavigateInstructorRequest,
   onNavigateMap,
   onNavigateChat,
@@ -87,9 +84,7 @@ export default function GuestMarketplace({
         <button className="ghostBtn" onClick={onBecomeHost}>
          Browse as Captain
         </button>
-        {/* <button className="ghostBtn" onClick={onNavigateMap}>
-          Map view
-        </button> */} 
+        <ApprovedRequestsDropdown />
         <UserButton
           viewer={viewer}
           authLoading={authLoading}
@@ -98,24 +93,6 @@ export default function GuestMarketplace({
           onClick={onOpenProfile}
         />
         <MenuDropdown menuOpen={menuOpen} setMenuOpen={setMenuOpen}>
-          <button
-            className="menuItem"
-            onClick={() => { setMenuOpen(false); onBecomeHost() }}
-          >
-            Sign up as a captain
-          </button>
-          <button
-            className="menuItem"
-            onClick={() => { setMenuOpen(false); onNavigateCaptainSetup() }}
-          >
-            Captain Setup
-          </button>
-          <button
-            className="menuItem"
-            onClick={() => { setMenuOpen(false); onNavigateSailorSetup() }}
-          >
-            Sailor Setup
-          </button>
           <button
             className="menuItem"
             onClick={() => { setMenuOpen(false); onNavigateInstructorRequest() }}
@@ -201,6 +178,9 @@ export default function GuestMarketplace({
                   <p>{boat.location}</p>
                   <p>
                     Captain {boat.captain} · {formatTripDate(boat.date)} · {boat.seats} seats
+                  {(boat.seatsTaken ?? 0) > 0 && (
+                    <span> · {Math.max(0, boat.seats - (boat.seatsTaken ?? 0))} left</span>
+                  )}
                   </p>
                 </div>
               </article>
