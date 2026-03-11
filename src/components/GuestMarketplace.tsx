@@ -149,7 +149,6 @@ export default function GuestMarketplace({
 
         <section className="listHeader">
           <h2>Explore Popular Boats</h2>
-          <p>{boatsLoading ? 'Loading trips...' : `${filteredBoats.length} trips available`}</p>
         </section>
         {boatsError && <p className="authNotice">{boatsError}</p>}
 
