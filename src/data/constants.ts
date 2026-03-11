@@ -1,5 +1,5 @@
 import { type BoatCoordinates } from '../features/boats/boatsApi'
-import { type BoatCategory, type ProfileDraft } from '../types'
+import { type ProfileDraft } from '../types'
 
 export const profileStorageKey = 'land-ho-profile-draft'
 export const maxBoatImages = 6
