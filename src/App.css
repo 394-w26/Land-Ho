@@ -652,7 +652,7 @@
 .weatherTodayTemp {
   font-size: 2.5rem;
   font-weight: 800;
-  color: var(--color-navy);
+  color: var(--color-text-secondary);
   line-height: 1.1;
   margin: 0;
 }
@@ -711,7 +711,7 @@
 .weatherForecastDayTemp {
   font-size: 1rem;
   font-weight: 700;
-  color: var(--color-navy);
+  color: var(--color-text-secondary);
 }
 
 .weatherForecastDayDesc {
@@ -741,6 +741,7 @@
   align-items: flex-end;
   gap: 6px;
   flex-shrink: 0;
+  color: white !important;
 }
 
 .weatherInlineToday {
@@ -758,7 +759,7 @@
 .weatherInlineTemp {
   font-size: 1.125rem;
   font-weight: 700;
-  color: var(--color-navy);
+  color: white !important;
 }
 
 .weatherInlineDesc {
@@ -768,6 +769,10 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.weatherInlineDate {
+  color: #5a6b82 !important;
 }
 
 .weatherInlineWeek {

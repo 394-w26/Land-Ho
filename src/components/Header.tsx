@@ -1,6 +1,7 @@
 import { useEffect, type ReactNode } from 'react'
 import { type User } from 'firebase/auth'
 import { Link } from 'react-router-dom'
+import { WeatherInline } from './Weather'
 
 interface HeaderProps {
   brandText: string
@@ -16,6 +17,7 @@ export function Header({ brandText, children }: HeaderProps) {
           <span>{brandText}</span>
         </Link>
         <div className="topActions">
+          <WeatherInline />
           {children}
         </div>
       </div>

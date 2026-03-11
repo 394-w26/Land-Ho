@@ -93,10 +93,3 @@ export const findCoordinatesForLocation = (locationText: string): BoatCoordinate
   return locationCoordinatesLookup[trimmed] ?? defaultCoordinates
 }
 
-export const categories: { key: BoatCategory; label: string; icon: string }[] = [
-  { key: 'all', label: 'All', icon: '⛵' },
-  { key: 'dayTrip', label: 'Day Trips', icon: '🌊' },
-  { key: 'sunset', label: 'Sunset Cruises', icon: '🌇' },
-  { key: 'training', label: 'Training', icon: '🧭' },
-  { key: 'cruise', label: 'Cruises', icon: '🚢' },
-]

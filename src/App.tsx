@@ -19,6 +19,7 @@ import SailorSetupPage from './pages/SailorSetupPage'
 import InstructorRequestPage from './pages/InstructorRequestPage'
 import ChatPage from './pages/ChatPage'
 
+
 function MarketplacePage() {
   const navigate = useNavigate()
   const location = useLocation()
@@ -316,7 +317,8 @@ function MarketplacePage() {
 
 function App() {
   return (
-    <Routes>
+    <>
+      <Routes>
       <Route path="/" element={<MarketplacePage />} />
       <Route path="/boats/:boatId" element={<BoatDetailPage />} />
       <Route path="/hosts/:uid" element={<HostResumePage />} />
@@ -326,6 +328,7 @@ function App() {
       <Route path="/chat" element={<ChatPage />} />
       <Route path="/chat/:conversationId" element={<ChatPage />} />
     </Routes>
+    </>
   )
 }
 
