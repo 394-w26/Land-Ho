@@ -30,7 +30,6 @@ export function useBoats({
 
   useEffect(() => {
     if (!db || !isFirebaseReady) {
-      // setBoats(initialBoatData)
       setBoatsLoading(false)
       return
     }
